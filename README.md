@@ -58,7 +58,7 @@ dataset/<repo_name>/
         "lines_added": 155,
         "lines_deleted": 0
       }
-      ……
+      ...
     ],
     "lines_added": 2020,
     "lines_deleted": 0
