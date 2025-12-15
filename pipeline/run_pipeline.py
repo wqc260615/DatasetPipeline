@@ -1,4 +1,18 @@
-"""End-to-end dataset construction pipeline."""
+"""End-to-end dataset construction pipeline.
+
+This pipeline implements Feature 1 (Evolution-Aware Repository Representation)
+and Feature 2 (Automated Q&A Generation Pipeline) from the thesis proposal.
+
+Steps:
+1. Index repository commits and tags
+2. Export source code snapshots for selected commits  
+3. Parse AST to extract functions, classes, imports, calls
+4. Build diffs between consecutive versions
+5. Aggregate metadata for each snapshot
+6. Track entity lifecycle across versions (for RQ1)
+7. Detect code evolution events (for RQ2)
+8. Generate Q&A pairs for evaluation (RQ1-RQ4)
+"""
 
 import argparse
 import importlib.util
@@ -32,6 +46,9 @@ EXPORT_MODULE = _load_module("02_export_snapshot.py", "pipeline_export")
 PARSE_MODULE = _load_module("03_parse_snapshot.py", "pipeline_parse")
 DIFF_MODULE = _load_module("04_diff_snapshot.py", "pipeline_diff")
 METADATA_MODULE = _load_module("05_build_metadata.py", "pipeline_metadata")
+ENTITY_MODULE = _load_module("06_track_entities.py", "pipeline_entity")
+CHANGES_MODULE = _load_module("07_detect_changes.py", "pipeline_changes")
+QA_MODULE = _load_module("08_generate_qa.py", "pipeline_qa")
 
 
 def setup_logging(log_path: Path) -> logging.Logger:
@@ -162,12 +179,79 @@ def run_pipeline(
             logger.exception("Failed to process %s: %s", commit_hash, exc)
             failures.append({"commit": commit_hash, "error": str(exc)})
 
+    # Phase 2: Build cross-version analysis
+    logger.info("Building entity timeline across versions...")
+    entity_timeline_path = repo_output_dir / "entity_timeline.json"
+    try:
+        entity_result = ENTITY_MODULE.build_entity_timeline(
+            str(snapshot_root),
+            str(index_path),
+            str(entity_timeline_path),
+        )
+        logger.info(
+            "Tracked %d entities across %d commits",
+            entity_result["summary"]["total_entities_tracked"],
+            entity_result["summary"]["commits_processed"],
+        )
+    except Exception as exc:
+        logger.exception("Failed to build entity timeline: %s", exc)
+        entity_result = None
+
+    logger.info("Detecting code evolution events...")
+    change_history_path = repo_output_dir / "change_history.json"
+    try:
+        change_result = CHANGES_MODULE.build_change_history(
+            str(snapshot_root),
+            str(index_path),
+            str(change_history_path),
+        )
+        logger.info(
+            "Detected changes across %d version pairs",
+            change_result["summary"]["total_version_pairs"],
+        )
+    except Exception as exc:
+        logger.exception("Failed to build change history: %s", exc)
+        change_result = None
+
+    # Phase 3: Generate Q&A dataset
+    qa_dataset_path = repo_output_dir / "qa_dataset.json"
+    qa_result = None
+    if entity_result and change_result:
+        logger.info("Generating Q&A dataset...")
+        try:
+            qa_result = QA_MODULE.generate_qa_dataset(
+                str(entity_timeline_path),
+                str(change_history_path),
+                str(index_path),
+                str(snapshot_root),
+                str(qa_dataset_path),
+            )
+            logger.info(
+                "Generated %d questions: %s",
+                qa_result["summary"]["total_questions"],
+                qa_result["summary"]["questions_by_rq"],
+            )
+        except Exception as exc:
+            logger.exception("Failed to generate Q&A dataset: %s", exc)
+
     summary = {
         "repo": repo_url,
         "output_dir": str(repo_output_dir),
         "total_commits": len(commits),
         "processed": len(sliced) - len(failures),
         "failed": failures,
+        "entity_tracking": {
+            "entities_tracked": entity_result["summary"]["total_entities_tracked"] if entity_result else 0,
+            "events_detected": entity_result["summary"]["total_events"] if entity_result else 0,
+        } if entity_result else None,
+        "change_detection": {
+            "version_pairs": change_result["summary"]["total_version_pairs"] if change_result else 0,
+            "change_counts": change_result["summary"]["global_change_counts"] if change_result else {},
+        } if change_result else None,
+        "qa_generation": {
+            "total_questions": qa_result["summary"]["total_questions"] if qa_result else 0,
+            "by_rq": qa_result["summary"]["questions_by_rq"] if qa_result else {},
+        } if qa_result else None,
     }
     summary_path = repo_output_dir / "summary.json"
     with open(summary_path, "w", encoding="utf-8") as f:

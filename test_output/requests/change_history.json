@@ -1,0 +1,444 @@
+{
+  "summary": {
+    "total_version_pairs": 1,
+    "global_change_counts": {
+      "added": 45,
+      "removed": 1
+    },
+    "total_entity_mappings": 0
+  },
+  "change_history": [
+    {
+      "old_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "new_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "old_timestamp": "2011-02-14T07:15:30+00:00",
+      "new_timestamp": "2011-02-14T15:46:40+00:00",
+      "summary": {
+        "total_changes": 46,
+        "change_counts": {
+          "added": 45,
+          "removed": 1
+        },
+        "entities_mapped": 0
+      },
+      "changes": [
+        {
+          "change_type": "added",
+          "entity_type": "class",
+          "entity_key": "class::requests/core.py::URLRequired",
+          "name": "URLRequired",
+          "file": "requests/core.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/packages/poster/encode.py::__init__",
+          "name": "__init__",
+          "file": "requests/packages/poster/encode.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/packages/poster/encode.py::from_file",
+          "name": "from_file",
+          "file": "requests/packages/poster/encode.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/packages/poster/encode.py::_strify",
+          "name": "_strify",
+          "file": "requests/packages/poster/encode.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/core.py::__init__",
+          "name": "__init__",
+          "file": "requests/core.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/core.py::_get_opener",
+          "name": "_get_opener",
+          "file": "requests/core.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/packages/poster/encode.py::encode",
+          "name": "encode",
+          "file": "requests/packages/poster/encode.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/core.py::_get_autoauth",
+          "name": "_get_autoauth",
+          "file": "requests/core.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "class",
+          "entity_key": "class::requests/core.py::_Request",
+          "name": "_Request",
+          "file": "requests/core.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/packages/poster/encode.py::encode_string",
+          "name": "encode_string",
+          "file": "requests/packages/poster/encode.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/packages/poster/encode.py::get_headers",
+          "name": "get_headers",
+          "file": "requests/packages/poster/encode.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/packages/poster/encode.py::reset",
+          "name": "reset",
+          "file": "requests/packages/poster/encode.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "class",
+          "entity_key": "class::requests/packages/poster/encode.py::MultipartParam",
+          "name": "MultipartParam",
+          "file": "requests/packages/poster/encode.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/packages/poster/encode.py::iter_encode",
+          "name": "iter_encode",
+          "file": "requests/packages/poster/encode.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "class",
+          "entity_key": "class::requests/packages/poster/encode.py::multipart_yielder",
+          "name": "multipart_yielder",
+          "file": "requests/packages/poster/encode.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/packages/poster/encode.py::encode_hdr",
+          "name": "encode_hdr",
+          "file": "requests/packages/poster/encode.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/packages/poster/encode.py::gen_boundary",
+          "name": "gen_boundary",
+          "file": "requests/packages/poster/encode.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/packages/poster/encode.py::get_size",
+          "name": "get_size",
+          "file": "requests/packages/poster/encode.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "class",
+          "entity_key": "class::requests/core.py::AuthObject",
+          "name": "AuthObject",
+          "file": "requests/core.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/core.py::__setattr__",
+          "name": "__setattr__",
+          "file": "requests/core.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/packages/poster/encode.py::get_body_size",
+          "name": "get_body_size",
+          "file": "requests/packages/poster/encode.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/core.py::head",
+          "name": "head",
+          "file": "requests/core.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/core.py::__repr__",
+          "name": "__repr__",
+          "file": "requests/core.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/packages/poster/encode.py::__iter__",
+          "name": "__iter__",
+          "file": "requests/packages/poster/encode.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/packages/poster/encode.py::multipart_encode",
+          "name": "multipart_encode",
+          "file": "requests/packages/poster/encode.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "class",
+          "entity_key": "class::requests/core.py::AuthenticationError",
+          "name": "AuthenticationError",
+          "file": "requests/core.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/packages/poster/encode.py::encode_and_quote",
+          "name": "encode_and_quote",
+          "file": "requests/packages/poster/encode.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/core.py::put",
+          "name": "put",
+          "file": "requests/core.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/core.py::add_autoauth",
+          "name": "add_autoauth",
+          "file": "requests/core.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/core.py::send",
+          "name": "send",
+          "file": "requests/core.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/core.py::_detect_auth",
+          "name": "_detect_auth",
+          "file": "requests/core.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/core.py::_checks",
+          "name": "_checks",
+          "file": "requests/core.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "class",
+          "entity_key": "class::requests/core.py::Request",
+          "name": "Request",
+          "file": "requests/core.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/core.py::delete",
+          "name": "delete",
+          "file": "requests/core.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/core.py::get",
+          "name": "get",
+          "file": "requests/core.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/core.py::post",
+          "name": "post",
+          "file": "requests/core.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/packages/poster/encode.py::encode_file_header",
+          "name": "encode_file_header",
+          "file": "requests/packages/poster/encode.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/packages/poster/encode.py::__cmp__",
+          "name": "__cmp__",
+          "file": "requests/packages/poster/encode.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/core.py::get_method",
+          "name": "get_method",
+          "file": "requests/core.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "class",
+          "entity_key": "class::requests/core.py::Response",
+          "name": "Response",
+          "file": "requests/core.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/packages/poster/encode.py::from_params",
+          "name": "from_params",
+          "file": "requests/packages/poster/encode.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::requests/packages/poster/encode.py::next",
+          "name": "next",
+          "file": "requests/packages/poster/encode.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "class",
+          "entity_key": "class::requests/core.py::InvalidMethod",
+          "name": "InvalidMethod",
+          "file": "requests/core.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "function",
+          "entity_key": "function::test_requests.py::test_POSTBIN_GET_POST_FILES",
+          "name": "test_POSTBIN_GET_POST_FILES",
+          "file": "test_requests.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "added",
+          "entity_type": "class",
+          "entity_key": "class::requests/core.py::RequestException",
+          "name": "RequestException",
+          "file": "requests/core.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        },
+        {
+          "change_type": "removed",
+          "entity_type": "function",
+          "entity_key": "function::setup.py::publish",
+          "name": "publish",
+          "file": "setup.py",
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00"
+        }
+      ],
+      "entity_mappings": {}
+    }
+  ],
+  "entity_mappings": {}
+}

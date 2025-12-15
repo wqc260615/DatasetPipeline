@@ -1,0 +1,2259 @@
+{
+  "summary": {
+    "total_entities_tracked": 55,
+    "total_events": 65,
+    "functions_tracked": 44,
+    "classes_tracked": 11,
+    "commits_processed": 2
+  },
+  "entity_index": {
+    "function::test_requests.py::setUp": {
+      "entity_key": "function::test_requests.py::setUp",
+      "type": "function",
+      "name": "setUp",
+      "introduced_in": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "introduced_at": "2011-02-14T07:15:30+00:00",
+      "introduced_tags": [
+        "v0.2.0"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "test_requests.py"
+      ],
+      "modifications": [
+        {
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00",
+          "changes": {
+            "signature_changed": false,
+            "args_changed": false,
+            "returns_changed": false,
+            "docstring_changed": false,
+            "lineno_changed": true,
+            "modified": true
+          }
+        }
+      ],
+      "exists_in_versions": [
+        "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::test_requests.py::test_HTTPS_200_OK_HEAD": {
+      "entity_key": "function::test_requests.py::test_HTTPS_200_OK_HEAD",
+      "type": "function",
+      "name": "test_HTTPS_200_OK_HEAD",
+      "introduced_in": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "introduced_at": "2011-02-14T07:15:30+00:00",
+      "introduced_tags": [
+        "v0.2.0"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "test_requests.py"
+      ],
+      "modifications": [
+        {
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00",
+          "changes": {
+            "signature_changed": false,
+            "args_changed": false,
+            "returns_changed": false,
+            "docstring_changed": false,
+            "lineno_changed": true,
+            "modified": true
+          }
+        }
+      ],
+      "exists_in_versions": [
+        "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "class::test_requests.py::RequestsTestSuite": {
+      "entity_key": "class::test_requests.py::RequestsTestSuite",
+      "type": "class",
+      "name": "RequestsTestSuite",
+      "introduced_in": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "introduced_at": "2011-02-14T07:15:30+00:00",
+      "introduced_tags": [
+        "v0.2.0"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "test_requests.py"
+      ],
+      "modifications": [
+        {
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00",
+          "changes": {
+            "signature_changed": false,
+            "args_changed": false,
+            "returns_changed": false,
+            "docstring_changed": false,
+            "lineno_changed": true,
+            "modified": true
+          }
+        }
+      ],
+      "exists_in_versions": [
+        "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::setup.py::publish": {
+      "entity_key": "function::setup.py::publish",
+      "type": "function",
+      "name": "publish",
+      "introduced_in": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "introduced_at": "2011-02-14T07:15:30+00:00",
+      "introduced_tags": [
+        "v0.2.0"
+      ],
+      "removed_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "removed_at": "2011-02-14T15:46:40+00:00",
+      "last_seen_in": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "last_seen_at": "2011-02-14T07:15:30+00:00",
+      "files": [
+        "setup.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "d2427ecae751a533ddd9026849dd19cfaa3394f4"
+      ]
+    },
+    "function::test_requests.py::test_HTTPS_200_OK_GET": {
+      "entity_key": "function::test_requests.py::test_HTTPS_200_OK_GET",
+      "type": "function",
+      "name": "test_HTTPS_200_OK_GET",
+      "introduced_in": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "introduced_at": "2011-02-14T07:15:30+00:00",
+      "introduced_tags": [
+        "v0.2.0"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "test_requests.py"
+      ],
+      "modifications": [
+        {
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00",
+          "changes": {
+            "signature_changed": false,
+            "args_changed": false,
+            "returns_changed": false,
+            "docstring_changed": false,
+            "lineno_changed": true,
+            "modified": true
+          }
+        }
+      ],
+      "exists_in_versions": [
+        "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::test_requests.py::test_AUTH_HTTPS_200_OK_GET": {
+      "entity_key": "function::test_requests.py::test_AUTH_HTTPS_200_OK_GET",
+      "type": "function",
+      "name": "test_AUTH_HTTPS_200_OK_GET",
+      "introduced_in": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "introduced_at": "2011-02-14T07:15:30+00:00",
+      "introduced_tags": [
+        "v0.2.0"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "test_requests.py"
+      ],
+      "modifications": [
+        {
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00",
+          "changes": {
+            "signature_changed": false,
+            "args_changed": false,
+            "returns_changed": false,
+            "docstring_changed": false,
+            "lineno_changed": true,
+            "modified": true
+          }
+        }
+      ],
+      "exists_in_versions": [
+        "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::test_requests.py::test_HTTP_200_OK_HEAD": {
+      "entity_key": "function::test_requests.py::test_HTTP_200_OK_HEAD",
+      "type": "function",
+      "name": "test_HTTP_200_OK_HEAD",
+      "introduced_in": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "introduced_at": "2011-02-14T07:15:30+00:00",
+      "introduced_tags": [
+        "v0.2.0"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "test_requests.py"
+      ],
+      "modifications": [
+        {
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00",
+          "changes": {
+            "signature_changed": false,
+            "args_changed": false,
+            "returns_changed": false,
+            "docstring_changed": false,
+            "lineno_changed": true,
+            "modified": true
+          }
+        }
+      ],
+      "exists_in_versions": [
+        "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::test_requests.py::test_HTTP_200_OK_GET": {
+      "entity_key": "function::test_requests.py::test_HTTP_200_OK_GET",
+      "type": "function",
+      "name": "test_HTTP_200_OK_GET",
+      "introduced_in": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "introduced_at": "2011-02-14T07:15:30+00:00",
+      "introduced_tags": [
+        "v0.2.0"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "test_requests.py"
+      ],
+      "modifications": [
+        {
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00",
+          "changes": {
+            "signature_changed": false,
+            "args_changed": false,
+            "returns_changed": false,
+            "docstring_changed": false,
+            "lineno_changed": true,
+            "modified": true
+          }
+        }
+      ],
+      "exists_in_versions": [
+        "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::test_requests.py::test_invalid_url": {
+      "entity_key": "function::test_requests.py::test_invalid_url",
+      "type": "function",
+      "name": "test_invalid_url",
+      "introduced_in": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "introduced_at": "2011-02-14T07:15:30+00:00",
+      "introduced_tags": [
+        "v0.2.0"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "test_requests.py"
+      ],
+      "modifications": [
+        {
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00",
+          "changes": {
+            "signature_changed": false,
+            "args_changed": false,
+            "returns_changed": false,
+            "docstring_changed": false,
+            "lineno_changed": true,
+            "modified": true
+          }
+        }
+      ],
+      "exists_in_versions": [
+        "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::test_requests.py::tearDown": {
+      "entity_key": "function::test_requests.py::tearDown",
+      "type": "function",
+      "name": "tearDown",
+      "introduced_in": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "introduced_at": "2011-02-14T07:15:30+00:00",
+      "introduced_tags": [
+        "v0.2.0"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "test_requests.py"
+      ],
+      "modifications": [
+        {
+          "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+          "timestamp": "2011-02-14T15:46:40+00:00",
+          "changes": {
+            "signature_changed": false,
+            "args_changed": false,
+            "returns_changed": false,
+            "docstring_changed": false,
+            "lineno_changed": true,
+            "modified": true
+          }
+        }
+      ],
+      "exists_in_versions": [
+        "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "class::requests/core.py::URLRequired": {
+      "entity_key": "class::requests/core.py::URLRequired",
+      "type": "class",
+      "name": "URLRequired",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/core.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/packages/poster/encode.py::__init__": {
+      "entity_key": "function::requests/packages/poster/encode.py::__init__",
+      "type": "function",
+      "name": "__init__",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/packages/poster/encode.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/packages/poster/encode.py::from_file": {
+      "entity_key": "function::requests/packages/poster/encode.py::from_file",
+      "type": "function",
+      "name": "from_file",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/packages/poster/encode.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/packages/poster/encode.py::_strify": {
+      "entity_key": "function::requests/packages/poster/encode.py::_strify",
+      "type": "function",
+      "name": "_strify",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/packages/poster/encode.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/core.py::__init__": {
+      "entity_key": "function::requests/core.py::__init__",
+      "type": "function",
+      "name": "__init__",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/core.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/core.py::_get_opener": {
+      "entity_key": "function::requests/core.py::_get_opener",
+      "type": "function",
+      "name": "_get_opener",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/core.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/packages/poster/encode.py::encode": {
+      "entity_key": "function::requests/packages/poster/encode.py::encode",
+      "type": "function",
+      "name": "encode",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/packages/poster/encode.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/core.py::_get_autoauth": {
+      "entity_key": "function::requests/core.py::_get_autoauth",
+      "type": "function",
+      "name": "_get_autoauth",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/core.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "class::requests/core.py::_Request": {
+      "entity_key": "class::requests/core.py::_Request",
+      "type": "class",
+      "name": "_Request",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/core.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/packages/poster/encode.py::encode_string": {
+      "entity_key": "function::requests/packages/poster/encode.py::encode_string",
+      "type": "function",
+      "name": "encode_string",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/packages/poster/encode.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/packages/poster/encode.py::get_headers": {
+      "entity_key": "function::requests/packages/poster/encode.py::get_headers",
+      "type": "function",
+      "name": "get_headers",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/packages/poster/encode.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/packages/poster/encode.py::reset": {
+      "entity_key": "function::requests/packages/poster/encode.py::reset",
+      "type": "function",
+      "name": "reset",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/packages/poster/encode.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "class::requests/packages/poster/encode.py::MultipartParam": {
+      "entity_key": "class::requests/packages/poster/encode.py::MultipartParam",
+      "type": "class",
+      "name": "MultipartParam",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/packages/poster/encode.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/packages/poster/encode.py::iter_encode": {
+      "entity_key": "function::requests/packages/poster/encode.py::iter_encode",
+      "type": "function",
+      "name": "iter_encode",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/packages/poster/encode.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "class::requests/packages/poster/encode.py::multipart_yielder": {
+      "entity_key": "class::requests/packages/poster/encode.py::multipart_yielder",
+      "type": "class",
+      "name": "multipart_yielder",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/packages/poster/encode.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/packages/poster/encode.py::encode_hdr": {
+      "entity_key": "function::requests/packages/poster/encode.py::encode_hdr",
+      "type": "function",
+      "name": "encode_hdr",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/packages/poster/encode.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/packages/poster/encode.py::gen_boundary": {
+      "entity_key": "function::requests/packages/poster/encode.py::gen_boundary",
+      "type": "function",
+      "name": "gen_boundary",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/packages/poster/encode.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/packages/poster/encode.py::get_size": {
+      "entity_key": "function::requests/packages/poster/encode.py::get_size",
+      "type": "function",
+      "name": "get_size",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/packages/poster/encode.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "class::requests/core.py::AuthObject": {
+      "entity_key": "class::requests/core.py::AuthObject",
+      "type": "class",
+      "name": "AuthObject",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/core.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/core.py::__setattr__": {
+      "entity_key": "function::requests/core.py::__setattr__",
+      "type": "function",
+      "name": "__setattr__",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/core.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/packages/poster/encode.py::get_body_size": {
+      "entity_key": "function::requests/packages/poster/encode.py::get_body_size",
+      "type": "function",
+      "name": "get_body_size",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/packages/poster/encode.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/core.py::head": {
+      "entity_key": "function::requests/core.py::head",
+      "type": "function",
+      "name": "head",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/core.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/core.py::__repr__": {
+      "entity_key": "function::requests/core.py::__repr__",
+      "type": "function",
+      "name": "__repr__",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/core.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/packages/poster/encode.py::multipart_encode": {
+      "entity_key": "function::requests/packages/poster/encode.py::multipart_encode",
+      "type": "function",
+      "name": "multipart_encode",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/packages/poster/encode.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/packages/poster/encode.py::__iter__": {
+      "entity_key": "function::requests/packages/poster/encode.py::__iter__",
+      "type": "function",
+      "name": "__iter__",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/packages/poster/encode.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "class::requests/core.py::AuthenticationError": {
+      "entity_key": "class::requests/core.py::AuthenticationError",
+      "type": "class",
+      "name": "AuthenticationError",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/core.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/packages/poster/encode.py::encode_and_quote": {
+      "entity_key": "function::requests/packages/poster/encode.py::encode_and_quote",
+      "type": "function",
+      "name": "encode_and_quote",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/packages/poster/encode.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/core.py::put": {
+      "entity_key": "function::requests/core.py::put",
+      "type": "function",
+      "name": "put",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/core.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/core.py::add_autoauth": {
+      "entity_key": "function::requests/core.py::add_autoauth",
+      "type": "function",
+      "name": "add_autoauth",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/core.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/core.py::_detect_auth": {
+      "entity_key": "function::requests/core.py::_detect_auth",
+      "type": "function",
+      "name": "_detect_auth",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/core.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/core.py::send": {
+      "entity_key": "function::requests/core.py::send",
+      "type": "function",
+      "name": "send",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/core.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/core.py::_checks": {
+      "entity_key": "function::requests/core.py::_checks",
+      "type": "function",
+      "name": "_checks",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/core.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "class::requests/core.py::Request": {
+      "entity_key": "class::requests/core.py::Request",
+      "type": "class",
+      "name": "Request",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/core.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/core.py::delete": {
+      "entity_key": "function::requests/core.py::delete",
+      "type": "function",
+      "name": "delete",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/core.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/core.py::get": {
+      "entity_key": "function::requests/core.py::get",
+      "type": "function",
+      "name": "get",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/core.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/core.py::post": {
+      "entity_key": "function::requests/core.py::post",
+      "type": "function",
+      "name": "post",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/core.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/packages/poster/encode.py::encode_file_header": {
+      "entity_key": "function::requests/packages/poster/encode.py::encode_file_header",
+      "type": "function",
+      "name": "encode_file_header",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/packages/poster/encode.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/packages/poster/encode.py::__cmp__": {
+      "entity_key": "function::requests/packages/poster/encode.py::__cmp__",
+      "type": "function",
+      "name": "__cmp__",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/packages/poster/encode.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/core.py::get_method": {
+      "entity_key": "function::requests/core.py::get_method",
+      "type": "function",
+      "name": "get_method",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/core.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "class::requests/core.py::Response": {
+      "entity_key": "class::requests/core.py::Response",
+      "type": "class",
+      "name": "Response",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/core.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/packages/poster/encode.py::from_params": {
+      "entity_key": "function::requests/packages/poster/encode.py::from_params",
+      "type": "function",
+      "name": "from_params",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/packages/poster/encode.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::requests/packages/poster/encode.py::next": {
+      "entity_key": "function::requests/packages/poster/encode.py::next",
+      "type": "function",
+      "name": "next",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/packages/poster/encode.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "class::requests/core.py::InvalidMethod": {
+      "entity_key": "class::requests/core.py::InvalidMethod",
+      "type": "class",
+      "name": "InvalidMethod",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/core.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "function::test_requests.py::test_POSTBIN_GET_POST_FILES": {
+      "entity_key": "function::test_requests.py::test_POSTBIN_GET_POST_FILES",
+      "type": "function",
+      "name": "test_POSTBIN_GET_POST_FILES",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "test_requests.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    },
+    "class::requests/core.py::RequestException": {
+      "entity_key": "class::requests/core.py::RequestException",
+      "type": "class",
+      "name": "RequestException",
+      "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "introduced_at": "2011-02-14T15:46:40+00:00",
+      "introduced_tags": [
+        "v0.2.1"
+      ],
+      "removed_in": null,
+      "removed_at": null,
+      "last_seen_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "last_seen_at": "2011-02-14T15:46:40+00:00",
+      "files": [
+        "requests/core.py"
+      ],
+      "modifications": [],
+      "exists_in_versions": [
+        "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      ]
+    }
+  },
+  "version_entities": {
+    "d2427ecae751a533ddd9026849dd19cfaa3394f4": [
+      "function::test_requests.py::setUp",
+      "function::test_requests.py::test_HTTPS_200_OK_HEAD",
+      "class::test_requests.py::RequestsTestSuite",
+      "function::setup.py::publish",
+      "function::test_requests.py::test_HTTPS_200_OK_GET",
+      "function::test_requests.py::test_AUTH_HTTPS_200_OK_GET",
+      "function::test_requests.py::test_HTTP_200_OK_HEAD",
+      "function::test_requests.py::test_HTTP_200_OK_GET",
+      "function::test_requests.py::test_invalid_url",
+      "function::test_requests.py::tearDown"
+    ],
+    "e09efc490ef6dec36298af3fcc04eabb81cdec54": [
+      "class::requests/core.py::URLRequired",
+      "function::requests/packages/poster/encode.py::__init__",
+      "function::requests/packages/poster/encode.py::from_file",
+      "function::requests/packages/poster/encode.py::_strify",
+      "function::requests/core.py::__init__",
+      "function::requests/core.py::_get_opener",
+      "function::requests/packages/poster/encode.py::encode",
+      "function::requests/core.py::_get_autoauth",
+      "class::requests/core.py::_Request",
+      "function::requests/packages/poster/encode.py::encode_string",
+      "function::requests/packages/poster/encode.py::get_headers",
+      "function::requests/packages/poster/encode.py::reset",
+      "function::test_requests.py::test_invalid_url",
+      "function::test_requests.py::test_HTTP_200_OK_GET",
+      "class::requests/packages/poster/encode.py::MultipartParam",
+      "function::requests/packages/poster/encode.py::iter_encode",
+      "class::requests/packages/poster/encode.py::multipart_yielder",
+      "function::requests/packages/poster/encode.py::encode_hdr",
+      "function::requests/packages/poster/encode.py::gen_boundary",
+      "function::requests/packages/poster/encode.py::get_size",
+      "function::test_requests.py::test_HTTP_200_OK_HEAD",
+      "class::requests/core.py::AuthObject",
+      "function::requests/core.py::__setattr__",
+      "function::requests/packages/poster/encode.py::get_body_size",
+      "function::requests/core.py::head",
+      "function::requests/core.py::__repr__",
+      "function::test_requests.py::tearDown",
+      "function::requests/packages/poster/encode.py::multipart_encode",
+      "function::requests/packages/poster/encode.py::__iter__",
+      "class::requests/core.py::AuthenticationError",
+      "function::requests/packages/poster/encode.py::encode_and_quote",
+      "function::requests/core.py::put",
+      "function::requests/core.py::add_autoauth",
+      "function::test_requests.py::test_AUTH_HTTPS_200_OK_GET",
+      "function::requests/core.py::_detect_auth",
+      "function::requests/core.py::send",
+      "function::requests/core.py::_checks",
+      "class::requests/core.py::Request",
+      "function::requests/core.py::delete",
+      "function::requests/core.py::get",
+      "function::requests/core.py::post",
+      "function::test_requests.py::setUp",
+      "function::requests/packages/poster/encode.py::encode_file_header",
+      "function::test_requests.py::test_HTTPS_200_OK_HEAD",
+      "function::requests/packages/poster/encode.py::__cmp__",
+      "class::test_requests.py::RequestsTestSuite",
+      "function::test_requests.py::test_HTTPS_200_OK_GET",
+      "function::requests/core.py::get_method",
+      "class::requests/core.py::Response",
+      "function::requests/packages/poster/encode.py::from_params",
+      "function::requests/packages/poster/encode.py::next",
+      "class::requests/core.py::InvalidMethod",
+      "function::test_requests.py::test_POSTBIN_GET_POST_FILES",
+      "class::requests/core.py::RequestException"
+    ]
+  },
+  "entity_events": [
+    {
+      "event": "introduced",
+      "entity_key": "function::test_requests.py::setUp",
+      "entity_type": "function",
+      "entity_name": "setUp",
+      "file": "test_requests.py",
+      "commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "timestamp": "2011-02-14T07:15:30+00:00",
+      "tags": [
+        "v0.2.0"
+      ],
+      "signature": "setUp(self)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::test_requests.py::test_HTTPS_200_OK_HEAD",
+      "entity_type": "function",
+      "entity_name": "test_HTTPS_200_OK_HEAD",
+      "file": "test_requests.py",
+      "commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "timestamp": "2011-02-14T07:15:30+00:00",
+      "tags": [
+        "v0.2.0"
+      ],
+      "signature": "test_HTTPS_200_OK_HEAD(self)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "class::test_requests.py::RequestsTestSuite",
+      "entity_type": "class",
+      "entity_name": "RequestsTestSuite",
+      "file": "test_requests.py",
+      "commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "timestamp": "2011-02-14T07:15:30+00:00",
+      "tags": [
+        "v0.2.0"
+      ],
+      "signature": null
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::setup.py::publish",
+      "entity_type": "function",
+      "entity_name": "publish",
+      "file": "setup.py",
+      "commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "timestamp": "2011-02-14T07:15:30+00:00",
+      "tags": [
+        "v0.2.0"
+      ],
+      "signature": "publish()"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::test_requests.py::test_HTTPS_200_OK_GET",
+      "entity_type": "function",
+      "entity_name": "test_HTTPS_200_OK_GET",
+      "file": "test_requests.py",
+      "commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "timestamp": "2011-02-14T07:15:30+00:00",
+      "tags": [
+        "v0.2.0"
+      ],
+      "signature": "test_HTTPS_200_OK_GET(self)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::test_requests.py::test_AUTH_HTTPS_200_OK_GET",
+      "entity_type": "function",
+      "entity_name": "test_AUTH_HTTPS_200_OK_GET",
+      "file": "test_requests.py",
+      "commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "timestamp": "2011-02-14T07:15:30+00:00",
+      "tags": [
+        "v0.2.0"
+      ],
+      "signature": "test_AUTH_HTTPS_200_OK_GET(self)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::test_requests.py::test_HTTP_200_OK_HEAD",
+      "entity_type": "function",
+      "entity_name": "test_HTTP_200_OK_HEAD",
+      "file": "test_requests.py",
+      "commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "timestamp": "2011-02-14T07:15:30+00:00",
+      "tags": [
+        "v0.2.0"
+      ],
+      "signature": "test_HTTP_200_OK_HEAD(self)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::test_requests.py::test_HTTP_200_OK_GET",
+      "entity_type": "function",
+      "entity_name": "test_HTTP_200_OK_GET",
+      "file": "test_requests.py",
+      "commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "timestamp": "2011-02-14T07:15:30+00:00",
+      "tags": [
+        "v0.2.0"
+      ],
+      "signature": "test_HTTP_200_OK_GET(self)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::test_requests.py::test_invalid_url",
+      "entity_type": "function",
+      "entity_name": "test_invalid_url",
+      "file": "test_requests.py",
+      "commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "timestamp": "2011-02-14T07:15:30+00:00",
+      "tags": [
+        "v0.2.0"
+      ],
+      "signature": "test_invalid_url(self)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::test_requests.py::tearDown",
+      "entity_type": "function",
+      "entity_name": "tearDown",
+      "file": "test_requests.py",
+      "commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "timestamp": "2011-02-14T07:15:30+00:00",
+      "tags": [
+        "v0.2.0"
+      ],
+      "signature": "tearDown(self)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "class::requests/core.py::URLRequired",
+      "entity_type": "class",
+      "entity_name": "URLRequired",
+      "file": "requests/core.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": null
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/packages/poster/encode.py::__init__",
+      "entity_type": "function",
+      "entity_name": "__init__",
+      "file": "requests/packages/poster/encode.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "__init__(self, params, boundary, cb)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/packages/poster/encode.py::from_file",
+      "entity_type": "function",
+      "entity_name": "from_file",
+      "file": "requests/packages/poster/encode.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "from_file(cls, paramname, filename)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/packages/poster/encode.py::_strify",
+      "entity_type": "function",
+      "entity_name": "_strify",
+      "file": "requests/packages/poster/encode.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "_strify(s)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/core.py::__init__",
+      "entity_type": "function",
+      "entity_name": "__init__",
+      "file": "requests/core.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "__init__(self, username, password)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/core.py::_get_opener",
+      "entity_type": "function",
+      "entity_name": "_get_opener",
+      "file": "requests/core.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "_get_opener(self)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/packages/poster/encode.py::encode",
+      "entity_type": "function",
+      "entity_name": "encode",
+      "file": "requests/packages/poster/encode.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "encode(self, boundary)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/core.py::_get_autoauth",
+      "entity_type": "function",
+      "entity_name": "_get_autoauth",
+      "file": "requests/core.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "_get_autoauth(url)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "class::requests/core.py::_Request",
+      "entity_type": "class",
+      "entity_name": "_Request",
+      "file": "requests/core.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": null
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/packages/poster/encode.py::encode_string",
+      "entity_type": "function",
+      "entity_name": "encode_string",
+      "file": "requests/packages/poster/encode.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "encode_string(boundary, name, value)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/packages/poster/encode.py::get_headers",
+      "entity_type": "function",
+      "entity_name": "get_headers",
+      "file": "requests/packages/poster/encode.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "get_headers(params, boundary)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/packages/poster/encode.py::reset",
+      "entity_type": "function",
+      "entity_name": "reset",
+      "file": "requests/packages/poster/encode.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "reset(self)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "class::requests/packages/poster/encode.py::MultipartParam",
+      "entity_type": "class",
+      "entity_name": "MultipartParam",
+      "file": "requests/packages/poster/encode.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": null
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/packages/poster/encode.py::iter_encode",
+      "entity_type": "function",
+      "entity_name": "iter_encode",
+      "file": "requests/packages/poster/encode.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "iter_encode(self, boundary, blocksize)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "class::requests/packages/poster/encode.py::multipart_yielder",
+      "entity_type": "class",
+      "entity_name": "multipart_yielder",
+      "file": "requests/packages/poster/encode.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": null
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/packages/poster/encode.py::encode_hdr",
+      "entity_type": "function",
+      "entity_name": "encode_hdr",
+      "file": "requests/packages/poster/encode.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "encode_hdr(self, boundary)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/packages/poster/encode.py::gen_boundary",
+      "entity_type": "function",
+      "entity_name": "gen_boundary",
+      "file": "requests/packages/poster/encode.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "gen_boundary()"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/packages/poster/encode.py::get_size",
+      "entity_type": "function",
+      "entity_name": "get_size",
+      "file": "requests/packages/poster/encode.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "get_size(self, boundary)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "class::requests/core.py::AuthObject",
+      "entity_type": "class",
+      "entity_name": "AuthObject",
+      "file": "requests/core.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": null
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/core.py::__setattr__",
+      "entity_type": "function",
+      "entity_name": "__setattr__",
+      "file": "requests/core.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "__setattr__(self, name, value)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/packages/poster/encode.py::get_body_size",
+      "entity_type": "function",
+      "entity_name": "get_body_size",
+      "file": "requests/packages/poster/encode.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "get_body_size(params, boundary)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/core.py::head",
+      "entity_type": "function",
+      "entity_name": "head",
+      "file": "requests/core.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "head(url, params, headers, auth)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/core.py::__repr__",
+      "entity_type": "function",
+      "entity_name": "__repr__",
+      "file": "requests/core.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "__repr__(self)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/packages/poster/encode.py::multipart_encode",
+      "entity_type": "function",
+      "entity_name": "multipart_encode",
+      "file": "requests/packages/poster/encode.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "multipart_encode(params, boundary, cb)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/packages/poster/encode.py::__iter__",
+      "entity_type": "function",
+      "entity_name": "__iter__",
+      "file": "requests/packages/poster/encode.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "__iter__(self)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "class::requests/core.py::AuthenticationError",
+      "entity_type": "class",
+      "entity_name": "AuthenticationError",
+      "file": "requests/core.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": null
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/packages/poster/encode.py::encode_and_quote",
+      "entity_type": "function",
+      "entity_name": "encode_and_quote",
+      "file": "requests/packages/poster/encode.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "encode_and_quote(data)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/core.py::put",
+      "entity_type": "function",
+      "entity_name": "put",
+      "file": "requests/core.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "put(url, data, headers, files, auth)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/core.py::add_autoauth",
+      "entity_type": "function",
+      "entity_name": "add_autoauth",
+      "file": "requests/core.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "add_autoauth(url, authobject)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/core.py::_detect_auth",
+      "entity_type": "function",
+      "entity_name": "_detect_auth",
+      "file": "requests/core.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "_detect_auth(url, auth)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/core.py::send",
+      "entity_type": "function",
+      "entity_name": "send",
+      "file": "requests/core.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "send(self, anyway)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/core.py::_checks",
+      "entity_type": "function",
+      "entity_name": "_checks",
+      "file": "requests/core.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "_checks(self)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "class::requests/core.py::Request",
+      "entity_type": "class",
+      "entity_name": "Request",
+      "file": "requests/core.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": null
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/core.py::delete",
+      "entity_type": "function",
+      "entity_name": "delete",
+      "file": "requests/core.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "delete(url, params, headers, auth)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/core.py::get",
+      "entity_type": "function",
+      "entity_name": "get",
+      "file": "requests/core.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "get(url, params, headers, auth)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/core.py::post",
+      "entity_type": "function",
+      "entity_name": "post",
+      "file": "requests/core.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "post(url, data, headers, files, auth)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/packages/poster/encode.py::encode_file_header",
+      "entity_type": "function",
+      "entity_name": "encode_file_header",
+      "file": "requests/packages/poster/encode.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "encode_file_header(boundary, paramname, filesize, filename, filetype)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/packages/poster/encode.py::__cmp__",
+      "entity_type": "function",
+      "entity_name": "__cmp__",
+      "file": "requests/packages/poster/encode.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "__cmp__(self, other)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/core.py::get_method",
+      "entity_type": "function",
+      "entity_name": "get_method",
+      "file": "requests/core.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "get_method(self)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "class::requests/core.py::Response",
+      "entity_type": "class",
+      "entity_name": "Response",
+      "file": "requests/core.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": null
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/packages/poster/encode.py::from_params",
+      "entity_type": "function",
+      "entity_name": "from_params",
+      "file": "requests/packages/poster/encode.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "from_params(cls, params)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::requests/packages/poster/encode.py::next",
+      "entity_type": "function",
+      "entity_name": "next",
+      "file": "requests/packages/poster/encode.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "next(self)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "class::requests/core.py::InvalidMethod",
+      "entity_type": "class",
+      "entity_name": "InvalidMethod",
+      "file": "requests/core.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": null
+    },
+    {
+      "event": "introduced",
+      "entity_key": "function::test_requests.py::test_POSTBIN_GET_POST_FILES",
+      "entity_type": "function",
+      "entity_name": "test_POSTBIN_GET_POST_FILES",
+      "file": "test_requests.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": "test_POSTBIN_GET_POST_FILES(self)"
+    },
+    {
+      "event": "introduced",
+      "entity_key": "class::requests/core.py::RequestException",
+      "entity_type": "class",
+      "entity_name": "RequestException",
+      "file": "requests/core.py",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "signature": null
+    },
+    {
+      "event": "removed",
+      "entity_key": "function::setup.py::publish",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ]
+    },
+    {
+      "event": "modified",
+      "entity_key": "function::test_requests.py::setUp",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "changes": {
+        "signature_changed": false,
+        "args_changed": false,
+        "returns_changed": false,
+        "docstring_changed": false,
+        "lineno_changed": true,
+        "modified": true
+      },
+      "old_signature": "setUp(self)",
+      "new_signature": "setUp(self)"
+    },
+    {
+      "event": "modified",
+      "entity_key": "function::test_requests.py::test_HTTPS_200_OK_HEAD",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "changes": {
+        "signature_changed": false,
+        "args_changed": false,
+        "returns_changed": false,
+        "docstring_changed": false,
+        "lineno_changed": true,
+        "modified": true
+      },
+      "old_signature": "test_HTTPS_200_OK_HEAD(self)",
+      "new_signature": "test_HTTPS_200_OK_HEAD(self)"
+    },
+    {
+      "event": "modified",
+      "entity_key": "class::test_requests.py::RequestsTestSuite",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "changes": {
+        "signature_changed": false,
+        "args_changed": false,
+        "returns_changed": false,
+        "docstring_changed": false,
+        "lineno_changed": true,
+        "modified": true
+      },
+      "old_signature": null,
+      "new_signature": null
+    },
+    {
+      "event": "modified",
+      "entity_key": "function::test_requests.py::test_HTTPS_200_OK_GET",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "changes": {
+        "signature_changed": false,
+        "args_changed": false,
+        "returns_changed": false,
+        "docstring_changed": false,
+        "lineno_changed": true,
+        "modified": true
+      },
+      "old_signature": "test_HTTPS_200_OK_GET(self)",
+      "new_signature": "test_HTTPS_200_OK_GET(self)"
+    },
+    {
+      "event": "modified",
+      "entity_key": "function::test_requests.py::test_AUTH_HTTPS_200_OK_GET",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "changes": {
+        "signature_changed": false,
+        "args_changed": false,
+        "returns_changed": false,
+        "docstring_changed": false,
+        "lineno_changed": true,
+        "modified": true
+      },
+      "old_signature": "test_AUTH_HTTPS_200_OK_GET(self)",
+      "new_signature": "test_AUTH_HTTPS_200_OK_GET(self)"
+    },
+    {
+      "event": "modified",
+      "entity_key": "function::test_requests.py::test_HTTP_200_OK_HEAD",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "changes": {
+        "signature_changed": false,
+        "args_changed": false,
+        "returns_changed": false,
+        "docstring_changed": false,
+        "lineno_changed": true,
+        "modified": true
+      },
+      "old_signature": "test_HTTP_200_OK_HEAD(self)",
+      "new_signature": "test_HTTP_200_OK_HEAD(self)"
+    },
+    {
+      "event": "modified",
+      "entity_key": "function::test_requests.py::test_invalid_url",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "changes": {
+        "signature_changed": false,
+        "args_changed": false,
+        "returns_changed": false,
+        "docstring_changed": false,
+        "lineno_changed": true,
+        "modified": true
+      },
+      "old_signature": "test_invalid_url(self)",
+      "new_signature": "test_invalid_url(self)"
+    },
+    {
+      "event": "modified",
+      "entity_key": "function::test_requests.py::test_HTTP_200_OK_GET",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "changes": {
+        "signature_changed": false,
+        "args_changed": false,
+        "returns_changed": false,
+        "docstring_changed": false,
+        "lineno_changed": true,
+        "modified": true
+      },
+      "old_signature": "test_HTTP_200_OK_GET(self)",
+      "new_signature": "test_HTTP_200_OK_GET(self)"
+    },
+    {
+      "event": "modified",
+      "entity_key": "function::test_requests.py::tearDown",
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "changes": {
+        "signature_changed": false,
+        "args_changed": false,
+        "returns_changed": false,
+        "docstring_changed": false,
+        "lineno_changed": true,
+        "modified": true
+      },
+      "old_signature": "tearDown(self)",
+      "new_signature": "tearDown(self)"
+    }
+  ]
+}

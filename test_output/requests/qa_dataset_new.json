@@ -1,0 +1,3069 @@
+{
+  "summary": {
+    "total_questions": 136,
+    "questions_by_rq": {
+      "RQ1": 62,
+      "RQ2": 32,
+      "RQ3": 42
+    },
+    "questions_by_category": {
+      "availability": 2,
+      "introduction_time": 20,
+      "api_shape": 20,
+      "location_discovery": 20,
+      "before_after_behavior": 32,
+      "assumption_check": 20,
+      "pre_feature_boundary": 20,
+      "historical_behavior": 2
+    },
+    "seed": 42,
+    "entity_filtering": {
+      "excluded_patterns": [
+        "^test_",
+        "^Test",
+        "Test$",
+        "TestCase$",
+        "TestSuite$",
+        "_test$",
+        "^__.*__$",
+        "^setUp$",
+        "^tearDown$",
+        "^main$",
+        "^_[^_]",
+        "^publish$"
+      ],
+      "excluded_files": [
+        "test_",
+        "tests/",
+        "setup.py",
+        "conftest.py",
+        "__init__.py",
+        "_test.py"
+      ]
+    }
+  },
+  "questions": [
+    {
+      "rq": "RQ1",
+      "category": "availability",
+      "question": "I'm looking at the project as of version v0.2.1. Does the API include a way to working with iter encode?",
+      "answer": "Yes, `iter_encode` is available at this point. It's a function located in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "exists": true,
+        "entity_key": "function::requests/packages/poster/encode.py::iter_encode",
+        "entity_type": "function",
+        "file": "requests/packages/poster/encode.py"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "iter_encode",
+        "question_type": "factual"
+      },
+      "id": "q_00000"
+    },
+    {
+      "rq": "RQ1",
+      "category": "availability",
+      "question": "I am working with the codebase at this point in its history. Is there already support for `from_file`, or was it added later?",
+      "answer": "Yes, `from_file` is available at this point. It's a function located in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "exists": true,
+        "entity_key": "function::requests/packages/poster/encode.py::from_file",
+        "entity_type": "function",
+        "file": "requests/packages/poster/encode.py"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "from_file",
+        "question_type": "factual"
+      },
+      "id": "q_00001"
+    },
+    {
+      "rq": "RQ1",
+      "category": "introduction_time",
+      "question": "When did `URLRequired` first become part of the project?",
+      "answer": "`URLRequired` was first introduced in v0.2.1 (tag: v0.2.1), on 2011-02-14.",
+      "ground_truth": {
+        "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+        "tags": [
+          "v0.2.1"
+        ],
+        "timestamp": "2011-02-14T15:46:40+00:00"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "class::requests/core.py::URLRequired",
+      "metadata": {
+        "entity_type": "class",
+        "entity_name": "URLRequired",
+        "question_type": "factual"
+      },
+      "id": "q_00002"
+    },
+    {
+      "rq": "RQ1",
+      "category": "introduction_time",
+      "question": "When did `from_file` first become part of the project?",
+      "answer": "`from_file` was first introduced in v0.2.1 (tag: v0.2.1), on 2011-02-14.",
+      "ground_truth": {
+        "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+        "tags": [
+          "v0.2.1"
+        ],
+        "timestamp": "2011-02-14T15:46:40+00:00"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::from_file",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "from_file",
+        "question_type": "factual"
+      },
+      "id": "q_00003"
+    },
+    {
+      "rq": "RQ1",
+      "category": "introduction_time",
+      "question": "I need to know when `encode` became available. What version should I target for minimum compatibility?",
+      "answer": "`encode` was first introduced in v0.2.1 (tag: v0.2.1), on 2011-02-14.",
+      "ground_truth": {
+        "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+        "tags": [
+          "v0.2.1"
+        ],
+        "timestamp": "2011-02-14T15:46:40+00:00"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::encode",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "encode",
+        "question_type": "factual"
+      },
+      "id": "q_00004"
+    },
+    {
+      "rq": "RQ1",
+      "category": "introduction_time",
+      "question": "When did `encode_string` first become part of the project?",
+      "answer": "`encode_string` was first introduced in v0.2.1 (tag: v0.2.1), on 2011-02-14.",
+      "ground_truth": {
+        "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+        "tags": [
+          "v0.2.1"
+        ],
+        "timestamp": "2011-02-14T15:46:40+00:00"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::encode_string",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "encode_string",
+        "question_type": "factual"
+      },
+      "id": "q_00005"
+    },
+    {
+      "rq": "RQ1",
+      "category": "introduction_time",
+      "question": "I need to know when `get_headers` became available. What version should I target for minimum compatibility?",
+      "answer": "`get_headers` was first introduced in v0.2.1 (tag: v0.2.1), on 2011-02-14.",
+      "ground_truth": {
+        "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+        "tags": [
+          "v0.2.1"
+        ],
+        "timestamp": "2011-02-14T15:46:40+00:00"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::get_headers",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "get_headers",
+        "question_type": "factual"
+      },
+      "id": "q_00006"
+    },
+    {
+      "rq": "RQ1",
+      "category": "introduction_time",
+      "question": "I need to know when `reset` became available. What version should I target for minimum compatibility?",
+      "answer": "`reset` was first introduced in v0.2.1 (tag: v0.2.1), on 2011-02-14.",
+      "ground_truth": {
+        "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+        "tags": [
+          "v0.2.1"
+        ],
+        "timestamp": "2011-02-14T15:46:40+00:00"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::reset",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "reset",
+        "question_type": "factual"
+      },
+      "id": "q_00007"
+    },
+    {
+      "rq": "RQ1",
+      "category": "introduction_time",
+      "question": "I need to know when `MultipartParam` became available. What version should I target for minimum compatibility?",
+      "answer": "`MultipartParam` was first introduced in v0.2.1 (tag: v0.2.1), on 2011-02-14.",
+      "ground_truth": {
+        "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+        "tags": [
+          "v0.2.1"
+        ],
+        "timestamp": "2011-02-14T15:46:40+00:00"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "class::requests/packages/poster/encode.py::MultipartParam",
+      "metadata": {
+        "entity_type": "class",
+        "entity_name": "MultipartParam",
+        "question_type": "factual"
+      },
+      "id": "q_00008"
+    },
+    {
+      "rq": "RQ1",
+      "category": "introduction_time",
+      "question": "When did `iter_encode` first become part of the project?",
+      "answer": "`iter_encode` was first introduced in v0.2.1 (tag: v0.2.1), on 2011-02-14.",
+      "ground_truth": {
+        "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+        "tags": [
+          "v0.2.1"
+        ],
+        "timestamp": "2011-02-14T15:46:40+00:00"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::iter_encode",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "iter_encode",
+        "question_type": "factual"
+      },
+      "id": "q_00009"
+    },
+    {
+      "rq": "RQ1",
+      "category": "introduction_time",
+      "question": "I need to know when `multipart_yielder` became available. What version should I target for minimum compatibility?",
+      "answer": "`multipart_yielder` was first introduced in v0.2.1 (tag: v0.2.1), on 2011-02-14.",
+      "ground_truth": {
+        "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+        "tags": [
+          "v0.2.1"
+        ],
+        "timestamp": "2011-02-14T15:46:40+00:00"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "class::requests/packages/poster/encode.py::multipart_yielder",
+      "metadata": {
+        "entity_type": "class",
+        "entity_name": "multipart_yielder",
+        "question_type": "factual"
+      },
+      "id": "q_00010"
+    },
+    {
+      "rq": "RQ1",
+      "category": "introduction_time",
+      "question": "In which release was `encode_hdr` introduced to the codebase?",
+      "answer": "`encode_hdr` was first introduced in v0.2.1 (tag: v0.2.1), on 2011-02-14.",
+      "ground_truth": {
+        "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+        "tags": [
+          "v0.2.1"
+        ],
+        "timestamp": "2011-02-14T15:46:40+00:00"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::encode_hdr",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "encode_hdr",
+        "question_type": "factual"
+      },
+      "id": "q_00011"
+    },
+    {
+      "rq": "RQ1",
+      "category": "introduction_time",
+      "question": "When did `gen_boundary` first become part of the project?",
+      "answer": "`gen_boundary` was first introduced in v0.2.1 (tag: v0.2.1), on 2011-02-14.",
+      "ground_truth": {
+        "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+        "tags": [
+          "v0.2.1"
+        ],
+        "timestamp": "2011-02-14T15:46:40+00:00"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::gen_boundary",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "gen_boundary",
+        "question_type": "factual"
+      },
+      "id": "q_00012"
+    },
+    {
+      "rq": "RQ1",
+      "category": "introduction_time",
+      "question": "When did `get_size` first become part of the project?",
+      "answer": "`get_size` was first introduced in v0.2.1 (tag: v0.2.1), on 2011-02-14.",
+      "ground_truth": {
+        "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+        "tags": [
+          "v0.2.1"
+        ],
+        "timestamp": "2011-02-14T15:46:40+00:00"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::get_size",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "get_size",
+        "question_type": "factual"
+      },
+      "id": "q_00013"
+    },
+    {
+      "rq": "RQ1",
+      "category": "introduction_time",
+      "question": "When did `AuthObject` first become part of the project?",
+      "answer": "`AuthObject` was first introduced in v0.2.1 (tag: v0.2.1), on 2011-02-14.",
+      "ground_truth": {
+        "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+        "tags": [
+          "v0.2.1"
+        ],
+        "timestamp": "2011-02-14T15:46:40+00:00"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "class::requests/core.py::AuthObject",
+      "metadata": {
+        "entity_type": "class",
+        "entity_name": "AuthObject",
+        "question_type": "factual"
+      },
+      "id": "q_00014"
+    },
+    {
+      "rq": "RQ1",
+      "category": "introduction_time",
+      "question": "When did `get_body_size` first become part of the project?",
+      "answer": "`get_body_size` was first introduced in v0.2.1 (tag: v0.2.1), on 2011-02-14.",
+      "ground_truth": {
+        "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+        "tags": [
+          "v0.2.1"
+        ],
+        "timestamp": "2011-02-14T15:46:40+00:00"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::get_body_size",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "get_body_size",
+        "question_type": "factual"
+      },
+      "id": "q_00015"
+    },
+    {
+      "rq": "RQ1",
+      "category": "introduction_time",
+      "question": "When did `head` first become part of the project?",
+      "answer": "`head` was first introduced in v0.2.1 (tag: v0.2.1), on 2011-02-14.",
+      "ground_truth": {
+        "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+        "tags": [
+          "v0.2.1"
+        ],
+        "timestamp": "2011-02-14T15:46:40+00:00"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/core.py::head",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "head",
+        "question_type": "factual"
+      },
+      "id": "q_00016"
+    },
+    {
+      "rq": "RQ1",
+      "category": "introduction_time",
+      "question": "I need to know when `multipart_encode` became available. What version should I target for minimum compatibility?",
+      "answer": "`multipart_encode` was first introduced in v0.2.1 (tag: v0.2.1), on 2011-02-14.",
+      "ground_truth": {
+        "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+        "tags": [
+          "v0.2.1"
+        ],
+        "timestamp": "2011-02-14T15:46:40+00:00"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::multipart_encode",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "multipart_encode",
+        "question_type": "factual"
+      },
+      "id": "q_00017"
+    },
+    {
+      "rq": "RQ1",
+      "category": "introduction_time",
+      "question": "I need to know when `AuthenticationError` became available. What version should I target for minimum compatibility?",
+      "answer": "`AuthenticationError` was first introduced in v0.2.1 (tag: v0.2.1), on 2011-02-14.",
+      "ground_truth": {
+        "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+        "tags": [
+          "v0.2.1"
+        ],
+        "timestamp": "2011-02-14T15:46:40+00:00"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "class::requests/core.py::AuthenticationError",
+      "metadata": {
+        "entity_type": "class",
+        "entity_name": "AuthenticationError",
+        "question_type": "factual"
+      },
+      "id": "q_00018"
+    },
+    {
+      "rq": "RQ1",
+      "category": "introduction_time",
+      "question": "When did `encode_and_quote` first become part of the project?",
+      "answer": "`encode_and_quote` was first introduced in v0.2.1 (tag: v0.2.1), on 2011-02-14.",
+      "ground_truth": {
+        "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+        "tags": [
+          "v0.2.1"
+        ],
+        "timestamp": "2011-02-14T15:46:40+00:00"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::encode_and_quote",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "encode_and_quote",
+        "question_type": "factual"
+      },
+      "id": "q_00019"
+    },
+    {
+      "rq": "RQ1",
+      "category": "introduction_time",
+      "question": "I need to know when `put` became available. What version should I target for minimum compatibility?",
+      "answer": "`put` was first introduced in v0.2.1 (tag: v0.2.1), on 2011-02-14.",
+      "ground_truth": {
+        "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+        "tags": [
+          "v0.2.1"
+        ],
+        "timestamp": "2011-02-14T15:46:40+00:00"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/core.py::put",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "put",
+        "question_type": "factual"
+      },
+      "id": "q_00020"
+    },
+    {
+      "rq": "RQ1",
+      "category": "introduction_time",
+      "question": "When did `add_autoauth` first become part of the project?",
+      "answer": "`add_autoauth` was first introduced in v0.2.1 (tag: v0.2.1), on 2011-02-14.",
+      "ground_truth": {
+        "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+        "tags": [
+          "v0.2.1"
+        ],
+        "timestamp": "2011-02-14T15:46:40+00:00"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/core.py::add_autoauth",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "add_autoauth",
+        "question_type": "factual"
+      },
+      "id": "q_00021"
+    },
+    {
+      "rq": "RQ1",
+      "category": "api_shape",
+      "question": "I want to use `from_file` in my code. What's the correct way to invoke it at this point in the project's history?",
+      "answer": "The function should be called as `from_file(cls, paramname, filename)`.",
+      "ground_truth": {
+        "signature": "from_file(cls, paramname, filename)"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::from_file",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "from_file",
+        "question_type": "factual"
+      },
+      "id": "q_00022"
+    },
+    {
+      "rq": "RQ1",
+      "category": "api_shape",
+      "question": "I want to use `encode` in my code. What's the correct way to invoke it at this point in the project's history?",
+      "answer": "The function should be called as `encode(self, boundary)`.",
+      "ground_truth": {
+        "signature": "encode(self, boundary)"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::encode",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "encode",
+        "question_type": "factual"
+      },
+      "id": "q_00023"
+    },
+    {
+      "rq": "RQ1",
+      "category": "api_shape",
+      "question": "I want to use `encode_string` in my code. What's the correct way to invoke it at this point in the project's history?",
+      "answer": "The function should be called as `encode_string(boundary, name, value)`.",
+      "ground_truth": {
+        "signature": "encode_string(boundary, name, value)"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::encode_string",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "encode_string",
+        "question_type": "factual"
+      },
+      "id": "q_00024"
+    },
+    {
+      "rq": "RQ1",
+      "category": "api_shape",
+      "question": "I want to use `get_headers` in my code. What's the correct way to invoke it at this point in the project's history?",
+      "answer": "The function should be called as `get_headers(params, boundary)`.",
+      "ground_truth": {
+        "signature": "get_headers(params, boundary)"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::get_headers",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "get_headers",
+        "question_type": "factual"
+      },
+      "id": "q_00025"
+    },
+    {
+      "rq": "RQ1",
+      "category": "api_shape",
+      "question": "What parameters does `reset` accept in version v0.2.1?",
+      "answer": "The function should be called as `reset(self)`.",
+      "ground_truth": {
+        "signature": "reset(self)"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::reset",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "reset",
+        "question_type": "factual"
+      },
+      "id": "q_00026"
+    },
+    {
+      "rq": "RQ1",
+      "category": "api_shape",
+      "question": "How should `iter_encode` be called at this point in the project?",
+      "answer": "The function should be called as `iter_encode(self, boundary, blocksize)`.",
+      "ground_truth": {
+        "signature": "iter_encode(self, boundary, blocksize)"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::iter_encode",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "iter_encode",
+        "question_type": "factual"
+      },
+      "id": "q_00027"
+    },
+    {
+      "rq": "RQ1",
+      "category": "api_shape",
+      "question": "What parameters does `encode_hdr` accept in version v0.2.1?",
+      "answer": "The function should be called as `encode_hdr(self, boundary)`.",
+      "ground_truth": {
+        "signature": "encode_hdr(self, boundary)"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::encode_hdr",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "encode_hdr",
+        "question_type": "factual"
+      },
+      "id": "q_00028"
+    },
+    {
+      "rq": "RQ1",
+      "category": "api_shape",
+      "question": "I want to use `gen_boundary` in my code. What's the correct way to invoke it at this point in the project's history?",
+      "answer": "The function should be called as `gen_boundary()`.",
+      "ground_truth": {
+        "signature": "gen_boundary()"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::gen_boundary",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "gen_boundary",
+        "question_type": "factual"
+      },
+      "id": "q_00029"
+    },
+    {
+      "rq": "RQ1",
+      "category": "api_shape",
+      "question": "What parameters does `get_size` accept in version v0.2.1?",
+      "answer": "The function should be called as `get_size(self, boundary)`.",
+      "ground_truth": {
+        "signature": "get_size(self, boundary)"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::get_size",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "get_size",
+        "question_type": "factual"
+      },
+      "id": "q_00030"
+    },
+    {
+      "rq": "RQ1",
+      "category": "api_shape",
+      "question": "How should `get_body_size` be called at this point in the project?",
+      "answer": "The function should be called as `get_body_size(params, boundary)`.",
+      "ground_truth": {
+        "signature": "get_body_size(params, boundary)"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::get_body_size",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "get_body_size",
+        "question_type": "factual"
+      },
+      "id": "q_00031"
+    },
+    {
+      "rq": "RQ1",
+      "category": "api_shape",
+      "question": "How should `head` be called at this point in the project?",
+      "answer": "The function should be called as `head(url, params, headers, auth)`.",
+      "ground_truth": {
+        "signature": "head(url, params, headers, auth)"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/core.py::head",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "head",
+        "question_type": "factual"
+      },
+      "id": "q_00032"
+    },
+    {
+      "rq": "RQ1",
+      "category": "api_shape",
+      "question": "I want to use `multipart_encode` in my code. What's the correct way to invoke it at this point in the project's history?",
+      "answer": "The function should be called as `multipart_encode(params, boundary, cb)`.",
+      "ground_truth": {
+        "signature": "multipart_encode(params, boundary, cb)"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::multipart_encode",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "multipart_encode",
+        "question_type": "factual"
+      },
+      "id": "q_00033"
+    },
+    {
+      "rq": "RQ1",
+      "category": "api_shape",
+      "question": "What parameters does `encode_and_quote` accept in version v0.2.1?",
+      "answer": "The function should be called as `encode_and_quote(data)`.",
+      "ground_truth": {
+        "signature": "encode_and_quote(data)"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::encode_and_quote",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "encode_and_quote",
+        "question_type": "factual"
+      },
+      "id": "q_00034"
+    },
+    {
+      "rq": "RQ1",
+      "category": "api_shape",
+      "question": "What parameters does `put` accept in version v0.2.1?",
+      "answer": "The function should be called as `put(url, data, headers, files, auth)`.",
+      "ground_truth": {
+        "signature": "put(url, data, headers, files, auth)"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/core.py::put",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "put",
+        "question_type": "factual"
+      },
+      "id": "q_00035"
+    },
+    {
+      "rq": "RQ1",
+      "category": "api_shape",
+      "question": "What parameters does `add_autoauth` accept in version v0.2.1?",
+      "answer": "The function should be called as `add_autoauth(url, authobject)`.",
+      "ground_truth": {
+        "signature": "add_autoauth(url, authobject)"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/core.py::add_autoauth",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "add_autoauth",
+        "question_type": "factual"
+      },
+      "id": "q_00036"
+    },
+    {
+      "rq": "RQ1",
+      "category": "api_shape",
+      "question": "How should `send` be called at this point in the project?",
+      "answer": "The function should be called as `send(self, anyway)`.",
+      "ground_truth": {
+        "signature": "send(self, anyway)"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/core.py::send",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "send",
+        "question_type": "factual"
+      },
+      "id": "q_00037"
+    },
+    {
+      "rq": "RQ1",
+      "category": "api_shape",
+      "question": "How should `delete` be called at this point in the project?",
+      "answer": "The function should be called as `delete(url, params, headers, auth)`.",
+      "ground_truth": {
+        "signature": "delete(url, params, headers, auth)"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/core.py::delete",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "delete",
+        "question_type": "factual"
+      },
+      "id": "q_00038"
+    },
+    {
+      "rq": "RQ1",
+      "category": "api_shape",
+      "question": "What parameters does `get` accept in version v0.2.1?",
+      "answer": "The function should be called as `get(url, params, headers, auth)`.",
+      "ground_truth": {
+        "signature": "get(url, params, headers, auth)"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/core.py::get",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "get",
+        "question_type": "factual"
+      },
+      "id": "q_00039"
+    },
+    {
+      "rq": "RQ1",
+      "category": "api_shape",
+      "question": "How should `post` be called at this point in the project?",
+      "answer": "The function should be called as `post(url, data, headers, files, auth)`.",
+      "ground_truth": {
+        "signature": "post(url, data, headers, files, auth)"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/core.py::post",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "post",
+        "question_type": "factual"
+      },
+      "id": "q_00040"
+    },
+    {
+      "rq": "RQ1",
+      "category": "api_shape",
+      "question": "How should `encode_file_header` be called at this point in the project?",
+      "answer": "The function should be called as `encode_file_header(boundary, paramname, filesize, filename, filetype)`.",
+      "ground_truth": {
+        "signature": "encode_file_header(boundary, paramname, filesize, filename, filetype)"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::encode_file_header",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "encode_file_header",
+        "question_type": "factual"
+      },
+      "id": "q_00041"
+    },
+    {
+      "rq": "RQ1",
+      "category": "location_discovery",
+      "question": "I need to look at the implementation of `URLRequired`. Which file should I check in version v0.2.1?",
+      "answer": "`URLRequired` is implemented in `requests/core.py`.",
+      "ground_truth": {
+        "file": "requests/core.py",
+        "all_files": [
+          "requests/core.py"
+        ]
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "class::requests/core.py::URLRequired",
+      "metadata": {
+        "entity_type": "class",
+        "entity_name": "URLRequired",
+        "question_type": "factual"
+      },
+      "id": "q_00042"
+    },
+    {
+      "rq": "RQ1",
+      "category": "location_discovery",
+      "question": "Where is `from_file` implemented in the codebase at this time?",
+      "answer": "`from_file` is implemented in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "file": "requests/packages/poster/encode.py",
+        "all_files": [
+          "requests/packages/poster/encode.py"
+        ]
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::from_file",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "from_file",
+        "question_type": "factual"
+      },
+      "id": "q_00043"
+    },
+    {
+      "rq": "RQ1",
+      "category": "location_discovery",
+      "question": "I need to look at the implementation of `encode`. Which file should I check in version v0.2.1?",
+      "answer": "`encode` is implemented in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "file": "requests/packages/poster/encode.py",
+        "all_files": [
+          "requests/packages/poster/encode.py"
+        ]
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::encode",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "encode",
+        "question_type": "factual"
+      },
+      "id": "q_00044"
+    },
+    {
+      "rq": "RQ1",
+      "category": "location_discovery",
+      "question": "I need to look at the implementation of `encode_string`. Which file should I check in version v0.2.1?",
+      "answer": "`encode_string` is implemented in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "file": "requests/packages/poster/encode.py",
+        "all_files": [
+          "requests/packages/poster/encode.py"
+        ]
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::encode_string",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "encode_string",
+        "question_type": "factual"
+      },
+      "id": "q_00045"
+    },
+    {
+      "rq": "RQ1",
+      "category": "location_discovery",
+      "question": "I need to look at the implementation of `get_headers`. Which file should I check in version v0.2.1?",
+      "answer": "`get_headers` is implemented in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "file": "requests/packages/poster/encode.py",
+        "all_files": [
+          "requests/packages/poster/encode.py"
+        ]
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::get_headers",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "get_headers",
+        "question_type": "factual"
+      },
+      "id": "q_00046"
+    },
+    {
+      "rq": "RQ1",
+      "category": "location_discovery",
+      "question": "Where is `reset` implemented in the codebase at this time?",
+      "answer": "`reset` is implemented in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "file": "requests/packages/poster/encode.py",
+        "all_files": [
+          "requests/packages/poster/encode.py"
+        ]
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::reset",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "reset",
+        "question_type": "factual"
+      },
+      "id": "q_00047"
+    },
+    {
+      "rq": "RQ1",
+      "category": "location_discovery",
+      "question": "I need to look at the implementation of `MultipartParam`. Which file should I check in version v0.2.1?",
+      "answer": "`MultipartParam` is implemented in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "file": "requests/packages/poster/encode.py",
+        "all_files": [
+          "requests/packages/poster/encode.py"
+        ]
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "class::requests/packages/poster/encode.py::MultipartParam",
+      "metadata": {
+        "entity_type": "class",
+        "entity_name": "MultipartParam",
+        "question_type": "factual"
+      },
+      "id": "q_00048"
+    },
+    {
+      "rq": "RQ1",
+      "category": "location_discovery",
+      "question": "Where is `iter_encode` implemented in the codebase at this time?",
+      "answer": "`iter_encode` is implemented in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "file": "requests/packages/poster/encode.py",
+        "all_files": [
+          "requests/packages/poster/encode.py"
+        ]
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::iter_encode",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "iter_encode",
+        "question_type": "factual"
+      },
+      "id": "q_00049"
+    },
+    {
+      "rq": "RQ1",
+      "category": "location_discovery",
+      "question": "I need to look at the implementation of `multipart_yielder`. Which file should I check in version v0.2.1?",
+      "answer": "`multipart_yielder` is implemented in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "file": "requests/packages/poster/encode.py",
+        "all_files": [
+          "requests/packages/poster/encode.py"
+        ]
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "class::requests/packages/poster/encode.py::multipart_yielder",
+      "metadata": {
+        "entity_type": "class",
+        "entity_name": "multipart_yielder",
+        "question_type": "factual"
+      },
+      "id": "q_00050"
+    },
+    {
+      "rq": "RQ1",
+      "category": "location_discovery",
+      "question": "Where is `encode_hdr` implemented in the codebase at this time?",
+      "answer": "`encode_hdr` is implemented in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "file": "requests/packages/poster/encode.py",
+        "all_files": [
+          "requests/packages/poster/encode.py"
+        ]
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::encode_hdr",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "encode_hdr",
+        "question_type": "factual"
+      },
+      "id": "q_00051"
+    },
+    {
+      "rq": "RQ1",
+      "category": "location_discovery",
+      "question": "I need to look at the implementation of `gen_boundary`. Which file should I check in version v0.2.1?",
+      "answer": "`gen_boundary` is implemented in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "file": "requests/packages/poster/encode.py",
+        "all_files": [
+          "requests/packages/poster/encode.py"
+        ]
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::gen_boundary",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "gen_boundary",
+        "question_type": "factual"
+      },
+      "id": "q_00052"
+    },
+    {
+      "rq": "RQ1",
+      "category": "location_discovery",
+      "question": "I need to look at the implementation of `get_size`. Which file should I check in version v0.2.1?",
+      "answer": "`get_size` is implemented in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "file": "requests/packages/poster/encode.py",
+        "all_files": [
+          "requests/packages/poster/encode.py"
+        ]
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::get_size",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "get_size",
+        "question_type": "factual"
+      },
+      "id": "q_00053"
+    },
+    {
+      "rq": "RQ1",
+      "category": "location_discovery",
+      "question": "Where is `AuthObject` implemented in the codebase at this time?",
+      "answer": "`AuthObject` is implemented in `requests/core.py`.",
+      "ground_truth": {
+        "file": "requests/core.py",
+        "all_files": [
+          "requests/core.py"
+        ]
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "class::requests/core.py::AuthObject",
+      "metadata": {
+        "entity_type": "class",
+        "entity_name": "AuthObject",
+        "question_type": "factual"
+      },
+      "id": "q_00054"
+    },
+    {
+      "rq": "RQ1",
+      "category": "location_discovery",
+      "question": "Where is `get_body_size` implemented in the codebase at this time?",
+      "answer": "`get_body_size` is implemented in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "file": "requests/packages/poster/encode.py",
+        "all_files": [
+          "requests/packages/poster/encode.py"
+        ]
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::get_body_size",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "get_body_size",
+        "question_type": "factual"
+      },
+      "id": "q_00055"
+    },
+    {
+      "rq": "RQ1",
+      "category": "location_discovery",
+      "question": "Where is `head` implemented in the codebase at this time?",
+      "answer": "`head` is implemented in `requests/core.py`.",
+      "ground_truth": {
+        "file": "requests/core.py",
+        "all_files": [
+          "requests/core.py"
+        ]
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/core.py::head",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "head",
+        "question_type": "factual"
+      },
+      "id": "q_00056"
+    },
+    {
+      "rq": "RQ1",
+      "category": "location_discovery",
+      "question": "Where is `multipart_encode` implemented in the codebase at this time?",
+      "answer": "`multipart_encode` is implemented in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "file": "requests/packages/poster/encode.py",
+        "all_files": [
+          "requests/packages/poster/encode.py"
+        ]
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::multipart_encode",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "multipart_encode",
+        "question_type": "factual"
+      },
+      "id": "q_00057"
+    },
+    {
+      "rq": "RQ1",
+      "category": "location_discovery",
+      "question": "I need to look at the implementation of `AuthenticationError`. Which file should I check in version v0.2.1?",
+      "answer": "`AuthenticationError` is implemented in `requests/core.py`.",
+      "ground_truth": {
+        "file": "requests/core.py",
+        "all_files": [
+          "requests/core.py"
+        ]
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "class::requests/core.py::AuthenticationError",
+      "metadata": {
+        "entity_type": "class",
+        "entity_name": "AuthenticationError",
+        "question_type": "factual"
+      },
+      "id": "q_00058"
+    },
+    {
+      "rq": "RQ1",
+      "category": "location_discovery",
+      "question": "Where is `encode_and_quote` implemented in the codebase at this time?",
+      "answer": "`encode_and_quote` is implemented in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "file": "requests/packages/poster/encode.py",
+        "all_files": [
+          "requests/packages/poster/encode.py"
+        ]
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::encode_and_quote",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "encode_and_quote",
+        "question_type": "factual"
+      },
+      "id": "q_00059"
+    },
+    {
+      "rq": "RQ1",
+      "category": "location_discovery",
+      "question": "Where is `put` implemented in the codebase at this time?",
+      "answer": "`put` is implemented in `requests/core.py`.",
+      "ground_truth": {
+        "file": "requests/core.py",
+        "all_files": [
+          "requests/core.py"
+        ]
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/core.py::put",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "put",
+        "question_type": "factual"
+      },
+      "id": "q_00060"
+    },
+    {
+      "rq": "RQ1",
+      "category": "location_discovery",
+      "question": "Where is `add_autoauth` implemented in the codebase at this time?",
+      "answer": "`add_autoauth` is implemented in `requests/core.py`.",
+      "ground_truth": {
+        "file": "requests/core.py",
+        "all_files": [
+          "requests/core.py"
+        ]
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/core.py::add_autoauth",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "add_autoauth",
+        "question_type": "factual"
+      },
+      "id": "q_00061"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "What's different about `URLRequired` between commit d2427eca and commit e09efc49?",
+      "answer": "`URLRequired` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/core.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "URLRequired",
+        "file": "requests/core.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "class",
+        "question_type": "comparison"
+      },
+      "id": "q_00062"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "What's different about `from_file` between commit d2427eca and commit e09efc49?",
+      "answer": "`from_file` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "from_file",
+        "file": "requests/packages/poster/encode.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "function",
+        "question_type": "comparison"
+      },
+      "id": "q_00063"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "What's different about `encode` between commit d2427eca and commit e09efc49?",
+      "answer": "`encode` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "encode",
+        "file": "requests/packages/poster/encode.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "function",
+        "question_type": "comparison"
+      },
+      "id": "q_00064"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "What's different about `encode_string` between commit d2427eca and commit e09efc49?",
+      "answer": "`encode_string` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "encode_string",
+        "file": "requests/packages/poster/encode.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "function",
+        "question_type": "comparison"
+      },
+      "id": "q_00065"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "How did `get_headers` behave before this change, and how does it behave now?",
+      "answer": "`get_headers` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "get_headers",
+        "file": "requests/packages/poster/encode.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "function",
+        "question_type": "comparison"
+      },
+      "id": "q_00066"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "What's different about `reset` between commit d2427eca and commit e09efc49?",
+      "answer": "`reset` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "reset",
+        "file": "requests/packages/poster/encode.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "function",
+        "question_type": "comparison"
+      },
+      "id": "q_00067"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "What's different about `MultipartParam` between commit d2427eca and commit e09efc49?",
+      "answer": "`MultipartParam` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "MultipartParam",
+        "file": "requests/packages/poster/encode.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "class",
+        "question_type": "comparison"
+      },
+      "id": "q_00068"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "How did `iter_encode` behave before this change, and how does it behave now?",
+      "answer": "`iter_encode` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "iter_encode",
+        "file": "requests/packages/poster/encode.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "function",
+        "question_type": "comparison"
+      },
+      "id": "q_00069"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "What's different about `multipart_yielder` between commit d2427eca and commit e09efc49?",
+      "answer": "`multipart_yielder` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "multipart_yielder",
+        "file": "requests/packages/poster/encode.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "class",
+        "question_type": "comparison"
+      },
+      "id": "q_00070"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "How did `encode_hdr` behave before this change, and how does it behave now?",
+      "answer": "`encode_hdr` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "encode_hdr",
+        "file": "requests/packages/poster/encode.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "function",
+        "question_type": "comparison"
+      },
+      "id": "q_00071"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "How did `gen_boundary` behave before this change, and how does it behave now?",
+      "answer": "`gen_boundary` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "gen_boundary",
+        "file": "requests/packages/poster/encode.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "function",
+        "question_type": "comparison"
+      },
+      "id": "q_00072"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "How did `get_size` behave before this change, and how does it behave now?",
+      "answer": "`get_size` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "get_size",
+        "file": "requests/packages/poster/encode.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "function",
+        "question_type": "comparison"
+      },
+      "id": "q_00073"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "How did `AuthObject` behave before this change, and how does it behave now?",
+      "answer": "`AuthObject` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/core.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "AuthObject",
+        "file": "requests/core.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "class",
+        "question_type": "comparison"
+      },
+      "id": "q_00074"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "What's different about `get_body_size` between commit d2427eca and commit e09efc49?",
+      "answer": "`get_body_size` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "get_body_size",
+        "file": "requests/packages/poster/encode.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "function",
+        "question_type": "comparison"
+      },
+      "id": "q_00075"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "What's different about `head` between commit d2427eca and commit e09efc49?",
+      "answer": "`head` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/core.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "head",
+        "file": "requests/core.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "function",
+        "question_type": "comparison"
+      },
+      "id": "q_00076"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "What's different about `multipart_encode` between commit d2427eca and commit e09efc49?",
+      "answer": "`multipart_encode` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "multipart_encode",
+        "file": "requests/packages/poster/encode.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "function",
+        "question_type": "comparison"
+      },
+      "id": "q_00077"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "How did `AuthenticationError` behave before this change, and how does it behave now?",
+      "answer": "`AuthenticationError` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/core.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "AuthenticationError",
+        "file": "requests/core.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "class",
+        "question_type": "comparison"
+      },
+      "id": "q_00078"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "What's different about `encode_and_quote` between commit d2427eca and commit e09efc49?",
+      "answer": "`encode_and_quote` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "encode_and_quote",
+        "file": "requests/packages/poster/encode.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "function",
+        "question_type": "comparison"
+      },
+      "id": "q_00079"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "How did `put` behave before this change, and how does it behave now?",
+      "answer": "`put` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/core.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "put",
+        "file": "requests/core.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "function",
+        "question_type": "comparison"
+      },
+      "id": "q_00080"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "How did `add_autoauth` behave before this change, and how does it behave now?",
+      "answer": "`add_autoauth` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/core.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "add_autoauth",
+        "file": "requests/core.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "function",
+        "question_type": "comparison"
+      },
+      "id": "q_00081"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "How did `send` behave before this change, and how does it behave now?",
+      "answer": "`send` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/core.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "send",
+        "file": "requests/core.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "function",
+        "question_type": "comparison"
+      },
+      "id": "q_00082"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "What's different about `Request` between commit d2427eca and commit e09efc49?",
+      "answer": "`Request` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/core.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "Request",
+        "file": "requests/core.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "class",
+        "question_type": "comparison"
+      },
+      "id": "q_00083"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "What's different about `delete` between commit d2427eca and commit e09efc49?",
+      "answer": "`delete` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/core.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "delete",
+        "file": "requests/core.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "function",
+        "question_type": "comparison"
+      },
+      "id": "q_00084"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "What's different about `get` between commit d2427eca and commit e09efc49?",
+      "answer": "`get` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/core.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "get",
+        "file": "requests/core.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "function",
+        "question_type": "comparison"
+      },
+      "id": "q_00085"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "How did `post` behave before this change, and how does it behave now?",
+      "answer": "`post` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/core.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "post",
+        "file": "requests/core.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "function",
+        "question_type": "comparison"
+      },
+      "id": "q_00086"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "How did `encode_file_header` behave before this change, and how does it behave now?",
+      "answer": "`encode_file_header` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "encode_file_header",
+        "file": "requests/packages/poster/encode.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "function",
+        "question_type": "comparison"
+      },
+      "id": "q_00087"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "What's different about `get_method` between commit d2427eca and commit e09efc49?",
+      "answer": "`get_method` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/core.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "get_method",
+        "file": "requests/core.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "function",
+        "question_type": "comparison"
+      },
+      "id": "q_00088"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "How did `Response` behave before this change, and how does it behave now?",
+      "answer": "`Response` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/core.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "Response",
+        "file": "requests/core.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "class",
+        "question_type": "comparison"
+      },
+      "id": "q_00089"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "What's different about `from_params` between commit d2427eca and commit e09efc49?",
+      "answer": "`from_params` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "from_params",
+        "file": "requests/packages/poster/encode.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "function",
+        "question_type": "comparison"
+      },
+      "id": "q_00090"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "What's different about `next` between commit d2427eca and commit e09efc49?",
+      "answer": "`next` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/packages/poster/encode.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "next",
+        "file": "requests/packages/poster/encode.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "function",
+        "question_type": "comparison"
+      },
+      "id": "q_00091"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "What's different about `InvalidMethod` between commit d2427eca and commit e09efc49?",
+      "answer": "`InvalidMethod` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/core.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "InvalidMethod",
+        "file": "requests/core.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "class",
+        "question_type": "comparison"
+      },
+      "id": "q_00092"
+    },
+    {
+      "rq": "RQ2",
+      "category": "before_after_behavior",
+      "question": "How did `RequestException` behave before this change, and how does it behave now?",
+      "answer": "`RequestException` did not exist in commit d2427eca. It was introduced in commit e09efc49 in `requests/core.py`.",
+      "ground_truth": {
+        "change_type": "added",
+        "name": "RequestException",
+        "file": "requests/core.py",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "before_commit": "d2427ecae751a533ddd9026849dd19cfaa3394f4",
+      "after_commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "metadata": {
+        "entity_type": "class",
+        "question_type": "comparison"
+      },
+      "id": "q_00093"
+    },
+    {
+      "rq": "RQ3",
+      "category": "assumption_check",
+      "question": "Is it safe to assume that `AuthenticationError` already supports `AuthenticationError` at this point?",
+      "answer": "No, `AuthenticationError` does not exist yet at this point. It was introduced later in v0.2.1.",
+      "ground_truth": {
+        "exists": false,
+        "reason": "not_yet_introduced",
+        "introduced_at": "2011-02-14T15:46:40+00:00",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "e7615cbc6b4af5985c4e0d4848a426e2d35f79c3",
+      "timestamp": "2011-02-13T18:41:18+00:00",
+      "tags": [],
+      "entity_key": "class::requests/core.py::AuthenticationError",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "class",
+        "entity_name": "AuthenticationError",
+        "question_type": "temporal_leakage_test",
+        "temporal_direction": "future_knowledge"
+      },
+      "id": "q_00094"
+    },
+    {
+      "rq": "RQ3",
+      "category": "assumption_check",
+      "question": "I'm writing code for commit e7615cbc. Does `multipart_yielder` exist yet, or do I need to implement this myself?",
+      "answer": "No, `multipart_yielder` does not exist yet at this point. It was introduced later in v0.2.1.",
+      "ground_truth": {
+        "exists": false,
+        "reason": "not_yet_introduced",
+        "introduced_at": "2011-02-14T15:46:40+00:00",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "e7615cbc6b4af5985c4e0d4848a426e2d35f79c3",
+      "timestamp": "2011-02-13T18:41:18+00:00",
+      "tags": [],
+      "entity_key": "class::requests/packages/poster/encode.py::multipart_yielder",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "class",
+        "entity_name": "multipart_yielder",
+        "question_type": "temporal_leakage_test",
+        "temporal_direction": "future_knowledge"
+      },
+      "id": "q_00095"
+    },
+    {
+      "rq": "RQ3",
+      "category": "assumption_check",
+      "question": "I'm writing code for commit d0bf5538. Does `AuthenticationError` exist yet, or do I need to implement this myself?",
+      "answer": "No, `AuthenticationError` does not exist yet at this point. It was introduced later in v0.2.1.",
+      "ground_truth": {
+        "exists": false,
+        "reason": "not_yet_introduced",
+        "introduced_at": "2011-02-14T15:46:40+00:00",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "d0bf5538097cbdee663eddf4e29e9f34106c67cb",
+      "timestamp": "2011-02-13T18:52:30+00:00",
+      "tags": [],
+      "entity_key": "class::requests/core.py::AuthenticationError",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "class",
+        "entity_name": "AuthenticationError",
+        "question_type": "temporal_leakage_test",
+        "temporal_direction": "future_knowledge"
+      },
+      "id": "q_00096"
+    },
+    {
+      "rq": "RQ3",
+      "category": "assumption_check",
+      "question": "Can I rely on `Response` having `working with response` in commit d0bf5538?",
+      "answer": "No, `Response` does not exist yet at this point. It was introduced later in v0.2.1.",
+      "ground_truth": {
+        "exists": false,
+        "reason": "not_yet_introduced",
+        "introduced_at": "2011-02-14T15:46:40+00:00",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "d0bf5538097cbdee663eddf4e29e9f34106c67cb",
+      "timestamp": "2011-02-13T18:52:30+00:00",
+      "tags": [],
+      "entity_key": "class::requests/core.py::Response",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "class",
+        "entity_name": "Response",
+        "question_type": "temporal_leakage_test",
+        "temporal_direction": "future_knowledge"
+      },
+      "id": "q_00097"
+    },
+    {
+      "rq": "RQ3",
+      "category": "assumption_check",
+      "question": "Is it safe to assume that `get` already supports `get` at this point?",
+      "answer": "No, `get` does not exist yet at this point. It was introduced later in v0.2.1.",
+      "ground_truth": {
+        "exists": false,
+        "reason": "not_yet_introduced",
+        "introduced_at": "2011-02-14T15:46:40+00:00",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "0477018761c67152cdcc0b83d56f27e701e65b9e",
+      "timestamp": "2011-02-13T18:52:37+00:00",
+      "tags": [],
+      "entity_key": "function::requests/core.py::get",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "get",
+        "question_type": "temporal_leakage_test",
+        "temporal_direction": "future_knowledge"
+      },
+      "id": "q_00098"
+    },
+    {
+      "rq": "RQ3",
+      "category": "assumption_check",
+      "question": "I'm writing code for commit 04770187. Does `head` exist yet, or do I need to implement this myself?",
+      "answer": "No, `head` does not exist yet at this point. It was introduced later in v0.2.1.",
+      "ground_truth": {
+        "exists": false,
+        "reason": "not_yet_introduced",
+        "introduced_at": "2011-02-14T15:46:40+00:00",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "0477018761c67152cdcc0b83d56f27e701e65b9e",
+      "timestamp": "2011-02-13T18:52:37+00:00",
+      "tags": [],
+      "entity_key": "function::requests/core.py::head",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "head",
+        "question_type": "temporal_leakage_test",
+        "temporal_direction": "future_knowledge"
+      },
+      "id": "q_00099"
+    },
+    {
+      "rq": "RQ3",
+      "category": "assumption_check",
+      "question": "Is it safe to assume that `RequestException` already supports `RequestException` at this point?",
+      "answer": "No, `RequestException` does not exist yet at this point. It was introduced later in v0.2.1.",
+      "ground_truth": {
+        "exists": false,
+        "reason": "not_yet_introduced",
+        "introduced_at": "2011-02-14T15:46:40+00:00",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "75b499dd046060021db0c7a772dd34df9374a30b",
+      "timestamp": "2011-02-13T18:52:47+00:00",
+      "tags": [],
+      "entity_key": "class::requests/core.py::RequestException",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "class",
+        "entity_name": "RequestException",
+        "question_type": "temporal_leakage_test",
+        "temporal_direction": "future_knowledge"
+      },
+      "id": "q_00100"
+    },
+    {
+      "rq": "RQ3",
+      "category": "assumption_check",
+      "question": "Is it safe to assume that `reset` already supports `reset` at this point?",
+      "answer": "No, `reset` does not exist yet at this point. It was introduced later in v0.2.1.",
+      "ground_truth": {
+        "exists": false,
+        "reason": "not_yet_introduced",
+        "introduced_at": "2011-02-14T15:46:40+00:00",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "75b499dd046060021db0c7a772dd34df9374a30b",
+      "timestamp": "2011-02-13T18:52:47+00:00",
+      "tags": [],
+      "entity_key": "function::requests/packages/poster/encode.py::reset",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "reset",
+        "question_type": "temporal_leakage_test",
+        "temporal_direction": "future_knowledge"
+      },
+      "id": "q_00101"
+    },
+    {
+      "rq": "RQ3",
+      "category": "assumption_check",
+      "question": "I'm writing code for commit c51b44d9. Does `encode_hdr` exist yet, or do I need to implement this myself?",
+      "answer": "No, `encode_hdr` does not exist yet at this point. It was introduced later in v0.2.1.",
+      "ground_truth": {
+        "exists": false,
+        "reason": "not_yet_introduced",
+        "introduced_at": "2011-02-14T15:46:40+00:00",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "c51b44d96bb460ebea3daee7deeff6b686585087",
+      "timestamp": "2011-02-13T18:53:01+00:00",
+      "tags": [],
+      "entity_key": "function::requests/packages/poster/encode.py::encode_hdr",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "encode_hdr",
+        "question_type": "temporal_leakage_test",
+        "temporal_direction": "future_knowledge"
+      },
+      "id": "q_00102"
+    },
+    {
+      "rq": "RQ3",
+      "category": "assumption_check",
+      "question": "Can I rely on `gen_boundary` having `working with gen boundary` in commit c51b44d9?",
+      "answer": "No, `gen_boundary` does not exist yet at this point. It was introduced later in v0.2.1.",
+      "ground_truth": {
+        "exists": false,
+        "reason": "not_yet_introduced",
+        "introduced_at": "2011-02-14T15:46:40+00:00",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "c51b44d96bb460ebea3daee7deeff6b686585087",
+      "timestamp": "2011-02-13T18:53:01+00:00",
+      "tags": [],
+      "entity_key": "function::requests/packages/poster/encode.py::gen_boundary",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "gen_boundary",
+        "question_type": "temporal_leakage_test",
+        "temporal_direction": "future_knowledge"
+      },
+      "id": "q_00103"
+    },
+    {
+      "rq": "RQ3",
+      "category": "assumption_check",
+      "question": "Can I rely on `get_headers` having `retrieving headers` in commit 72e99c0f?",
+      "answer": "No, `get_headers` does not exist yet at this point. It was introduced later in v0.2.1.",
+      "ground_truth": {
+        "exists": false,
+        "reason": "not_yet_introduced",
+        "introduced_at": "2011-02-14T15:46:40+00:00",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "72e99c0f49823a5b798f8d15896480b7216c4fba",
+      "timestamp": "2011-02-13T18:53:08+00:00",
+      "tags": [],
+      "entity_key": "function::requests/packages/poster/encode.py::get_headers",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "get_headers",
+        "question_type": "temporal_leakage_test",
+        "temporal_direction": "future_knowledge"
+      },
+      "id": "q_00104"
+    },
+    {
+      "rq": "RQ3",
+      "category": "assumption_check",
+      "question": "I'm writing code for commit 72e99c0f. Does `post` exist yet, or do I need to implement this myself?",
+      "answer": "No, `post` does not exist yet at this point. It was introduced later in v0.2.1.",
+      "ground_truth": {
+        "exists": false,
+        "reason": "not_yet_introduced",
+        "introduced_at": "2011-02-14T15:46:40+00:00",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "72e99c0f49823a5b798f8d15896480b7216c4fba",
+      "timestamp": "2011-02-13T18:53:08+00:00",
+      "tags": [],
+      "entity_key": "function::requests/core.py::post",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "post",
+        "question_type": "temporal_leakage_test",
+        "temporal_direction": "future_knowledge"
+      },
+      "id": "q_00105"
+    },
+    {
+      "rq": "RQ3",
+      "category": "assumption_check",
+      "question": "I'm writing code for commit ffdbc387. Does `next` exist yet, or do I need to implement this myself?",
+      "answer": "No, `next` does not exist yet at this point. It was introduced later in v0.2.1.",
+      "ground_truth": {
+        "exists": false,
+        "reason": "not_yet_introduced",
+        "introduced_at": "2011-02-14T15:46:40+00:00",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "ffdbc387ea67398ac123b2ff5a5d69df3e198340",
+      "timestamp": "2011-02-13T18:53:15+00:00",
+      "tags": [],
+      "entity_key": "function::requests/packages/poster/encode.py::next",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "next",
+        "question_type": "temporal_leakage_test",
+        "temporal_direction": "future_knowledge"
+      },
+      "id": "q_00106"
+    },
+    {
+      "rq": "RQ3",
+      "category": "assumption_check",
+      "question": "Is it safe to assume that `AuthenticationError` already supports `AuthenticationError` at this point?",
+      "answer": "No, `AuthenticationError` does not exist yet at this point. It was introduced later in v0.2.1.",
+      "ground_truth": {
+        "exists": false,
+        "reason": "not_yet_introduced",
+        "introduced_at": "2011-02-14T15:46:40+00:00",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "ffdbc387ea67398ac123b2ff5a5d69df3e198340",
+      "timestamp": "2011-02-13T18:53:15+00:00",
+      "tags": [],
+      "entity_key": "class::requests/core.py::AuthenticationError",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "class",
+        "entity_name": "AuthenticationError",
+        "question_type": "temporal_leakage_test",
+        "temporal_direction": "future_knowledge"
+      },
+      "id": "q_00107"
+    },
+    {
+      "rq": "RQ3",
+      "category": "assumption_check",
+      "question": "I'm writing code for commit 853a4fd0. Does `iter_encode` exist yet, or do I need to implement this myself?",
+      "answer": "No, `iter_encode` does not exist yet at this point. It was introduced later in v0.2.1.",
+      "ground_truth": {
+        "exists": false,
+        "reason": "not_yet_introduced",
+        "introduced_at": "2011-02-14T15:46:40+00:00",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "853a4fd04ce3f4644e204418ee2cd694d9f29180",
+      "timestamp": "2011-02-13T18:53:25+00:00",
+      "tags": [],
+      "entity_key": "function::requests/packages/poster/encode.py::iter_encode",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "iter_encode",
+        "question_type": "temporal_leakage_test",
+        "temporal_direction": "future_knowledge"
+      },
+      "id": "q_00108"
+    },
+    {
+      "rq": "RQ3",
+      "category": "assumption_check",
+      "question": "Can I rely on `encode_and_quote` having `working with encode and quote` in commit 853a4fd0?",
+      "answer": "No, `encode_and_quote` does not exist yet at this point. It was introduced later in v0.2.1.",
+      "ground_truth": {
+        "exists": false,
+        "reason": "not_yet_introduced",
+        "introduced_at": "2011-02-14T15:46:40+00:00",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "853a4fd04ce3f4644e204418ee2cd694d9f29180",
+      "timestamp": "2011-02-13T18:53:25+00:00",
+      "tags": [],
+      "entity_key": "function::requests/packages/poster/encode.py::encode_and_quote",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "encode_and_quote",
+        "question_type": "temporal_leakage_test",
+        "temporal_direction": "future_knowledge"
+      },
+      "id": "q_00109"
+    },
+    {
+      "rq": "RQ3",
+      "category": "assumption_check",
+      "question": "Can I rely on `iter_encode` having `working with iter encode` in commit a6ffd97e?",
+      "answer": "No, `iter_encode` does not exist yet at this point. It was introduced later in v0.2.1.",
+      "ground_truth": {
+        "exists": false,
+        "reason": "not_yet_introduced",
+        "introduced_at": "2011-02-14T15:46:40+00:00",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "a6ffd97ef150f50eb1a0e0e54edf217831011753",
+      "timestamp": "2011-02-13T18:56:54+00:00",
+      "tags": [],
+      "entity_key": "function::requests/packages/poster/encode.py::iter_encode",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "iter_encode",
+        "question_type": "temporal_leakage_test",
+        "temporal_direction": "future_knowledge"
+      },
+      "id": "q_00110"
+    },
+    {
+      "rq": "RQ3",
+      "category": "assumption_check",
+      "question": "Is it safe to assume that `put` already supports `put` at this point?",
+      "answer": "No, `put` does not exist yet at this point. It was introduced later in v0.2.1.",
+      "ground_truth": {
+        "exists": false,
+        "reason": "not_yet_introduced",
+        "introduced_at": "2011-02-14T15:46:40+00:00",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "a6ffd97ef150f50eb1a0e0e54edf217831011753",
+      "timestamp": "2011-02-13T18:56:54+00:00",
+      "tags": [],
+      "entity_key": "function::requests/core.py::put",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "put",
+        "question_type": "temporal_leakage_test",
+        "temporal_direction": "future_knowledge"
+      },
+      "id": "q_00111"
+    },
+    {
+      "rq": "RQ3",
+      "category": "assumption_check",
+      "question": "I'm writing code for commit 45c68971. Does `next` exist yet, or do I need to implement this myself?",
+      "answer": "No, `next` does not exist yet at this point. It was introduced later in v0.2.1.",
+      "ground_truth": {
+        "exists": false,
+        "reason": "not_yet_introduced",
+        "introduced_at": "2011-02-14T15:46:40+00:00",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "45c6897128c1e20a98cf259101067123a4768793",
+      "timestamp": "2011-02-13T20:08:32+00:00",
+      "tags": [],
+      "entity_key": "function::requests/packages/poster/encode.py::next",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "next",
+        "question_type": "temporal_leakage_test",
+        "temporal_direction": "future_knowledge"
+      },
+      "id": "q_00112"
+    },
+    {
+      "rq": "RQ3",
+      "category": "assumption_check",
+      "question": "I'm writing code for commit 45c68971. Does `URLRequired` exist yet, or do I need to implement this myself?",
+      "answer": "No, `URLRequired` does not exist yet at this point. It was introduced later in v0.2.1.",
+      "ground_truth": {
+        "exists": false,
+        "reason": "not_yet_introduced",
+        "introduced_at": "2011-02-14T15:46:40+00:00",
+        "introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "45c6897128c1e20a98cf259101067123a4768793",
+      "timestamp": "2011-02-13T20:08:32+00:00",
+      "tags": [],
+      "entity_key": "class::requests/core.py::URLRequired",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "class",
+        "entity_name": "URLRequired",
+        "question_type": "temporal_leakage_test",
+        "temporal_direction": "future_knowledge"
+      },
+      "id": "q_00113"
+    },
+    {
+      "rq": "RQ3",
+      "category": "pre_feature_boundary",
+      "question": "Before `URLRequired` was introduced, how was `working with urlrequired` handled?",
+      "answer": "Before `URLRequired` was introduced, this functionality was not available in the library. Users would need to implement it themselves or use external solutions.",
+      "ground_truth": {
+        "feature_exists": false,
+        "feature_introduced_at": "2011-02-14T15:46:40+00:00",
+        "feature_introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "59c6aebd606e3c5fb7b684817faa92051fc0295a",
+      "timestamp": "2011-02-14T03:53:14+00:00",
+      "tags": [],
+      "entity_key": "class::requests/core.py::URLRequired",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "class",
+        "entity_name": "URLRequired",
+        "question_type": "temporal_leakage_test"
+      },
+      "id": "q_00114"
+    },
+    {
+      "rq": "RQ3",
+      "category": "pre_feature_boundary",
+      "question": "Before `from_file` was introduced, how was `working with from file` handled?",
+      "answer": "Before `from_file` was introduced, this functionality was not available in the library. Users would need to implement it themselves or use external solutions.",
+      "ground_truth": {
+        "feature_exists": false,
+        "feature_introduced_at": "2011-02-14T15:46:40+00:00",
+        "feature_introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "d6e7e19100f9f2ccbb95cb98ec2c261a293802f2",
+      "timestamp": "2011-02-14T06:47:16+00:00",
+      "tags": [],
+      "entity_key": "function::requests/packages/poster/encode.py::from_file",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "from_file",
+        "question_type": "temporal_leakage_test"
+      },
+      "id": "q_00115"
+    },
+    {
+      "rq": "RQ3",
+      "category": "pre_feature_boundary",
+      "question": "In commit 127bbbb1, what approach was used for `working with encode` (before the current implementation)?",
+      "answer": "Before `encode` was introduced, this functionality was not available in the library. Users would need to implement it themselves or use external solutions.",
+      "ground_truth": {
+        "feature_exists": false,
+        "feature_introduced_at": "2011-02-14T15:46:40+00:00",
+        "feature_introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "127bbbb18dccc0bb0522377c7b81b99b63b84a68",
+      "timestamp": "2011-02-14T14:04:41+00:00",
+      "tags": [],
+      "entity_key": "function::requests/packages/poster/encode.py::encode",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "encode",
+        "question_type": "temporal_leakage_test"
+      },
+      "id": "q_00116"
+    },
+    {
+      "rq": "RQ3",
+      "category": "pre_feature_boundary",
+      "question": "Before `encode_string` was introduced, how was `working with encode string` handled?",
+      "answer": "Before `encode_string` was introduced, this functionality was not available in the library. Users would need to implement it themselves or use external solutions.",
+      "ground_truth": {
+        "feature_exists": false,
+        "feature_introduced_at": "2011-02-14T15:46:40+00:00",
+        "feature_introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "7dd37d5ea91cd26c869a39b5a200136305c6f3bb",
+      "timestamp": "2011-02-14T14:27:47+00:00",
+      "tags": [],
+      "entity_key": "function::requests/packages/poster/encode.py::encode_string",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "encode_string",
+        "question_type": "temporal_leakage_test"
+      },
+      "id": "q_00117"
+    },
+    {
+      "rq": "RQ3",
+      "category": "pre_feature_boundary",
+      "question": "In commit 49f915fb, what approach was used for `retrieving headers` (before the current implementation)?",
+      "answer": "Before `get_headers` was introduced, this functionality was not available in the library. Users would need to implement it themselves or use external solutions.",
+      "ground_truth": {
+        "feature_exists": false,
+        "feature_introduced_at": "2011-02-14T15:46:40+00:00",
+        "feature_introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "49f915fb90f135082a83f64a21cc901d0b0e4d15",
+      "timestamp": "2011-02-13T21:59:13+00:00",
+      "tags": [],
+      "entity_key": "function::requests/packages/poster/encode.py::get_headers",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "get_headers",
+        "question_type": "temporal_leakage_test"
+      },
+      "id": "q_00118"
+    },
+    {
+      "rq": "RQ3",
+      "category": "pre_feature_boundary",
+      "question": "Before `reset` was introduced, how was `working with reset` handled?",
+      "answer": "Before `reset` was introduced, this functionality was not available in the library. Users would need to implement it themselves or use external solutions.",
+      "ground_truth": {
+        "feature_exists": false,
+        "feature_introduced_at": "2011-02-14T15:46:40+00:00",
+        "feature_introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "af272d58276a9d1415a563e4ac763a6207742342",
+      "timestamp": "2011-02-13T22:13:10+00:00",
+      "tags": [],
+      "entity_key": "function::requests/packages/poster/encode.py::reset",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "reset",
+        "question_type": "temporal_leakage_test"
+      },
+      "id": "q_00119"
+    },
+    {
+      "rq": "RQ3",
+      "category": "pre_feature_boundary",
+      "question": "In commit 8e8604d8, what approach was used for `working with multipart param` (before the current implementation)?",
+      "answer": "Before `MultipartParam` was introduced, this functionality was not available in the library. Users would need to implement it themselves or use external solutions.",
+      "ground_truth": {
+        "feature_exists": false,
+        "feature_introduced_at": "2011-02-14T15:46:40+00:00",
+        "feature_introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "8e8604d88bb6dc98a1fa5b0f040ba1a5b6dbc775",
+      "timestamp": "2011-02-14T13:55:24+00:00",
+      "tags": [],
+      "entity_key": "class::requests/packages/poster/encode.py::MultipartParam",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "class",
+        "entity_name": "MultipartParam",
+        "question_type": "temporal_leakage_test"
+      },
+      "id": "q_00120"
+    },
+    {
+      "rq": "RQ3",
+      "category": "pre_feature_boundary",
+      "question": "Before `iter_encode` was introduced, how was `working with iter encode` handled?",
+      "answer": "Before `iter_encode` was introduced, this functionality was not available in the library. Users would need to implement it themselves or use external solutions.",
+      "ground_truth": {
+        "feature_exists": false,
+        "feature_introduced_at": "2011-02-14T15:46:40+00:00",
+        "feature_introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "a42c003cdc43e0ade4fe624db56f405761eb3afc",
+      "timestamp": "2011-02-14T06:45:52+00:00",
+      "tags": [],
+      "entity_key": "function::requests/packages/poster/encode.py::iter_encode",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "iter_encode",
+        "question_type": "temporal_leakage_test"
+      },
+      "id": "q_00121"
+    },
+    {
+      "rq": "RQ3",
+      "category": "pre_feature_boundary",
+      "question": "In commit d8b19573, what approach was used for `working with multipart yielder` (before the current implementation)?",
+      "answer": "Before `multipart_yielder` was introduced, this functionality was not available in the library. Users would need to implement it themselves or use external solutions.",
+      "ground_truth": {
+        "feature_exists": false,
+        "feature_introduced_at": "2011-02-14T15:46:40+00:00",
+        "feature_introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "d8b19573f38aa84db95a7e4d1f1c0a2fa26517eb",
+      "timestamp": "2011-02-13T21:03:47+00:00",
+      "tags": [],
+      "entity_key": "class::requests/packages/poster/encode.py::multipart_yielder",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "class",
+        "entity_name": "multipart_yielder",
+        "question_type": "temporal_leakage_test"
+      },
+      "id": "q_00122"
+    },
+    {
+      "rq": "RQ3",
+      "category": "pre_feature_boundary",
+      "question": "Before `encode_hdr` was introduced, how was `working with encode hdr` handled?",
+      "answer": "Before `encode_hdr` was introduced, this functionality was not available in the library. Users would need to implement it themselves or use external solutions.",
+      "ground_truth": {
+        "feature_exists": false,
+        "feature_introduced_at": "2011-02-14T15:46:40+00:00",
+        "feature_introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "fdd54e14d68123899e61dd651176264b1276f416",
+      "timestamp": "2011-02-14T04:51:29+00:00",
+      "tags": [],
+      "entity_key": "function::requests/packages/poster/encode.py::encode_hdr",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "encode_hdr",
+        "question_type": "temporal_leakage_test"
+      },
+      "id": "q_00123"
+    },
+    {
+      "rq": "RQ3",
+      "category": "pre_feature_boundary",
+      "question": "Before `gen_boundary` was introduced, how was `working with gen boundary` handled?",
+      "answer": "Before `gen_boundary` was introduced, this functionality was not available in the library. Users would need to implement it themselves or use external solutions.",
+      "ground_truth": {
+        "feature_exists": false,
+        "feature_introduced_at": "2011-02-14T15:46:40+00:00",
+        "feature_introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "853a4fd04ce3f4644e204418ee2cd694d9f29180",
+      "timestamp": "2011-02-13T18:53:25+00:00",
+      "tags": [],
+      "entity_key": "function::requests/packages/poster/encode.py::gen_boundary",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "gen_boundary",
+        "question_type": "temporal_leakage_test"
+      },
+      "id": "q_00124"
+    },
+    {
+      "rq": "RQ3",
+      "category": "pre_feature_boundary",
+      "question": "Before `get_size` was introduced, how was `retrieving size` handled?",
+      "answer": "Before `get_size` was introduced, this functionality was not available in the library. Users would need to implement it themselves or use external solutions.",
+      "ground_truth": {
+        "feature_exists": false,
+        "feature_introduced_at": "2011-02-14T15:46:40+00:00",
+        "feature_introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "19db3ead4cd9bd0d9ac5d4615871ad3dcfde8144",
+      "timestamp": "2011-02-14T07:45:09+00:00",
+      "tags": [],
+      "entity_key": "function::requests/packages/poster/encode.py::get_size",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "get_size",
+        "question_type": "temporal_leakage_test"
+      },
+      "id": "q_00125"
+    },
+    {
+      "rq": "RQ3",
+      "category": "pre_feature_boundary",
+      "question": "In commit 23842865, what approach was used for `working with auth object` (before the current implementation)?",
+      "answer": "Before `AuthObject` was introduced, this functionality was not available in the library. Users would need to implement it themselves or use external solutions.",
+      "ground_truth": {
+        "feature_exists": false,
+        "feature_introduced_at": "2011-02-14T15:46:40+00:00",
+        "feature_introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "23842865e973f9aacd58fa935f1fec5c2069de11",
+      "timestamp": "2011-02-13T20:10:54+00:00",
+      "tags": [],
+      "entity_key": "class::requests/core.py::AuthObject",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "class",
+        "entity_name": "AuthObject",
+        "question_type": "temporal_leakage_test"
+      },
+      "id": "q_00126"
+    },
+    {
+      "rq": "RQ3",
+      "category": "pre_feature_boundary",
+      "question": "Before `get_body_size` was introduced, how was `retrieving body size` handled?",
+      "answer": "Before `get_body_size` was introduced, this functionality was not available in the library. Users would need to implement it themselves or use external solutions.",
+      "ground_truth": {
+        "feature_exists": false,
+        "feature_introduced_at": "2011-02-14T15:46:40+00:00",
+        "feature_introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "a6ffd97ef150f50eb1a0e0e54edf217831011753",
+      "timestamp": "2011-02-13T18:56:54+00:00",
+      "tags": [],
+      "entity_key": "function::requests/packages/poster/encode.py::get_body_size",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "get_body_size",
+        "question_type": "temporal_leakage_test"
+      },
+      "id": "q_00127"
+    },
+    {
+      "rq": "RQ3",
+      "category": "pre_feature_boundary",
+      "question": "In commit 54240b48, what approach was used for `working with head` (before the current implementation)?",
+      "answer": "Before `head` was introduced, this functionality was not available in the library. Users would need to implement it themselves or use external solutions.",
+      "ground_truth": {
+        "feature_exists": false,
+        "feature_introduced_at": "2011-02-14T15:46:40+00:00",
+        "feature_introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "54240b4811b66dc7d5c2738b91994c21023f0e9e",
+      "timestamp": "2011-02-13T21:24:14+00:00",
+      "tags": [],
+      "entity_key": "function::requests/core.py::head",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "head",
+        "question_type": "temporal_leakage_test"
+      },
+      "id": "q_00128"
+    },
+    {
+      "rq": "RQ3",
+      "category": "pre_feature_boundary",
+      "question": "Before `multipart_encode` was introduced, how was `working with multipart encode` handled?",
+      "answer": "Before `multipart_encode` was introduced, this functionality was not available in the library. Users would need to implement it themselves or use external solutions.",
+      "ground_truth": {
+        "feature_exists": false,
+        "feature_introduced_at": "2011-02-14T15:46:40+00:00",
+        "feature_introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "d1dc6aa329ef2bc972f9e71a795a9d00c3c46ceb",
+      "timestamp": "2011-02-14T07:40:39+00:00",
+      "tags": [],
+      "entity_key": "function::requests/packages/poster/encode.py::multipart_encode",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "multipart_encode",
+        "question_type": "temporal_leakage_test"
+      },
+      "id": "q_00129"
+    },
+    {
+      "rq": "RQ3",
+      "category": "pre_feature_boundary",
+      "question": "In commit 59c6aebd, what approach was used for `working with authentication error` (before the current implementation)?",
+      "answer": "Before `AuthenticationError` was introduced, this functionality was not available in the library. Users would need to implement it themselves or use external solutions.",
+      "ground_truth": {
+        "feature_exists": false,
+        "feature_introduced_at": "2011-02-14T15:46:40+00:00",
+        "feature_introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "59c6aebd606e3c5fb7b684817faa92051fc0295a",
+      "timestamp": "2011-02-14T03:53:14+00:00",
+      "tags": [],
+      "entity_key": "class::requests/core.py::AuthenticationError",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "class",
+        "entity_name": "AuthenticationError",
+        "question_type": "temporal_leakage_test"
+      },
+      "id": "q_00130"
+    },
+    {
+      "rq": "RQ3",
+      "category": "pre_feature_boundary",
+      "question": "Before `encode_and_quote` was introduced, how was `working with encode and quote` handled?",
+      "answer": "Before `encode_and_quote` was introduced, this functionality was not available in the library. Users would need to implement it themselves or use external solutions.",
+      "ground_truth": {
+        "feature_exists": false,
+        "feature_introduced_at": "2011-02-14T15:46:40+00:00",
+        "feature_introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "71df02df2c9ab37a8ee40b31f5e28742d1a6cee8",
+      "timestamp": "2011-02-13T23:49:02+00:00",
+      "tags": [],
+      "entity_key": "function::requests/packages/poster/encode.py::encode_and_quote",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "encode_and_quote",
+        "question_type": "temporal_leakage_test"
+      },
+      "id": "q_00131"
+    },
+    {
+      "rq": "RQ3",
+      "category": "pre_feature_boundary",
+      "question": "In commit 9f9ebece, what approach was used for `working with put` (before the current implementation)?",
+      "answer": "Before `put` was introduced, this functionality was not available in the library. Users would need to implement it themselves or use external solutions.",
+      "ground_truth": {
+        "feature_exists": false,
+        "feature_introduced_at": "2011-02-14T15:46:40+00:00",
+        "feature_introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "9f9ebecec27108db292a31397e44d447f4ebfeb9",
+      "timestamp": "2011-02-14T15:35:15+00:00",
+      "tags": [],
+      "entity_key": "function::requests/core.py::put",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "put",
+        "question_type": "temporal_leakage_test"
+      },
+      "id": "q_00132"
+    },
+    {
+      "rq": "RQ3",
+      "category": "pre_feature_boundary",
+      "question": "In commit a2ecf9c7, what approach was used for `working with add autoauth` (before the current implementation)?",
+      "answer": "Before `add_autoauth` was introduced, this functionality was not available in the library. Users would need to implement it themselves or use external solutions.",
+      "ground_truth": {
+        "feature_exists": false,
+        "feature_introduced_at": "2011-02-14T15:46:40+00:00",
+        "feature_introduced_in": "e09efc490ef6dec36298af3fcc04eabb81cdec54"
+      },
+      "commit": "a2ecf9c7864a849236c6a9589ac76b05c00244fb",
+      "timestamp": "2011-02-14T05:48:08+00:00",
+      "tags": [],
+      "entity_key": "function::requests/core.py::add_autoauth",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "add_autoauth",
+        "question_type": "temporal_leakage_test"
+      },
+      "id": "q_00133"
+    },
+    {
+      "rq": "RQ3",
+      "category": "historical_behavior",
+      "question": "At this point in the project, how does `from_params` behave?",
+      "answer": "`from_params` is a function that has the signature `from_params(cls, params)`. It was introduced in v0.2.1.",
+      "ground_truth": {
+        "exists": true,
+        "entity_key": "function::requests/packages/poster/encode.py::from_params",
+        "signature": "from_params(cls, params)"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::from_params",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "from_params",
+        "question_type": "factual"
+      },
+      "id": "q_00134"
+    },
+    {
+      "rq": "RQ3",
+      "category": "historical_behavior",
+      "question": "At this point in the project, how does `iter_encode` behave?",
+      "answer": "`iter_encode` is a function that has the signature `iter_encode(self, boundary, blocksize)`. It was introduced in v0.2.1.",
+      "ground_truth": {
+        "exists": true,
+        "entity_key": "function::requests/packages/poster/encode.py::iter_encode",
+        "signature": "iter_encode(self, boundary, blocksize)"
+      },
+      "commit": "e09efc490ef6dec36298af3fcc04eabb81cdec54",
+      "timestamp": "2011-02-14T15:46:40+00:00",
+      "tags": [
+        "v0.2.1"
+      ],
+      "entity_key": "function::requests/packages/poster/encode.py::iter_encode",
+      "context_setting": "C1",
+      "metadata": {
+        "entity_type": "function",
+        "entity_name": "iter_encode",
+        "question_type": "factual"
+      },
+      "id": "q_00135"
+    }
+  ]
+}

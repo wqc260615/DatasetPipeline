@@ -1,0 +1,26 @@
+{
+  "repo": "https://github.com/psf/requests",
+  "output_dir": "/Users/wqc/Downloads/thesis/DatasetPipeline/test_output/requests",
+  "total_commits": 100,
+  "processed": 2,
+  "failed": [],
+  "entity_tracking": {
+    "entities_tracked": 55,
+    "events_detected": 65
+  },
+  "change_detection": {
+    "version_pairs": 1,
+    "change_counts": {
+      "added": 45,
+      "removed": 1
+    }
+  },
+  "qa_generation": {
+    "total_questions": 147,
+    "by_rq": {
+      "RQ1": 66,
+      "RQ2": 46,
+      "RQ3": 35
+    }
+  }
+}
