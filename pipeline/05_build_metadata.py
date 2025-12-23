@@ -14,6 +14,9 @@ def _load_json(path: Path) -> Dict:
 
 
 def _count_files_and_languages(source_dir: Path) -> Tuple[int, Dict[str, int]]:
+    """Count files and detect languages by extension."""
+    from parsers import detect_language
+    
     file_count = 0
     languages: Dict[str, int] = {}
     if not source_dir.exists():
@@ -22,11 +25,16 @@ def _count_files_and_languages(source_dir: Path) -> Tuple[int, Dict[str, int]]:
     for file_path in source_dir.rglob("*"):
         if file_path.is_file():
             file_count += 1
-            ext = file_path.suffix.lower()
-            if ext == ".py":
-                languages["python"] = languages.get("python", 0) + 1
+            lang = detect_language(str(file_path))
+            if lang:
+                languages[lang] = languages.get(lang, 0) + 1
             else:
-                languages["other"] = languages.get("other", 0) + 1
+                # Fallback to extension-based detection
+                ext = file_path.suffix.lower().lstrip(".")
+                if ext:
+                    languages[ext] = languages.get(ext, 0) + 1
+                else:
+                    languages["other"] = languages.get("other", 0) + 1
     return file_count, languages
 
 
