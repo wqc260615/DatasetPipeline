@@ -37,6 +37,8 @@ pip-log.txt
 dataset/
 output/
 snapshots/
+data/
+*.json
 
 # ------------------------
 # Logs

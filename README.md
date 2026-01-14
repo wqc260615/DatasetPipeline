@@ -1,226 +1,169 @@
-# Dataset Pipeline (Temporal Q&A Benchmark for Evolving Repositories)
+# Temporal Question-Answering Dataset for Evolving Repositories
 
-This repository builds evolution-aware datasets from git repositories for evaluating LLMs' temporal reasoning capabilities. The pipeline implements the data collection and Q&A generation components described in the thesis proposal.
+A pipeline for extracting semantic evolution slices from Git repositories and generating snapshot-grounded question-answer pairs for evaluating LLMs' understanding of code evolution.
 
-## Pipeline Overview
+## Overview
 
-The pipeline consists of three phases:
+This project implements an automated pipeline that:
+1. Clones and analyzes Git repositories
+2. Identifies semantic evolution slices based on version releases, feature integrations, API changes, and refactoring events
+3. Extracts ASTs, function signatures, and metadata for each slice
+4. Generates slice-grounded Q&A pairs for temporal code understanding evaluation
 
-### Phase 1: Snapshot Extraction
-| Module | Description |
-|--------|-------------|
-| `01_index_repo.py` | Traverse commits via PyDriller, record parents, timestamps, tag metadata |
-| `02_export_snapshot.py` | Export clean snapshot per commit (git archive → worktree fallback) |
-| `03_parse_snapshot.py` | AST pass for Python files (functions/classes/imports/calls, LOC) |
-| `04_diff_snapshot.py` | Git diff stats and patch capture against parent commit |
-| `05_build_metadata.py` | Aggregate snapshot, parse, and diff outputs into `metadata.json` |
+## Features
 
-### Phase 2: Cross-Version Analysis
-| Module | Description |
-|--------|-------------|
-| `06_track_entities.py` | Track entity lifecycle (introduction, modification, removal) across versions |
-| `07_detect_changes.py` | Detect code evolution events (rename, move, signature change, refactor) |
+- **Semantic Slicing**: Automatically identifies meaningful code evolution points from Git history
+- **Multi-language Support**: Currently supports Python and Java
+- **AST Parsing**: Extracts structured code information using tree-sitter
+- **Validation**: Ensures slice quality and code parseability
+- **Flexible Configuration**: Customizable thresholds and settings via YAML config
 
-### Phase 3: Q&A Generation
-| Module | Description |
-|--------|-------------|
-| `08_generate_qa.py` | Generate temporally grounded Q&A pairs for RQ1-RQ4 evaluation |
+## Installation
 
-### Utilities
-| Module | Description |
-|--------|-------------|
-| `slicer.py` | Commit selection strategies (`commit`, `tag`, `release`, `time-interval`) |
-| `run_pipeline.py` | Orchestrates the full flow with logging, progress bars, and error isolation |
+### Prerequisites
 
-## Research Questions Supported
+- Python 3.10 or higher
+- Git
 
-The generated Q&A dataset supports evaluation of the following research questions:
+### Setup
 
-- **RQ1**: Factual questions about repository state at specific versions
-  - Entity existence ("Does function X exist in v1.0?")
-  - Introduction timing ("When was class Y introduced?")
-  - Signature queries ("What are the parameters of function Z?")
-
-- **RQ2**: Sensitivity to code evolution events
-  - Rename detection ("Was function A renamed to B?")
-  - Move detection ("Was class C moved to a different file?")
-  - Signature changes ("Did the API of function D change?")
-
-- **RQ3**: Temporal leakage detection
-  - Questions about entities before their introduction
-  - Questions about entities after their removal
-
-- **RQ4**: Multi-version reasoning
-  - Evolution summaries ("How has function X evolved?")
-  - Backward compatibility analysis
-
-## Quick Start
-
+1. **Create virtual environment:**
 ```bash
-# Install dependencies
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+2. **Install dependencies:**
+```bash
 pip install -r requirements.txt
-
-# Run the full pipeline
-python pipeline/run_pipeline.py \
-  --repo_url https://github.com/huggingface/transformers \
-  --output_dir ./dataset \
-  --slice_mode release \
-  --limit_commits 100 \
-  --index_limit 5000
 ```
 
-### Slicing Modes
+The requirements include:
+- GitPython for repository operations
+- tree-sitter for AST parsing
+- pydantic for data models
+- pyyaml for configuration
 
-| Mode | Description |
-|------|-------------|
-| `commit` | Process all commits (up to limit) |
-| `tag` | Process only commits with tags |
-| `release` | Process only commits with version-like tags (v1.0, etc.) |
-| `time-interval` | Process commits at regular intervals (e.g., `--time_interval 30d`) |
+## Usage
 
-## Output Structure
-
-```
-dataset/<repo_name>/
-├── index.json              # Commit index with metadata
-├── pipeline.log            # Execution log
-├── summary.json            # Pipeline execution summary
-├── entity_timeline.json    # Entity lifecycle tracking (RQ1)
-├── change_history.json     # Code evolution events (RQ2)
-├── qa_dataset.json         # Generated Q&A pairs (RQ1-RQ4)
-└── snapshots/
-    └── <commit_hash>/
-        ├── source/         # Extracted source code
-        ├── parsed.json     # AST analysis results
-        ├── diff.json       # Diff from parent commit
-        └── metadata.json   # Aggregated metadata
-```
-
-## Sample Outputs
-
-### `entity_timeline.json` (Entity Lifecycle)
-```json
-{
-  "summary": {
-    "total_entities_tracked": 1250,
-    "functions_tracked": 980,
-    "classes_tracked": 270
-  },
-  "entity_index": {
-    "function::src/model.py::forward": {
-      "introduced_in": "abc123",
-      "introduced_at": "2024-01-15T10:30:00Z",
-      "modifications": [...],
-      "removed_in": null
-    }
-  }
-}
-```
-
-### `change_history.json` (Evolution Events)
-```json
-{
-  "summary": {
-    "total_version_pairs": 45,
-    "global_change_counts": {
-      "added": 120,
-      "removed": 30,
-      "renamed": 15,
-      "signature_changed": 45
-    }
-  }
-}
-```
-
-### `qa_dataset.json` (Q&A Pairs)
-```json
-{
-  "summary": {
-    "total_questions": 500,
-    "questions_by_rq": {
-      "RQ1": 200,
-      "RQ2": 150,
-      "RQ3": 80,
-      "RQ4": 70
-    }
-  },
-  "questions": [
-    {
-      "id": "q_00001",
-      "rq": "RQ1",
-      "category": "existence",
-      "question": "Does the function `forward` exist in version v2.0?",
-      "answer": "Yes",
-      "ground_truth": true,
-      "commit": "abc123def",
-      "metadata": {
-        "entity_type": "function",
-        "question_type": "boolean"
-      }
-    }
-  ]
-}
-```
-
-### `metadata.json` (Per-Snapshot)
-```json
-{
-  "commit": "0e4b7938d0e965362973797f47ad2b85f605a96a",
-  "timestamp": "2025-07-15T08:40:41+00:00",
-  "message": "Add ModernBERT Decoder Models",
-  "parent": "0b724114cf8475f146ca2fd644c4e31f395441eb",
-  "num_files": 2803,
-  "loc": 1056661,
-  "languages": ["python", "other"],
-  "stats": {
-    "files_changed": [...],
-    "lines_added": 2020,
-    "lines_deleted": 0
-  },
-  "ast_summary": {
-    "files": 2521,
-    "functions": 36380,
-    "classes": 10836,
-    "imports": 38723,
-    "calls": 265279,
-    "loc": 1056661
-  }
-}
-```
-
-## Running Individual Modules
-
-Each module can be run independently:
+### Process a Single Repository
 
 ```bash
-# Index repository
-python pipeline/01_index_repo.py --repo_path /path/to/repo --out ./data/index.json
-
-# Export snapshot
-python pipeline/02_export_snapshot.py --repo_path /path/to/repo --commit abc123 --out_dir ./data/snapshots/abc123
-
-# Parse snapshot
-python pipeline/03_parse_snapshot.py --snapshot_dir ./data/snapshots/abc123 --out ./data/snapshots/abc123/parsed.json
-
-# Build entity timeline
-python pipeline/06_track_entities.py --snapshots_dir ./data/snapshots --index_path ./data/index.json --out ./data/entity_timeline.json
-
-# Detect changes
-python pipeline/07_detect_changes.py --snapshots_dir ./data/snapshots --index_path ./data/index.json --out ./data/change_history.json
-
-# Generate Q&A
-python pipeline/08_generate_qa.py \
-  --entity_timeline ./data/entity_timeline.json \
-  --change_history ./data/change_history.json \
-  --index_path ./data/index.json \
-  --snapshots_dir ./data/snapshots \
-  --out ./data/qa_dataset.json
+python -m pipeline.main --repo-url https://github.com/user/repo
 ```
 
-## Error Handling
+### Process Multiple Repositories
 
-Errors per commit are logged but do not stop the run. Inspect `summary.json` or `pipeline.log` for details. If a repository already exists locally, pass its path to `--repo_url` (the script detects local paths).
+Create a file `repos.txt` with one URL per line:
+```
+https://github.com/user/repo1
+https://github.com/user/repo2
+```
+
+Then run:
+```bash
+python -m pipeline.main --repo-list repos.txt
+```
+
+### Command Line Options
+
+- `--repo-url`: Single repository URL to process
+- `--repo-list`: Path to file containing repository URLs (one per line)
+- `--config`: Path to configuration file (default: `config.yaml`)
+- `--output-dir`: Output directory for results (default: `./data/slices`)
+
+## Configuration
+
+Edit `config.yaml` to customize:
+
+- **Slicing parameters**: Minimum interval between slices, maximum slices per repo, feature thresholds
+- **Language support**: Configure which languages to parse and their file extensions
+- **Storage paths**: Set output, cache, and repository directories
+- **Repository selection**: Criteria for filtering repositories (commit counts, licenses, etc.)
+- **Validation settings**: Quality thresholds and build checking options
+
+Example configuration:
+```yaml
+slicing:
+  min_interval_days: 14
+  max_slices_per_repo: 15
+  major_feature_threshold_lines: 200
+
+parsing:
+  languages: ["python", "java"]
+  timeout_seconds: 30
+
+storage:
+  output_dir: "./data/slices"
+  cache_dir: "./data/cache"
+  repositories_dir: "./data/repositories"
+```
+
+## Project Structure
+
+```
+DatasetPipeline/
+├── pipeline/              # Main pipeline code
+│   ├── repository_cloner.py      # Git cloning operations
+│   ├── commit_extractor.py       # Commit extraction and analysis
+│   ├── semantic_slicer.py        # Slice identification algorithm
+│   ├── ast_parser.py             # AST parsing with tree-sitter
+│   ├── metadata_generator.py     # Metadata generation for slices
+│   ├── models.py                 # Data models (Pydantic)
+│   ├── config.py                 # Configuration loading
+│   ├── output_writer.py          # Output file writing
+│   ├── main.py                   # Entry point
+│   └── validation/               # Validation modules
+│       ├── slice_validator.py    # Slice quality validation
+│       └── build_checker.py      # Build/compilation checking
+├── tests/                 # Unit tests
+├── config.yaml           # Configuration file
+├── requirements.txt      # Python dependencies
+├── pytest.ini           # Pytest configuration
+└── README.md            # This file
+```
+
+## Output Format
+
+The pipeline generates structured JSON files in the output directory (default: `./data/slices/`). Each repository gets its own subdirectory with the following structure:
+
+```
+data/slices/{repo_name}/
+├── metadata.json              # Repository info + slice metadata list
+├── summary.json               # Overall statistics
+└── slices/
+    ├── slice_0001/
+    │   ├── metadata.json      # Individual slice metadata
+    │   ├── files.json         # File list with content hashes
+    │   └── symbols/           # Symbol-level data
+    │       ├── functions.json # Extracted functions
+    │       ├── classes.json   # Extracted classes
+    │       └── comments.json  # Extracted comments
+    └── slice_0002/
+        └── ...
+```
+
+### Key Files
+
+- **`metadata.json`**: Contains repository information and a list of all slices with their metadata
+- **`summary.json`**: Overall statistics including total slices, files, lines, functions, classes, and language distribution
+- **`slices/slice_XXXX/metadata.json`**: Individual slice metadata (commit hash, date, type, version tag, etc.)
+- **`slices/slice_XXXX/files.json`**: List of files in the slice with their paths, content hashes, and languages
+- **`slices/slice_XXXX/symbols/`**: Symbol-level extracted data (functions, classes, comments) from all files in the slice
+
+## Testing
+
+Run unit tests:
+```bash
+pytest tests/
+```
+
+Run with coverage:
+```bash
+pytest tests/ --cov=pipeline --cov-report=html
+```
+
 
 ## License
 
-MIT
+This project is part of a Master's thesis research project.

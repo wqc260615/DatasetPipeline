@@ -1,0 +1,40 @@
+slicing:
+  min_interval_days: 14
+  max_slices_per_repo: 15
+  major_feature_threshold_lines: 200
+  refactoring_file_threshold: 5
+  version_release_weights:
+    major: 1.0
+    minor: 0.7
+    patch: 0.3
+  slice_score_threshold: 0.3
+
+parsing:
+  languages: ["python", "java"]
+  timeout_seconds: 30
+  supported_extensions:
+    python: [".py"]
+    java: [".java"]
+
+storage:
+  output_dir: "./data/slices"
+  cache_dir: "./data/cache"
+  repositories_dir: "./data/repositories"
+
+repository_selection:
+  min_commits: 100
+  max_commits: 50000
+  min_commits_per_year: 10
+  required_languages: ["python", "java"]
+  library_percentage: 0.6
+  application_percentage: 0.4
+  permissive_licenses: ["MIT", "Apache-2.0", "BSD-2-Clause", "BSD-3-Clause"]
+
+validation:
+  min_code_files_per_slice: 1
+  ast_parsing_success_rate_threshold: 0.9
+  enable_build_check: false  # Set to true if you want to test compilation
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s [%(levelname)s] %(name)s: %(message)s"

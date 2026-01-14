@@ -1,6 +1,8 @@
-"""Pipeline package for dataset construction utilities."""
+"""
+Temporal Question-Answering Dataset Pipeline
 
-from . import slicer
+A pipeline for extracting semantic evolution slices from Git repositories
+and generating snapshot-grounded question-answer pairs.
+"""
 
-__all__ = ["slicer"]
-
+__version__ = "0.1.0"
