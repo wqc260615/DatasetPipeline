@@ -56,8 +56,7 @@ def process_repository(
         cloned_path = clone_repository(
             repo_url,
             str(repo_dir),
-            shallow=True,
-            depth=1000
+            shallow=False
         )
         
         if not cloned_path:

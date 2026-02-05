@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 def clone_repository(
     url: str,
     target_dir: str,
-    shallow: bool = True,
+    shallow: bool = False,
     depth: int = 1000,
     max_retries: int = 3
 ) -> Optional[str]:

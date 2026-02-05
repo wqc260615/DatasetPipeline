@@ -56,6 +56,11 @@ class SliceMetadata(BaseModel):
     lines_added: Optional[int] = Field(None, description="Lines added in this commit")
     lines_deleted: Optional[int] = Field(None, description="Lines deleted in this commit")
     files_modified: Optional[List[str]] = Field(None, description="List of modified file paths")
+    slice_score: float = Field(0.0, description="Slice score used for selection")
+    score_breakdown: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Breakdown of how the slice score was computed"
+    )
 
 
 class SemanticSlice(BaseModel):

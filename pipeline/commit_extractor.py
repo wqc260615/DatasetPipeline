@@ -88,9 +88,9 @@ def extract_commits(
                 logger.warning(f"Error processing commit {commit.hexsha[:8]}: {e}")
                 continue
         
-        # Also process commits referenced by tags that might not be in shallow clone
-        # This ensures version releases are identified even if their commits are old
-        logger.info("Checking tags for commits outside shallow clone range...")
+        # Process commits referenced by tags from all branches
+        # This ensures version releases from all branches are identified
+        logger.info("Checking tags for commits from other branches...")        
         tag_commits_added = 0
         for tag_ref in repo.tags:
             try:
