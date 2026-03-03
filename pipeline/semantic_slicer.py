@@ -29,7 +29,8 @@ from pipeline.config import Config, SlicingConfig
 from pipeline.commit_extractor import (
     parse_version_tag,
     get_changed_files,
-    detect_file_renames
+    detect_file_renames,
+    get_diff_between_refs
 )
 
 logger = logging.getLogger(__name__)
@@ -462,6 +463,59 @@ def has_api_changes(commit: CommitInfo, repo: Repo) -> Tuple[bool, Dict[str, obj
         
     except Exception as e:
         logger.warning(f"Error checking API changes for commit {commit.hash[:8]}: {e}")
+        details["skipped_reason"] = "error"
+        return False, details
+
+
+def compare_api_symbols_between_commits(
+    repo: Repo,
+    old_hash: str,
+    new_hash: str,
+    file_paths: Optional[List[str]] = None
+) -> Tuple[bool, Dict[str, object]]:
+    details: Dict[str, object] = {
+        "matched": False,
+        "checked": False,
+        "changed_files": 0,
+        "code_files": 0,
+        "symbol_diff": False,
+        "skipped_reason": None
+    }
+    try:
+        paths: List[str] = []
+        if file_paths is None:
+            diff = get_diff_between_refs(repo, old_hash, new_hash)
+            if not diff:
+                details["skipped_reason"] = "no_diff"
+                return False, details
+            for item in diff:
+                if item.a_path:
+                    paths.append(item.a_path)
+                if item.b_path and item.b_path != item.a_path:
+                    paths.append(item.b_path)
+            paths = list(set(paths))
+        else:
+            paths = file_paths
+        details["changed_files"] = len(paths)
+        code_files = [
+            p for p in paths if p.endswith(".py") or p.endswith(".java")
+        ]
+        details["code_files"] = len(code_files)
+        if not code_files:
+            details["skipped_reason"] = "no_code_files"
+            return False, details
+        details["checked"] = True
+        for file_path in code_files:
+            lang = "python" if file_path.endswith(".py") else "java"
+            old_symbols = _get_public_api_symbols(repo, old_hash, file_path, lang)
+            new_symbols = _get_public_api_symbols(repo, new_hash, file_path, lang)
+            if _has_symbol_diff(new_symbols, old_symbols):
+                details["symbol_diff"] = True
+                details["matched"] = True
+                return True, details
+        return False, details
+    except Exception as e:
+        logger.warning(f"Error comparing API symbols between {old_hash[:8]} and {new_hash[:8]}: {e}")
         details["skipped_reason"] = "error"
         return False, details
 

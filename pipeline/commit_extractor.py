@@ -176,6 +176,16 @@ def get_commit_diff(repo: Repo, commit_hash: str) -> Optional[str]:
         return None
 
 
+def get_diff_between_refs(repo: Repo, old_ref: str, new_ref: str):
+    try:
+        old_commit = repo.commit(old_ref)
+        new_commit = repo.commit(new_ref)
+        return old_commit.diff(new_commit, create_patch=True)
+    except Exception as e:
+        logger.warning(f"Error getting diff between {old_ref[:8]} and {new_ref[:8]}: {e}")
+        return None
+
+
 def get_tags_at_commit(repo: Repo, commit_hash: str) -> List[str]:
     """
     Get all Git tags pointing to a specific commit.
