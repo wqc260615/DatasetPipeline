@@ -185,8 +185,12 @@ def generate_summary(dataset: RepositoryDataset) -> dict:
     from pipeline.metadata_generator import calculate_slice_statistics
     
     total_slices = len(dataset.slices)
-    total_files = sum(len(slice.files) for slice in dataset.slices)
+    total_files = sum(slice.metadata.total_files for slice in dataset.slices)
     total_lines = sum(slice.metadata.total_lines for slice in dataset.slices)
+    target_language_total_files = sum(len(slice.files) for slice in dataset.slices)
+    target_language_total_lines = sum(
+        slice.metadata.target_language_total_lines for slice in dataset.slices
+    )
     
     slice_types = {}
     languages = {}
@@ -210,6 +214,8 @@ def generate_summary(dataset: RepositoryDataset) -> dict:
             "total_slices": total_slices,
             "total_files": total_files,
             "total_lines": total_lines,
+            "target_language_total_files": target_language_total_files,
+            "target_language_total_lines": target_language_total_lines,
             "total_functions": total_functions,
             "total_classes": total_classes,
             "slice_types": slice_types,

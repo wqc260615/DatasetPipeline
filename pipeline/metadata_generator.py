@@ -25,6 +25,41 @@ from pipeline.ast_parser import parse_slice_files, detect_language
 logger = logging.getLogger(__name__)
 
 
+def _calculate_repository_totals(repo_path: str) -> tuple[int, int]:
+    """
+    Calculate repository-wide totals for current checked out snapshot.
+
+    Counts all regular files under repo root (excluding `.git`) and counts
+    text lines using utf-8 decoding with ignore errors.
+
+    Args:
+        repo_path: Path to repository root
+
+    Returns:
+        Tuple of (total_files, total_lines)
+    """
+    repo_root = Path(repo_path)
+    total_files = 0
+    total_lines = 0
+
+    for path in repo_root.rglob("*"):
+        if not path.is_file():
+            continue
+        if ".git" in path.parts:
+            continue
+
+        total_files += 1
+
+        try:
+            with open(path, 'r', encoding='utf-8', errors='ignore') as f:
+                total_lines += sum(1 for _ in f)
+        except Exception:
+            # Keep file count even if line counting fails
+            continue
+
+    return total_files, total_lines
+
+
 def enrich_slice_with_files(
     slice: SemanticSlice,
     repo_path: str,
@@ -58,9 +93,12 @@ def enrich_slice_with_files(
             config.parsing.timeout_seconds
         )
         
-        # Convert to CodeFile objects
+        # Repository-wide totals (all files in snapshot)
+        repo_total_files, repo_total_lines = _calculate_repository_totals(repo_path)
+
+        # Convert parsed target-language files to CodeFile objects
         code_files = []
-        total_lines = 0
+        target_language_total_lines = 0
         
         for parsed_file in parsed_files:
             # parse_file now returns symbol-level data directly
@@ -78,7 +116,7 @@ def enrich_slice_with_files(
             try:
                 with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
                     lines = f.readlines()
-                    total_lines += len(lines)
+                    target_language_total_lines += len(lines)
             except Exception:
                 pass
             
@@ -97,8 +135,12 @@ def enrich_slice_with_files(
         slice.files = code_files
         
         # Update metadata
-        slice.metadata.total_files = len(code_files)
-        slice.metadata.total_lines = total_lines
+        # total_* = repository-wide totals
+        # target_language_total_* = parsed language totals (e.g. python/java)
+        slice.metadata.total_files = repo_total_files
+        slice.metadata.total_lines = repo_total_lines
+        slice.metadata.target_language_total_files = len(code_files)
+        slice.metadata.target_language_total_lines = target_language_total_lines
         
         # Return to original branch
         if original_branch:
@@ -128,11 +170,13 @@ def calculate_slice_statistics(slice: SemanticSlice) -> dict:
         Dictionary with statistics
     """
     stats = {
-        "total_files": len(slice.files),
+        "total_files": slice.metadata.total_files,
+        "target_language_total_files": len(slice.files),
         "total_functions": 0,
         "total_classes": 0,
         "languages": {},
-        "total_lines": slice.metadata.total_lines
+        "total_lines": slice.metadata.total_lines,
+        "target_language_total_lines": slice.metadata.target_language_total_lines
     }
     
     for file in slice.files:

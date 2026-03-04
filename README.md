@@ -6,17 +6,17 @@ A pipeline for extracting semantic evolution slices from Git repositories and ge
 
 This project implements an automated pipeline that:
 1. Clones and analyzes Git repositories
-2. Identifies semantic evolution slices based on version releases, feature integrations, API changes, and refactoring events
+2. Identifies semantic evolution slices with a tag-distance + dynamic programming strategy
 3. Extracts ASTs, function signatures, and metadata for each slice
 4. Generates slice-grounded Q&A pairs for temporal code understanding evaluation
 
 ## Features
 
-- **Semantic Slicing**: Automatically identifies meaningful code evolution points from Git history
+- **Semantic Slicing**: Uses release tags as anchors, computes adjacent-tag semantic distance, and selects slices under budget with DP
 - **Multi-language Support**: Currently supports Python and Java
 - **AST Parsing**: Extracts structured code information using tree-sitter
 - **Validation**: Ensures slice quality and code parseability
-- **Flexible Configuration**: Customizable thresholds and settings via YAML config
+- **Flexible Configuration**: Customizable slicing and parsing settings via YAML config
 
 ## Installation
 
@@ -76,7 +76,7 @@ python -m pipeline.main --repo-list repos.txt
 
 Edit `config.yaml` to customize:
 
-- **Slicing parameters**: Minimum interval between slices, maximum slices per repo, feature thresholds
+- **Slicing parameters**: Target slices, tag scope, distance weights, and DP gain function
 - **Language support**: Configure which languages to parse and their file extensions
 - **Storage paths**: Set output, cache, and repository directories
 - **Repository selection**: Criteria for filtering repositories (commit counts, licenses, etc.)
@@ -85,9 +85,17 @@ Edit `config.yaml` to customize:
 Example configuration:
 ```yaml
 slicing:
-  min_interval_days: 14
-  max_slices_per_repo: 15
-  major_feature_threshold_lines: 200
+  target_slices: 20
+  tag_scope: "main_only"
+  main_branch_name: "main"
+  distance_weights:
+    lines: 0.45
+    files: 0.45
+    api_break: 0.10
+  segment_gain: "log1p"
+  force_first_release_tag: true
+  filter_non_semver: false
+  min_days_between_selected: 0
 
 parsing:
   languages: ["python", "java"]

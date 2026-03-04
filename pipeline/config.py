@@ -6,21 +6,59 @@ Loads and validates configuration from config.yaml.
 
 import yaml
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from pydantic import BaseModel, Field
+
+
+class DistanceWeightsConfig(BaseModel):
+    """Weights for tag-pair semantic distance computation."""
+    lines: float = Field(default=0.45, description="Weight for normalized ΔLines")
+    files: float = Field(default=0.45, description="Weight for normalized ΔFiles")
+    api_break: float = Field(default=0.10, description="Weight for API break indicator")
+
+
+class ApiBreakConfig(BaseModel):
+    """Backend configuration for API break detection."""
+    python_backend: str = Field(default="ast_symbol_diff", description="Python API break detection backend")
+    java_backend: str = Field(default="refactoring_miner", description="Java API break detection backend")
 
 
 class SlicingConfig(BaseModel):
     """Configuration for semantic slicing."""
-    min_interval_days: int = Field(default=14, description="Minimum days between slices")
-    max_slices_per_repo: int = Field(default=15, description="Maximum slices per repository")
-    major_feature_threshold_lines: int = Field(default=200, description="Lines changed threshold for major features")
-    refactoring_file_threshold: int = Field(default=5, description="File count threshold for refactoring")
-    version_release_weights: Dict[str, float] = Field(
-        default={"major": 1.0, "minor": 0.7, "patch": 0.3},
-        description="Weights for version release types"
+    # --- Tag-Distance + DP fields ---
+    target_slices: int = Field(default=20, description="Target number of slices to select (budget N)")
+    tag_scope: str = Field(
+        default="main_only",
+        description="Tag filtering scope: 'main_only' | 'all'"
     )
-    slice_score_threshold: float = Field(default=0.3, description="Minimum score for slice candidacy")
+    main_branch_name: str = Field(
+        default="main",
+        description="Main branch name; auto-fallback to 'master' if not found"
+    )
+    distance_weights: DistanceWeightsConfig = Field(
+        default_factory=DistanceWeightsConfig,
+        description="Weights for tag-pair semantic distance"
+    )
+    segment_gain: str = Field(
+        default="log1p",
+        description="Gain function for DP segment scoring: 'log1p' | 'sqrt'"
+    )
+    force_first_release_tag: bool = Field(
+        default=True,
+        description="Force the first release tag to be selected"
+    )
+    filter_non_semver: bool = Field(
+        default=False,
+        description="Exclude tags that cannot be parsed as semver"
+    )
+    min_days_between_selected: int = Field(
+        default=0,
+        description="Optional minimum days between selected tag slices (0 = no constraint)"
+    )
+    api_break: ApiBreakConfig = Field(
+        default_factory=ApiBreakConfig,
+        description="API break detection backend configuration"
+    )
 
 
 class ParsingConfig(BaseModel):

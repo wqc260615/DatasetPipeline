@@ -1,13 +1,19 @@
 slicing:
-  min_interval_days: 14
-  max_slices_per_repo: 15
-  major_feature_threshold_lines: 200
-  refactoring_file_threshold: 5
-  version_release_weights:
-    major: 1.0
-    minor: 0.7
-    patch: 0.3
-  slice_score_threshold: 0.3
+  # --- Tag-Distance + DP settings ---
+  target_slices: 20
+  tag_scope: "main_only"           # main_only | all
+  main_branch_name: "main"          # fallback to 'master' if not found
+  distance_weights:
+    lines: 0.45
+    files: 0.45
+    api_break: 0.10
+  segment_gain: "log1p"             # log1p | sqrt
+  force_first_release_tag: true
+  filter_non_semver: false
+  min_days_between_selected: 0      # 0 = no constraint
+  api_break:
+    python_backend: "ast_symbol_diff"
+    java_backend: "refactoring_miner"
 
 parsing:
   languages: ["python", "java"]
@@ -32,8 +38,8 @@ repository_selection:
 
 validation:
   min_code_files_per_slice: 1
-  ast_parsing_success_rate_threshold: 0.9
-  enable_build_check: false  # Set to true if you want to test compilation
+  ast_parsing_success_rate_threshold: 0.5
+  enable_build_check: false  # compilation test
 
 logging:
   level: "INFO"

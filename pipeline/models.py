@@ -49,8 +49,16 @@ class CodeFile(BaseModel):
 
 class SliceMetadata(BaseModel):
     """Metadata for a semantic evolution slice."""
-    total_files: int = Field(..., description="Total number of files in slice")
-    total_lines: int = Field(..., description="Total lines of code")
+    total_files: int = Field(..., description="Total number of files in repository snapshot")
+    total_lines: int = Field(..., description="Total number of lines in repository snapshot")
+    target_language_total_files: int = Field(
+        default=0,
+        description="Total number of target-language files in slice (configured extensions)"
+    )
+    target_language_total_lines: int = Field(
+        default=0,
+        description="Total lines in target-language files"
+    )
     changed_files_since_prev_slice: int = Field(..., description="Number of files changed since previous slice")
     commit_message: str = Field(..., description="Commit message")
     lines_added: Optional[int] = Field(None, description="Lines added in this commit")

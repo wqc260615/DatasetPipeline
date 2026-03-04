@@ -854,6 +854,13 @@ def parse_slice_files(
     
     try:
         repo = Repo(repo_path)
+
+        # Preserve exact original ref to avoid accidental branch toggling.
+        # `git checkout -` is fragile when caller already checked out a commit.
+        if repo.head.is_detached:
+            original_ref = repo.head.commit.hexsha
+        else:
+            original_ref = repo.active_branch.name
         
         # Checkout the commit
         repo.git.checkout(slice_commit_hash)
@@ -878,8 +885,8 @@ def parse_slice_files(
             if ast_data:
                 parsed_files.append(ast_data)
         
-        # Return to original branch
-        repo.git.checkout('-')
+        # Return to original ref
+        repo.git.checkout(original_ref)
         
     except Exception as e:
         logger.error(f"Error parsing slice files: {e}")

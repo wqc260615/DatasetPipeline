@@ -5,8 +5,6 @@ Purpose: Identifies semantic evolution slices from Git commit history.
 
 Key Functions:
 - identify_slices(repo_path: str, config: Config) -> List[SemanticSlice]
-- score_commit(commit: CommitInfo, repo: Repo, config: SlicingConfig) -> tuple[float, Optional[SliceType], dict]
-- merge_close_slices(slices: List[SemanticSlice], min_interval: timedelta) -> List[SemanticSlice]
 
 Example:
     >>> from pipeline.config import load_config
@@ -17,20 +15,29 @@ Example:
 """
 
 import logging
-import re
 import tempfile
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
+from datetime import datetime
+from functools import cmp_to_key
+from typing import Dict, List, NamedTuple, Optional, Tuple
 from pathlib import Path
 from git import Repo
 
-from pipeline.models import CommitInfo, SemanticSlice, SliceType, SliceMetadata
+from pipeline.models import SemanticSlice, SliceType, SliceMetadata
 from pipeline.config import Config, SlicingConfig
 from pipeline.commit_extractor import (
     parse_version_tag,
-    get_changed_files,
-    detect_file_renames,
     get_diff_between_refs
+)
+from pipeline.slicer.semver_utils import (
+    compare_prerelease_identifiers as _compare_prerelease_identifiers,
+    compare_version_tags as _compare_version_tags,
+)
+from pipeline.slicer.distance_metrics import (
+    percentile_rank as _percentile_rank,
+    normalize_tag_pair_metrics as _normalize_tag_pair_metrics_impl,
+)
+from pipeline.slicer.dp_selector import (
+    select_tag_slices_dp as _select_tag_slices_dp_impl,
 )
 
 logger = logging.getLogger(__name__)
@@ -38,433 +45,52 @@ logger = logging.getLogger(__name__)
 # Cache for parsed API symbols keyed by blob hash
 _api_symbol_cache: Dict[str, Dict[str, Dict[Tuple, Tuple]]] = {}
 
-# Patterns to identify non-code files
-DOCUMENTATION_PATTERNS = [
-    r'^docs?/',  # docs/, doc/
-    r'^documentation/',
-    r'\.md$',  # Markdown files
-    r'\.rst$',  # reStructuredText
-    r'\.txt$',  # Text files (often docs)
-    r'^README',
-    r'^CHANGELOG',
-    r'^LICENSE',
-    r'^CONTRIBUTING',
-]
+# Tag-distance slicing data types
 
-TRANSLATION_PATTERNS = [
-    r'^i18n/',
-    r'^locale/',
-    r'^translations/',
-    r'^lang/',
-    r'^l10n/',
-    r'/i18n/',
-    r'/locale/',
-    r'/translations/',
-    r'/lang/',
-    r'/l10n/',
-    r'\.po$',  # Gettext translation files
-    r'\.pot$',  # Gettext template files
-]
-
-# Commit message patterns that indicate documentation/translation updates
-DOC_COMMIT_PATTERNS = [
-    r'\[docs?\]',
-    r'\[documentation\]',
-    r'docs?:',
-    r'documentation:',
-    r'update.*readme',
-    r'update.*changelog',
-    r'fix.*typo',
-    r'fix.*grammar',
-    r'fix.*spelling',
-]
-
-TRANSLATION_COMMIT_PATTERNS = [
-    r'\[i18n',
-    r'\[translation',
-    r'\[locale',
-    r'translate',
-    r'translation',
-    r'i18n',
-    r'locale',
-]
+class TagAnchor(NamedTuple):
+    """Lightweight representation of a release-tag anchor point."""
+    tag_name: str
+    commit_hash: str
+    commit_date: datetime
+    version_info: dict  # output of parse_version_tag()
 
 
-def is_documentation_or_translation_commit(commit: CommitInfo, repo: Repo) -> bool:
-    """
-    Check if a commit is primarily documentation or translation updates.
-    
-    Args:
-        commit: Commit information
-        repo: Git repository object
-        
-    Returns:
-        True if commit is primarily docs/translation, False otherwise
-    """
-    # Check commit message for documentation/translation indicators
-    message_lower = commit.message.lower()
-    
-    # Check for documentation commit patterns
-    if any(re.search(pattern, message_lower) for pattern in DOC_COMMIT_PATTERNS):
-        return True
-    
-    # Check for translation commit patterns
-    if any(re.search(pattern, message_lower) for pattern in TRANSLATION_COMMIT_PATTERNS):
-        return True
-    
-    # Check changed files
-    try:
-        changed_files = get_changed_files(repo, commit.hash)
-        if not changed_files:
-            return False
-        
-        # Count code vs non-code files
-        code_files = 0
-        doc_files = 0
-        translation_files = 0
-        
-        for file_path in changed_files:
-            file_path_lower = file_path.lower()
-            
-            # Check if it's a documentation file
-            if any(re.search(pattern, file_path_lower) for pattern in DOCUMENTATION_PATTERNS):
-                doc_files += 1
-                continue
-            
-            # Check if it's a translation file
-            if any(re.search(pattern, file_path_lower) for pattern in TRANSLATION_PATTERNS):
-                translation_files += 1
-                continue
-            
-            # Check if it's a code file (common extensions)
-            code_extensions = ['.py', '.java', '.js', '.ts', '.cpp', '.c', '.h', '.go', '.rs', '.rb', '.php']
-            if any(file_path_lower.endswith(ext) for ext in code_extensions):
-                code_files += 1
-        
-        total_files = len(changed_files)
-        
-        # If more than 80% of files are docs/translation, consider it non-code
-        non_code_ratio = (doc_files + translation_files) / total_files if total_files > 0 else 0
-        
-        # Also check if there are significant code changes
-        # If less than 20% are code files, it's likely a docs/translation commit
-        code_ratio = code_files / total_files if total_files > 0 else 0
-        
-        # Exclude if:
-        # 1. More than 80% are docs/translation files, OR
-        # 2. Less than 20% are code files AND there are docs/translation files
-        if non_code_ratio > 0.8 or (code_ratio < 0.2 and (doc_files + translation_files) > 0):
-            return True
-        
-        # Special case: if commit message has translation indicators and files are mostly translation
-        if translation_files > 0 and code_ratio < 0.3:
-            return True
-            
-    except Exception as e:
-        logger.warning(f"Error checking files for commit {commit.hash[:8]}: {e}")
-        # If we can't check files, rely on commit message only
-        return False
-    
-    return False
+class TagPairMetrics(NamedTuple):
+    """Raw metrics between two adjacent tag anchors."""
+    from_anchor: TagAnchor
+    to_anchor: TagAnchor
+    delta_lines: int
+    delta_files: int
+    api_break: int  # 0 or 1
+
+
+class NormalizedTagPairMetrics(NamedTuple):
+    """Normalized metrics + computed distance for an adjacent tag pair."""
+    from_anchor: TagAnchor
+    to_anchor: TagAnchor
+    delta_lines: int
+    delta_files: int
+    api_break: int
+    norm_lines: float
+    norm_files: float
+    distance: float
 
 
 def identify_slices(repo_path: str, config: Config) -> List[SemanticSlice]:
     """
     Identify semantic evolution slices from a repository.
-    
+
     Args:
         repo_path: Path to Git repository
         config: Configuration object
-        
+
     Returns:
         List of SemanticSlice objects
     """
-    logger.info(f"Identifying slices for repository: {repo_path}")
-    
-    try:
-        repo = Repo(repo_path)
-        commits = _extract_commits_for_slicer(repo_path)
-        
-        if not commits:
-            logger.warning(f"No commits found in repository: {repo_path}")
-            return []
-        
-        # Score commits for slice candidacy
-        scored_commits = []
-        for commit in commits:
-            score, slice_type, breakdown = score_commit(commit, repo, config.slicing)
-            if score >= config.slicing.slice_score_threshold:
-                scored_commits.append((commit, score, slice_type, breakdown))
-        
-        logger.info(f"Found {len(scored_commits)} candidate slices")
-        
-        # Convert to SemanticSlice objects
-        slices = []
-        for commit, score, slice_type, breakdown in scored_commits:
-            try:
-                slice_obj = create_slice_from_commit(
-                    commit,
-                    repo,
-                    slice_type,
-                    config,
-                    score,
-                    breakdown
-                )
-                if slice_obj:
-                    slices.append(slice_obj)
-            except Exception as e:
-                logger.warning(f"Error creating slice for commit {commit.hash[:8]}: {e}")
-                continue
-        
-        # Apply temporal filtering
-        slices = merge_close_slices(slices, timedelta(days=config.slicing.min_interval_days))
-        
-        # Limit number of slices
-        if len(slices) > config.slicing.max_slices_per_repo:
-            # Keep highest scoring slices
-            slices.sort(key=lambda s: get_slice_score(s, scored_commits), reverse=True)
-            slices = slices[:config.slicing.max_slices_per_repo]
-            slices.sort(key=lambda s: s.commit_date)  # Re-sort by date
-        
-        logger.info(f"Final slice count: {len(slices)}")
-        return slices
-        
-    except Exception as e:
-        logger.error(f"Error identifying slices for {repo_path}: {e}")
-        return []
-
-
-def score_commit(
-    commit: CommitInfo,
-    repo: Repo,
-    config: SlicingConfig
-) -> Tuple[float, Optional[SliceType], Dict[str, object]]:
-    """
-    Score a commit for slice candidacy using weighted criteria.
-    
-    Args:
-        commit: Commit information
-        repo: Git repository object
-        config: Slicing configuration
-        
-    Returns:
-        Tuple of (score, slice_type, breakdown)
-    """
-    # Exclude documentation and translation commits (unless they're version releases)
-    # Version releases should still be included even if they contain docs
-    is_docs_or_translation = is_documentation_or_translation_commit(commit, repo)
-    has_version_tag = bool(commit.tags and any(
-        parse_version_tag(tag) for tag in commit.tags
-    ))
-    
-    breakdown: Dict[str, object] = {
-        "excluded_docs_or_translation": False,
-        "version_release": {},
-        "major_feature": {},
-        "api_change": {},
-        "refactoring": {},
-        "final": {}
-    }
-
-    # If it's a docs/translation commit and NOT a version release, exclude it
-    if is_docs_or_translation and not has_version_tag:
-        logger.debug(f"Excluding docs/translation commit {commit.hash[:8]}: {commit.message[:50]}...")
-        breakdown["excluded_docs_or_translation"] = True
-        breakdown["final"] = {
-            "score": 0.0,
-            "reason": "excluded_docs_or_translation",
-            "slice_type": None
-        }
-        return 0.0, None, breakdown
-    
-    score = 0.0
-    slice_type = None
-    
-    # Priority 1: Version releases (highest weight)
-    version_release_matched = False
-    version_release_weight = 0.0
-    version_release_type = None
-    version_release_tag = None
-    if commit.tags:
-        for tag in commit.tags:
-            version_info = parse_version_tag(tag)
-            if version_info:
-                version_type = version_info["type"]
-                weight = config.version_release_weights.get(version_type, 0.3)
-                version_release_matched = True
-                if weight >= version_release_weight:
-                    version_release_weight = weight
-                    version_release_type = version_type
-                    version_release_tag = tag
-                if weight > score:
-                    score = weight
-                    slice_type = SliceType.VERSION_RELEASE
-    breakdown["version_release"] = {
-        "matched": version_release_matched,
-        "weight": version_release_weight,
-        "version_type": version_release_type,
-        "tag": version_release_tag
-    }
-    
-    # Priority 2: Major feature integrations
-    is_feature, feature_details = is_major_feature(commit, config)
-    breakdown["major_feature"] = {
-        **feature_details,
-        "weight": 0.6
-    }
-    if is_feature:
-        feature_score = 0.6
-        if feature_score > score:
-            score = feature_score
-            slice_type = slice_type or SliceType.FEATURE
-    
-    # Priority 3: Breaking API changes
-    has_api, api_details = has_api_changes(commit, repo)
-    breakdown["api_change"] = {
-        **api_details,
-        "weight": 0.5
-    }
-    if has_api:
-        api_score = 0.5
-        if api_score > score:
-            score = api_score
-            slice_type = slice_type or SliceType.API_CHANGE
-    
-    # Priority 4: Large-scale refactoring
-    is_refactor, refactor_details = is_large_refactoring(commit, repo, config)
-    breakdown["refactoring"] = {
-        **refactor_details,
-        "weight": 0.4
-    }
-    if is_refactor:
-        refactor_score = 0.4
-        if refactor_score > score:
-            score = refactor_score
-            slice_type = slice_type or SliceType.REFACTORING
-
-    breakdown["final"] = {
-        "score": score,
-        "reason": slice_type.value if slice_type else None,
-        "slice_type": slice_type.value if slice_type else None
-    }
-    
-    return score, slice_type, breakdown
-
-
-def is_major_feature(commit: CommitInfo, config: SlicingConfig) -> Tuple[bool, Dict[str, object]]:
-    """
-    Check if commit represents a major feature integration.
-    
-    Args:
-        commit: Commit information
-        config: Slicing configuration
-        
-    Returns:
-        Tuple of (is_major_feature, details)
-    """
-    # Check commit message for feature markers
-    message_lower = commit.message.lower()
-    feature_markers = ["feat:", "feature", "add", "implement", "introduce"]
-    
-    has_feature_marker = any(marker in message_lower for marker in feature_markers)
-    
-    # Check size thresholds
-    total_lines_changed = commit.lines_added + commit.lines_deleted
-    meets_size_threshold = (
-        total_lines_changed > config.major_feature_threshold_lines or
-        commit.files_changed > 10
+    logger.info(
+        f"Identifying slices for repository: {repo_path} (strategy=tag_distance_dp)"
     )
-    
-    details = {
-        "matched": has_feature_marker and meets_size_threshold,
-        "has_feature_marker": has_feature_marker,
-        "meets_size_threshold": meets_size_threshold,
-        "total_lines_changed": total_lines_changed,
-        "files_changed": commit.files_changed,
-        "threshold_lines": config.major_feature_threshold_lines
-    }
-
-    return details["matched"], details
-
-
-def has_api_changes(commit: CommitInfo, repo: Repo) -> Tuple[bool, Dict[str, object]]:
-    """
-    Detect breaking API changes in a commit using lightweight AST symbol diffing.
-    
-    Strategy:
-    - Only analyze changed code files (.py, .java)
-    - Compare commit vs parent for public symbols (functions/classes)
-    - Use lightweight symbol extraction (no full AST retention)
-    - Short-circuit on simple heuristics to keep it fast
-    Returns:
-        Tuple of (has_api_changes, details)
-    """
-    details: Dict[str, object] = {
-        "matched": False,
-        "checked": False,
-        "has_api_keywords": False,
-        "total_lines_changed": commit.lines_added + commit.lines_deleted,
-        "changed_files": 0,
-        "code_files": 0,
-        "skipped_reason": None,
-        "symbol_diff": False
-    }
-
-    try:
-        changed_files = get_changed_files(repo, commit.hash)
-        details["changed_files"] = len(changed_files)
-        if not changed_files:
-            details["skipped_reason"] = "no_changed_files"
-            return False, details
-
-        # Quick heuristics to avoid heavy work on tiny commits
-        message_lower = commit.message.lower()
-        api_keywords = ["api", "interface", "signature", "breaking", "deprecate", "rename", "remove"]
-        has_api_keywords = any(keyword in message_lower for keyword in api_keywords)
-        total_lines_changed = commit.lines_added + commit.lines_deleted
-        details["has_api_keywords"] = has_api_keywords
-
-        # Only consider Python/Java files for AST-based check (lightweight scope)
-        code_files = [
-            f for f in changed_files
-            if f.endswith(".py") or f.endswith(".java")
-        ]
-        details["code_files"] = len(code_files)
-        if not code_files:
-            details["skipped_reason"] = "no_code_files"
-            return False, details
-
-        # Skip tiny commits unless message indicates API changes
-        if not has_api_keywords and total_lines_changed < 50 and len(code_files) < 3:
-            details["skipped_reason"] = "tiny_commit_without_keywords"
-            return False, details
-
-        # Identify parent commit
-        git_commit = repo.commit(commit.hash)
-        if not git_commit.parents:
-            details["skipped_reason"] = "no_parent_commit"
-            return False, details
-        parent_hash = git_commit.parents[0].hexsha
-
-        details["checked"] = True
-
-        for file_path in code_files:
-            lang = "python" if file_path.endswith(".py") else "java"
-
-            current_symbols = _get_public_api_symbols(repo, commit.hash, file_path, lang)
-            parent_symbols = _get_public_api_symbols(repo, parent_hash, file_path, lang)
-
-            if _has_symbol_diff(current_symbols, parent_symbols):
-                details["symbol_diff"] = True
-                details["matched"] = True
-                return True, details
-
-        return False, details
-        
-    except Exception as e:
-        logger.warning(f"Error checking API changes for commit {commit.hash[:8]}: {e}")
-        details["skipped_reason"] = "error"
-        return False, details
+    return _identify_slices_impl(repo_path, config)
 
 
 def compare_api_symbols_between_commits(
@@ -627,192 +253,472 @@ def _has_symbol_diff(current: Dict[str, Dict[Tuple, Tuple]], previous: Dict[str,
     return False
 
 
-def is_large_refactoring(commit: CommitInfo, repo: Repo, config: SlicingConfig) -> Tuple[bool, Dict[str, object]]:
+# Tag-Distance + DP slicing strategy
+def _identify_slices_impl(repo_path: str, config: Config) -> List[SemanticSlice]:
     """
-    Detect large-scale refactoring events.
-    
+    Tag-Distance + DP slicing strategy.
+
+    1. Collect release-tag anchors reachable from the main branch.
+    2. Compute semantic distance for each adjacent tag pair.
+    3. Normalise metrics via percentile rank.
+    4. Select *N* tag-anchors that maximise total segment gain (DP).
+    5. Convert selected anchors to ``SemanticSlice`` objects.
+
     Args:
-        commit: Commit information
-        repo: Git repository object
-        config: Slicing configuration
-        
+        repo_path: Path to Git repository
+        config: Pipeline configuration
+
     Returns:
-        Tuple of (is_refactoring, details)
+        List of SemanticSlice objects
     """
-    details: Dict[str, object] = {
-        "matched": False,
-        "renames": 0,
-        "refactor_keywords": False,
-        "files_changed": commit.files_changed,
-        "threshold_files": config.refactoring_file_threshold
-    }
-
     try:
-        # Check for file renames
-        renames = detect_file_renames(repo, commit.hash)
-        details["renames"] = len(renames)
-        if len(renames) >= config.refactoring_file_threshold:
-            details["matched"] = True
-            return True, details
-        
-        # Check commit message for refactoring keywords
-        message_lower = commit.message.lower()
-        refactor_keywords = ["refactor", "restructure", "reorganize", "move", "rename"]
-        if any(keyword in message_lower for keyword in refactor_keywords):
-            details["refactor_keywords"] = True
-            # Check if many files changed
-            if commit.files_changed >= config.refactoring_file_threshold:
-                details["matched"] = True
-                return True, details
-        
-        return False, details
-        
+        repo = Repo(repo_path)
+        slicing = config.slicing
+
+        # Step 1 – collect tag anchors
+        anchors = collect_tag_anchors(repo, slicing)
+        if not anchors:
+            logger.warning("No tag anchors found for slicing strategy")
+            return []
+
+        logger.info(f"Collected {len(anchors)} tag anchors (sorted by SemVer)")
+
+        # Step 2 – compute raw metrics for each adjacent pair
+        pair_metrics = compute_adjacent_tag_metrics(repo, anchors, slicing)
+        logger.info(
+            f"Computed metrics for {len(pair_metrics)} adjacent tag pairs"
+        )
+
+        # Step 3 – normalise and compute distances
+        normalised = normalize_tag_pair_metrics(pair_metrics, slicing)
+        distances = [m.distance for m in normalised]
+
+        # Step 4 – DP selection
+        n_target = min(slicing.target_slices, len(anchors))
+        selected_indices = select_tag_slices_dp(
+            anchors,
+            distances,
+            n_target,
+            gain_func=slicing.segment_gain,
+            force_first=slicing.force_first_release_tag,
+        )
+        logger.info(
+            f"DP selected {len(selected_indices)} anchors out of {len(anchors)} "
+            f"(target={slicing.target_slices})"
+        )
+
+        # Log each selected anchor
+        for rank, idx in enumerate(selected_indices, 1):
+            a = anchors[idx]
+            logger.info(
+                f"  #{rank}: tag={a.tag_name}  commit={a.commit_hash[:8]}  "
+                f"date={a.commit_date.isoformat()}"
+            )
+
+        # Step 5 – build SemanticSlice objects
+        # Pre-compute a lookup: anchor_index → left-segment normalised metrics
+        seg_lookup = _build_segment_lookup(normalised, anchors, selected_indices)
+
+        slices: List[SemanticSlice] = []
+        for idx in selected_indices:
+            anchor = anchors[idx]
+            try:
+                slice_obj = _create_slice_from_anchor(
+                    anchor, repo, config, seg_lookup.get(idx)
+                )
+                if slice_obj:
+                    slices.append(slice_obj)
+            except Exception as e:
+                logger.warning(
+                    f"Error creating slice for tag {anchor.tag_name}: {e}"
+                )
+                continue
+
+        # Sort by commit date (should already be in order)
+        slices.sort(key=lambda s: s.commit_date)
+        logger.info(f"Final slice count: {len(slices)}")
+        return slices
+
     except Exception as e:
-        logger.warning(f"Error checking refactoring for commit {commit.hash[:8]}: {e}")
-        return False, details
+        logger.error(f"Error in slicing for {repo_path}: {e}", exc_info=True)
+        return []
 
 
-def create_slice_from_commit(
-    commit: CommitInfo,
+# Collect tag anchors
+def collect_tag_anchors(
     repo: Repo,
-    slice_type: SliceType,
-    config: Config,
-    slice_score: float,
-    score_breakdown: Dict[str, object]
-) -> Optional[SemanticSlice]:
+    config: SlicingConfig,
+) -> List[TagAnchor]:
     """
-    Create a SemanticSlice object from a commit.
-    
-    Args:
-        commit: Commit information
-        repo: Git repository object
-        slice_type: Type of semantic slice
-        config: Configuration object
-        
-    Returns:
-        SemanticSlice object, or None if error
+    Collect semver tag anchors from the repository, optionally filtering to
+    those reachable from the main branch.
+
+    Returns a list sorted by SemVer precedence (ascending).
     """
+    # Determine main branch head (for main_only filtering)
+    main_head_hash: Optional[str] = None
+    if config.tag_scope == "main_only":
+        main_head_hash = _resolve_main_branch(repo, config.main_branch_name)
+        if main_head_hash:
+            logger.info(
+                f"Main branch resolved to {config.main_branch_name} "
+                f"({main_head_hash[:8]})"
+            )
+        else:
+            logger.warning(
+                "Could not resolve main branch – falling back to tag_scope='all'"
+            )
+
+    raw_anchors: Dict[str, TagAnchor] = {}  # keyed by commit_hash
+
+    for tag_ref in repo.tags:
+        tag_name = tag_ref.name
+        version_info = parse_version_tag(tag_name)
+
+        # Optionally skip non-semver tags
+        if version_info is None:
+            if config.filter_non_semver:
+                continue
+            else:
+                # Keep unknown tags with a synthetic version_info so they sort
+                # after all real semver tags (gives them lowest selection
+                # priority in DP, but doesn't discard information).
+                version_info = {
+                    "major": 999999, "minor": 999999, "patch": 999999,
+                    "prerelease": tag_name, "build": None,
+                    "type": "unknown",
+                }
+
+        try:
+            tag_commit = tag_ref.commit
+        except Exception:
+            logger.debug(f"Skipping tag {tag_name}: cannot resolve commit")
+            continue
+
+        commit_hash = tag_commit.hexsha
+
+        # main_only reachability check
+        if main_head_hash is not None:
+            if not _is_ancestor(repo, commit_hash, main_head_hash):
+                logger.debug(
+                    f"Skipping tag {tag_name}: not reachable from main branch"
+                )
+                continue
+
+        commit_date = tag_commit.committed_datetime
+
+        # De-duplicate: keep the tag with the *highest* semver when multiple
+        # tags point at the same commit.
+        existing = raw_anchors.get(commit_hash)
+        if existing is not None:
+            try:
+                # Only compare if both are real semver
+                if (
+                    existing.version_info.get("type") != "unknown"
+                    and version_info.get("type") != "unknown"
+                ):
+                    if _compare_version_tags(tag_name, existing.tag_name) <= 0:
+                        continue
+                elif version_info.get("type") == "unknown":
+                    # Existing is real semver, new is unknown – keep existing
+                    continue
+            except ValueError:
+                continue
+
+        raw_anchors[commit_hash] = TagAnchor(
+            tag_name=tag_name,
+            commit_hash=commit_hash,
+            commit_date=commit_date,
+            version_info=version_info,
+        )
+
+    anchors = list(raw_anchors.values())
+
+    # Use the proper SemVer comparator for real tags
+    semver_anchors = [a for a in anchors if a.version_info.get("type") != "unknown"]
+    unknown_anchors = [a for a in anchors if a.version_info.get("type") == "unknown"]
+
+    if semver_anchors:
+        semver_anchors.sort(
+            key=cmp_to_key(
+                lambda a, b: _compare_version_tags(a.tag_name, b.tag_name)
+            )
+        )
+
+    # Unknown tags appended at the end sorted by commit date
+    unknown_anchors.sort(key=lambda a: a.commit_date)
+
+    sorted_anchors = semver_anchors + unknown_anchors
+    logger.debug(
+        f"Tag anchors after filtering & sorting: "
+        f"{[a.tag_name for a in sorted_anchors]}"
+    )
+    return sorted_anchors
+
+
+def _resolve_main_branch(repo: Repo, preferred_name: str) -> Optional[str]:
+    """Return the HEAD commit hash of the main branch, or *None*."""
+    for name in (preferred_name, "master", "main"):
+        try:
+            return repo.commit(name).hexsha
+        except Exception:
+            continue
+    # Last resort: try the repo HEAD
     try:
-        # Generate slice ID
-        repo_name = Path(repo.working_dir).name
-        date_str = commit.date.strftime("%Y%m%d")
-        slice_id = f"{repo_name}_{commit.hash[:8]}_{date_str}"
-        
-        # Get version tag if available
-        version_tag = None
-        if commit.tags:
-            for tag in commit.tags:
-                if parse_version_tag(tag):
-                    version_tag = tag
-                    break
-        
-        # Get changed files
-        changed_files = get_changed_files(repo, commit.hash)
-        
-        # Create metadata
-        metadata = SliceMetadata(
-            total_files=commit.files_changed,
-            total_lines=commit.lines_added + commit.lines_deleted,
-            changed_files_since_prev_slice=commit.files_changed,
-            commit_message=commit.message,
-            lines_added=commit.lines_added,
-            lines_deleted=commit.lines_deleted,
-            files_modified=changed_files,
-            slice_score=slice_score,
-            score_breakdown=score_breakdown
-        )
-        
-        slice_obj = SemanticSlice(
-            slice_id=slice_id,
-            commit_hash=commit.hash,
-            commit_date=commit.date.isoformat(),
-            slice_type=slice_type,
-            version_tag=version_tag,
-            files=[],  # Files will be populated by AST parser
-            metadata=metadata
-        )
-        
-        return slice_obj
-        
-    except Exception as e:
-        logger.error(f"Error creating slice from commit {commit.hash[:8]}: {e}")
+        return repo.head.commit.hexsha
+    except Exception:
         return None
 
 
-def merge_close_slices(
-    slices: List[SemanticSlice],
-    min_interval: timedelta
-) -> List[SemanticSlice]:
+def _is_ancestor(repo: Repo, maybe_ancestor: str, descendant: str) -> bool:
+    """Check if *maybe_ancestor* is an ancestor of *descendant*."""
+    try:
+        repo.git.merge_base("--is-ancestor", maybe_ancestor, descendant)
+        return True
+    except Exception:
+        return False
+
+
+# Compute adjacent tag-pair metrics
+def compute_adjacent_tag_metrics(
+    repo: Repo,
+    anchors: List[TagAnchor],
+    config: SlicingConfig,
+) -> List[TagPairMetrics]:
     """
-    Merge slices that are too close together temporally.
-    
-    Args:
-        slices: List of slices
-        min_interval: Minimum time interval between slices
-        
-    Returns:
-        Filtered list of slices
+    For each pair of adjacent anchors ``(t_i, t_{i+1})`` compute:
+
+    - ``delta_lines``: total added + deleted lines (via ``git diff --numstat``)
+    - ``delta_files``: number of changed file entries
+    - ``api_break``:   whether a public-API symbol diff was detected (0/1)
     """
-    if not slices:
-        return []
-    
-    # Sort by date
-    slices_sorted = sorted(slices, key=lambda s: s.commit_date)
-    
-    merged = [slices_sorted[0]]
-    
-    for current_slice in slices_sorted[1:]:
-        last_slice = merged[-1]
-        
-        # Parse dates
-        last_date = datetime.fromisoformat(last_slice.commit_date.replace('Z', '+00:00'))
-        current_date = datetime.fromisoformat(current_slice.commit_date.replace('Z', '+00:00'))
-        
-        time_diff = current_date - last_date
-        
-        if time_diff >= min_interval:
-            merged.append(current_slice)
-        else:
-            # Merge: keep the slice with higher priority (version_release > feature > api_change > refactoring)
-            priority_order = {
-                SliceType.VERSION_RELEASE: 4,
-                SliceType.FEATURE: 3,
-                SliceType.API_CHANGE: 2,
-                SliceType.REFACTORING: 1
+    metrics: List[TagPairMetrics] = []
+
+    for i in range(len(anchors) - 1):
+        a_from = anchors[i]
+        a_to = anchors[i + 1]
+
+        try:
+            delta_lines, delta_files = _diff_numstat(
+                repo, a_from.commit_hash, a_to.commit_hash
+            )
+        except Exception as e:
+            logger.warning(
+                f"Error computing diff between {a_from.tag_name} and "
+                f"{a_to.tag_name}: {e} – using zeros"
+            )
+            delta_lines, delta_files = 0, 0
+
+        # API break detection (reuse existing symbol diff machinery)
+        api_break = 0
+        try:
+            has_break, _details = compare_api_symbols_between_commits(
+                repo, a_from.commit_hash, a_to.commit_hash
+            )
+            if has_break:
+                api_break = 1
+        except Exception as e:
+            logger.warning(
+                f"API break detection failed between {a_from.tag_name} and "
+                f"{a_to.tag_name}: {e} – defaulting to 0 (api_break_status=unknown)"
+            )
+
+        m = TagPairMetrics(
+            from_anchor=a_from,
+            to_anchor=a_to,
+            delta_lines=delta_lines,
+            delta_files=delta_files,
+            api_break=api_break,
+        )
+        metrics.append(m)
+
+        logger.debug(
+            f"  {a_from.tag_name} → {a_to.tag_name}: "
+            f"ΔLines={delta_lines}, ΔFiles={delta_files}, APIBreak={api_break}"
+        )
+
+    return metrics
+
+
+def _diff_numstat(
+    repo: Repo, old_hash: str, new_hash: str
+) -> Tuple[int, int]:
+    """
+    Run ``git diff --numstat`` between two refs.
+
+    Returns ``(total_lines_changed, file_count)``.
+    Binary files (reported as ``-\t-``) are counted as 0 lines.
+    """
+    raw = repo.git.diff("--numstat", old_hash, new_hash)
+    if not raw.strip():
+        return 0, 0
+
+    total_lines = 0
+    file_count = 0
+    for line in raw.strip().split("\n"):
+        parts = line.split("\t")
+        if len(parts) < 3:
+            continue
+        added_str, deleted_str, _path = parts[0], parts[1], parts[2]
+        file_count += 1
+        # Binary files are reported as "-"
+        if added_str == "-" or deleted_str == "-":
+            continue
+        total_lines += int(added_str) + int(deleted_str)
+
+    return total_lines, file_count
+
+
+def normalize_tag_pair_metrics(
+    metrics: List[TagPairMetrics],
+    config: SlicingConfig,
+) -> List[NormalizedTagPairMetrics]:
+    return _normalize_tag_pair_metrics_impl(
+        metrics,
+        config,
+        NormalizedTagPairMetrics,
+    )
+
+
+def select_tag_slices_dp(
+    anchors: List[TagAnchor],
+    distances: List[float],
+    n: int,
+    gain_func: str = "log1p",
+    force_first: bool = True,
+) -> List[int]:
+    return _select_tag_slices_dp_impl(
+        anchors,
+        distances,
+        n,
+        gain_func=gain_func,
+        force_first=force_first,
+        logger=logger,
+    )
+
+
+# Helper: build SemanticSlice from a TagAnchor
+def _create_slice_from_anchor(
+    anchor: TagAnchor,
+    repo: Repo,
+    config: Config,
+    segment_info: Optional[Dict[str, object]] = None,
+) -> Optional[SemanticSlice]:
+    """
+    Build a ``SemanticSlice`` from a tag anchor.
+
+    Constructs the slice directly from tag anchor data.
+    """
+    try:
+        repo_name = Path(repo.working_dir).name
+        date_str = anchor.commit_date.strftime("%Y%m%d")
+        slice_id = f"{repo_name}_{anchor.commit_hash[:8]}_{date_str}"
+
+        # Get commit stats for metadata
+        git_commit = repo.commit(anchor.commit_hash)
+        stats = git_commit.stats.total
+        lines_added = stats.get("insertions", 0)
+        lines_deleted = stats.get("deletions", 0)
+        files_changed = stats.get("files", 0)
+
+        # Score breakdown carries the slicing audit trail
+        score_breakdown: Dict[str, object] = {
+            "strategy": "tag_distance_dp",
+            "tag_name": anchor.tag_name,
+            "version_info": anchor.version_info,
+        }
+        if segment_info:
+            score_breakdown["segment"] = segment_info
+
+        metadata = SliceMetadata(
+            total_files=0,  # Will be populated by enrich_slice_with_files
+            total_lines=0,  # Will be populated by enrich_slice_with_files
+            target_language_total_files=0,  # Will be populated by enrich_slice_with_files
+            target_language_total_lines=0,  # Will be populated by enrich_slice_with_files
+            changed_files_since_prev_slice=files_changed,
+            commit_message=git_commit.message.strip(),
+            lines_added=lines_added,
+            lines_deleted=lines_deleted,
+            files_modified=None,  # populated later by enrich_slice_with_files
+            slice_score=segment_info.get("distance", 0.0) if segment_info else 0.0,
+            score_breakdown=score_breakdown,
+        )
+
+        return SemanticSlice(
+            slice_id=slice_id,
+            commit_hash=anchor.commit_hash,
+            commit_date=anchor.commit_date.isoformat(),
+            slice_type=SliceType.VERSION_RELEASE,
+            version_tag=anchor.tag_name,
+            files=[],  # populated later by enrich_slice_with_files
+            metadata=metadata,
+        )
+
+    except Exception as e:
+        logger.error(
+            f"Error creating slice for tag {anchor.tag_name}: {e}"
+        )
+        return None
+
+
+def _build_segment_lookup(
+    normalised: List[NormalizedTagPairMetrics],
+    anchors: List[TagAnchor],
+    selected_indices: List[int],
+) -> Dict[int, Dict[str, object]]:
+    """
+    For each selected anchor (except the first), build an audit dict
+    describing the segment from its predecessor in the selection.
+
+    Returns ``{anchor_index: segment_info_dict}``.
+    """
+    # Pre-compute prefix-sum of distances keyed by anchor index
+    # normalised[i] covers anchors[i] → anchors[i+1]
+    dist_by_idx: Dict[int, float] = {}
+    for i, nm in enumerate(normalised):
+        dist_by_idx[i] = nm.distance
+
+    lookup: Dict[int, Dict[str, object]] = {}
+
+    for pos in range(len(selected_indices)):
+        idx = selected_indices[pos]
+        if pos == 0:
+            # First selected anchor – no preceding segment
+            lookup[idx] = {
+                "position_in_selection": 0,
+                "is_first": True,
+                "distance": 0.0,
             }
-            
-            if priority_order.get(current_slice.slice_type, 0) > priority_order.get(last_slice.slice_type, 0):
-                merged[-1] = current_slice
-    
-    return merged
+            continue
 
+        prev_idx = selected_indices[pos - 1]
+        # Accumulate distances between prev_idx and idx
+        seg_dist = sum(
+            dist_by_idx.get(k, 0.0) for k in range(prev_idx, idx)
+        )
+        # Accumulate raw deltas
+        seg_lines = sum(
+            normalised[k].delta_lines for k in range(prev_idx, idx)
+            if k < len(normalised)
+        )
+        seg_files = sum(
+            normalised[k].delta_files for k in range(prev_idx, idx)
+            if k < len(normalised)
+        )
+        seg_api = max(
+            (normalised[k].api_break for k in range(prev_idx, idx)
+             if k < len(normalised)),
+            default=0,
+        )
 
-def get_slice_score(slice: SemanticSlice, scored_commits: List[Tuple]) -> float:
-    """
-    Get the score for a slice (for sorting purposes).
-    
-    Args:
-        slice: Semantic slice
-        scored_commits: List of (commit, score, slice_type) tuples
-        
-    Returns:
-        Score value
-    """
-    for commit, score, _, _ in scored_commits:
-        if commit.hash == slice.commit_hash:
-            return score
-    return 0.0
+        lookup[idx] = {
+            "position_in_selection": pos,
+            "is_first": False,
+            "prev_tag": anchors[prev_idx].tag_name,
+            "distance": seg_dist,
+            "delta_lines": seg_lines,
+            "delta_files": seg_files,
+            "api_break": seg_api,
+        }
 
-
-def _extract_commits_for_slicer(repo_path: str) -> List[CommitInfo]:
-    """
-    Helper function to extract commits (imports from commit_extractor).
-    
-    Args:
-        repo_path: Path to repository
-        
-    Returns:
-        List of CommitInfo objects
-    """
-    from pipeline.commit_extractor import extract_commits as _extract_commits
-    return _extract_commits(repo_path)
+    return lookup
