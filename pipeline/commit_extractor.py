@@ -100,7 +100,7 @@ def extract_commits(
                 if tag_commit_hash in processed_hashes:
                     continue
                 
-                # Try to access the commit (it might have been fetched by repository_cloner)
+                # Try to access the commit directly from local repository data
                 try:
                     commit = repo.commit(tag_commit_hash)
                     
@@ -134,8 +134,7 @@ def extract_commits(
                     tag_commits_added += 1
                     
                 except (ValueError, GitCommandError):
-                    # Commit not accessible (too old or not fetched), skip
-                    # This is expected for tags pointing to commits outside shallow clone
+                    # Commit not accessible in local repository, skip
                     continue
                     
             except Exception as e:
@@ -143,7 +142,7 @@ def extract_commits(
                 continue
         
         if tag_commits_added > 0:
-            logger.info(f"Added {tag_commits_added} commits referenced by tags that were outside shallow clone range")
+            logger.info(f"Added {tag_commits_added} commits referenced by tags from other branches")
         
         logger.info(f"Extracted {len(commits)} commits from {repo_path}")
         return commits

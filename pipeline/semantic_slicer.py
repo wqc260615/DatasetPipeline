@@ -17,7 +17,6 @@ Example:
 import logging
 import tempfile
 from datetime import datetime
-from functools import cmp_to_key
 from typing import Dict, List, NamedTuple, Optional, Tuple
 from pathlib import Path
 from git import Repo
@@ -281,7 +280,7 @@ def _identify_slices_impl(repo_path: str, config: Config) -> List[SemanticSlice]
             logger.warning("No tag anchors found for slicing strategy")
             return []
 
-        logger.info(f"Collected {len(anchors)} tag anchors (sorted by SemVer)")
+        logger.info(f"Collected {len(anchors)} tag anchors (sorted by commit time)")
 
         # Step 2 – compute raw metrics for each adjacent pair
         pair_metrics = compute_adjacent_tag_metrics(repo, anchors, slicing)
@@ -353,7 +352,7 @@ def collect_tag_anchors(
     Collect semver tag anchors from the repository, optionally filtering to
     those reachable from the main branch.
 
-    Returns a list sorted by SemVer precedence (ascending).
+    Returns a list sorted by commit time (ascending).
     """
     # Determine main branch head (for main_only filtering)
     main_head_hash: Optional[str] = None
@@ -434,21 +433,11 @@ def collect_tag_anchors(
 
     anchors = list(raw_anchors.values())
 
-    # Use the proper SemVer comparator for real tags
-    semver_anchors = [a for a in anchors if a.version_info.get("type") != "unknown"]
-    unknown_anchors = [a for a in anchors if a.version_info.get("type") == "unknown"]
-
-    if semver_anchors:
-        semver_anchors.sort(
-            key=cmp_to_key(
-                lambda a, b: _compare_version_tags(a.tag_name, b.tag_name)
-            )
-        )
-
-    # Unknown tags appended at the end sorted by commit date
-    unknown_anchors.sort(key=lambda a: a.commit_date)
-
-    sorted_anchors = semver_anchors + unknown_anchors
+    # Chronological order by commit timestamp (tie-breaker: tag name)
+    sorted_anchors = sorted(
+        anchors,
+        key=lambda a: (a.commit_date, a.tag_name),
+    )
     logger.debug(
         f"Tag anchors after filtering & sorting: "
         f"{[a.tag_name for a in sorted_anchors]}"

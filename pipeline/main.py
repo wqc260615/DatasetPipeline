@@ -55,8 +55,7 @@ def process_repository(
         logger.info("Cloning repository...")
         cloned_path = clone_repository(
             repo_url,
-            str(repo_dir),
-            shallow=False
+            str(repo_dir)
         )
         
         if not cloned_path:
