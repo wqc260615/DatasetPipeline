@@ -17,7 +17,7 @@ Example:
 import logging
 import re
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from git import Repo
 from git.exc import GitCommandError
 
@@ -211,38 +211,40 @@ def get_tags_at_commit(repo: Repo, commit_hash: str) -> List[str]:
     return tags
 
 
-def parse_version_tag(tag: str) -> Optional[dict]:
+def parse_release_tag(tag_name: str) -> Tuple[Optional[Tuple[int, int, int]], str]:
     """
-    Parse a version tag to extract version information.
-    
-    Supports semver patterns: v1.2.3, 1.2.3, v1.2.3-beta, etc.
-    
+    Parse release-like tags with lenient version extraction and strict remainder check.
+
+    Accepts tags like ``v1.2.3``, ``1.2.3``, ``v1.1``, ``1.1``, ``v2``,
+    ``release-1.2``, ``1.2-release``.  Rejects any tag whose version number
+    is followed by a non-empty remainder (rc, alpha, preview, model names, etc.).
+
+    All version comparisons and sorting MUST use the returned integer tuple –
+    never compare version strings lexicographically.
+
     Args:
-        tag: Git tag string
-        
+        tag_name: Raw Git tag string.
+
     Returns:
-        Dictionary with version info, or None if not a version tag
+        ``(version_tuple, "release")`` on success, or ``(None, "discard")``.
     """
-    # Remove 'v' prefix if present
-    tag_clean = tag.lstrip('v')
-    
-    # Match semver pattern: major.minor.patch[-prerelease][+build]
-    pattern = r'^(\d+)\.(\d+)\.(\d+)(?:-([\w\.-]+))?(?:\+([\w\.-]+))?$'
-    match = re.match(pattern, tag_clean)
-    
-    if match:
-        major, minor, patch, prerelease, build = match.groups()
-        return {
-            "major": int(major),
-            "minor": int(minor),
-            "patch": int(patch),
-            "prerelease": prerelease,
-            "build": build,
-            "type": "major" if int(minor) == 0 and int(patch) == 0 else
-                   "minor" if int(patch) == 0 else "patch"
-        }
-    
-    return None
+    cleaned = re.sub(r'^[vV]', '', tag_name)
+    # Strip 'release' prefix: release-1.2, release_1.2, release.1.2
+    cleaned = re.sub(r'^release[-_.]?', '', cleaned, flags=re.IGNORECASE)
+    # Strip 'release' suffix: 1.2-release, 1.2_release
+    cleaned = re.sub(r'[-_.]?release$', '', cleaned, flags=re.IGNORECASE)
+
+    m = re.match(r'^(\d+)(?:\.(\d+))?(?:\.(\d+))?', cleaned)
+    if not m:
+        return None, "discard"
+
+    version = (int(m.group(1)), int(m.group(2) or 0), int(m.group(3) or 0))
+    remainder = cleaned[m.end():]
+
+    if remainder:
+        return None, "discard"
+
+    return version, "release"
 
 
 def get_changed_files(repo: Repo, commit_hash: str) -> List[str]:

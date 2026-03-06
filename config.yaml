@@ -1,15 +1,12 @@
 slicing:
   # --- Tag-Distance + DP settings ---
   target_slices: 20
-  tag_scope: "main_only"           # main_only | all
-  main_branch_name: "main"          # fallback to 'master' if not found
   distance_weights:
     lines: 0.45
     files: 0.45
     api_break: 0.10
   segment_gain: "log1p"             # log1p | sqrt
   force_first_release_tag: true
-  filter_non_semver: false
   min_days_between_selected: 0      # 0 = no constraint
   api_break:
     python_backend: "ast_symbol_diff"
@@ -26,6 +23,7 @@ storage:
   output_dir: "./data/slices"
   cache_dir: "./data/cache"
   repositories_dir: "./data/repositories"
+  existing_repo_action: "ask"   # ask | update | skip
 
 repository_selection:
   min_commits: 100

@@ -31,7 +31,8 @@ logger = logging.getLogger(__name__)
 def process_repository(
     repo_url: str,
     config,
-    output_dir: str
+    output_dir: str,
+    existing_repo_action: str = "ask"
 ) -> bool:
     """
     Process a single repository end-to-end.
@@ -55,7 +56,8 @@ def process_repository(
         logger.info("Cloning repository...")
         cloned_path = clone_repository(
             repo_url,
-            str(repo_dir)
+            str(repo_dir),
+            existing_repo_action=existing_repo_action
         )
         
         if not cloned_path:
@@ -145,6 +147,13 @@ def main():
         default="./data/slices",
         help="Output directory for results"
     )
+    parser.add_argument(
+        "--existing-repo-action",
+        type=str,
+        choices=["ask", "update", "skip"],
+        default=None,
+        help="When repository already exists locally: ask/update/skip (overrides config)"
+    )
     
     args = parser.parse_args()
     
@@ -157,6 +166,8 @@ def main():
     
     # Setup logging from config
     logging.getLogger().setLevel(getattr(logging, config.logging.level))
+
+    existing_repo_action = args.existing_repo_action or config.storage.existing_repo_action
     
     # Get repository URLs
     repo_urls = []
@@ -172,7 +183,7 @@ def main():
     # Process repositories
     success_count = 0
     for repo_url in repo_urls:
-        if process_repository(repo_url, config, args.output_dir):
+        if process_repository(repo_url, config, args.output_dir, existing_repo_action):
             success_count += 1
     
     logger.info(f"Processed {success_count}/{len(repo_urls)} repositories successfully")

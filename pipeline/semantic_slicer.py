@@ -24,12 +24,8 @@ from git import Repo
 from pipeline.models import SemanticSlice, SliceType, SliceMetadata
 from pipeline.config import Config, SlicingConfig
 from pipeline.commit_extractor import (
-    parse_version_tag,
+    parse_release_tag,
     get_diff_between_refs
-)
-from pipeline.slicer.semver_utils import (
-    compare_prerelease_identifiers as _compare_prerelease_identifiers,
-    compare_version_tags as _compare_version_tags,
 )
 from pipeline.slicer.distance_metrics import (
     percentile_rank as _percentile_rank,
@@ -51,7 +47,8 @@ class TagAnchor(NamedTuple):
     tag_name: str
     commit_hash: str
     commit_date: datetime
-    version_info: dict  # output of parse_version_tag()
+    version_info: dict  # version info dict for backward compat
+    version_tuple: Optional[Tuple[int, int, int]] = None
 
 
 class TagPairMetrics(NamedTuple):
@@ -257,7 +254,7 @@ def _identify_slices_impl(repo_path: str, config: Config) -> List[SemanticSlice]
     """
     Tag-Distance + DP slicing strategy.
 
-    1. Collect release-tag anchors reachable from the main branch.
+    1. Collect version-tag anchors from all tags.
     2. Compute semantic distance for each adjacent tag pair.
     3. Normalise metrics via percentile rank.
     4. Select *N* tag-anchors that maximise total segment gain (DP).
@@ -280,7 +277,7 @@ def _identify_slices_impl(repo_path: str, config: Config) -> List[SemanticSlice]
             logger.warning("No tag anchors found for slicing strategy")
             return []
 
-        logger.info(f"Collected {len(anchors)} tag anchors (sorted by commit time)")
+        logger.info(f"Collected {len(anchors)} tag anchors (sorted by version tuple)")
 
         # Step 2 – compute raw metrics for each adjacent pair
         pair_metrics = compute_adjacent_tag_metrics(repo, anchors, slicing)
@@ -343,50 +340,46 @@ def _identify_slices_impl(repo_path: str, config: Config) -> List[SemanticSlice]
         return []
 
 
-# Collect tag anchors
 def collect_tag_anchors(
     repo: Repo,
     config: SlicingConfig,
 ) -> List[TagAnchor]:
     """
-    Collect semver tag anchors from the repository, optionally filtering to
-    those reachable from the main branch.
+    Collect version-tag anchors from the repository.
 
-    Returns a list sorted by commit time (ascending).
+    Uses ``parse_release_tag`` for lenient version extraction with strict
+    remainder filtering.  Tags with rc/alpha/preview/model-name suffixes
+    are discarded automatically.
+
+    Sorting uses **integer version tuples** (never string comparison)
+    to avoid silent mis-ordering (e.g. ``v4.2.0`` vs ``v4.10.0``).
+
+    Returns a list sorted by version tuple ascending (commit date as
+    tiebreaker).
     """
-    # Determine main branch head (for main_only filtering)
-    main_head_hash: Optional[str] = None
-    if config.tag_scope == "main_only":
-        main_head_hash = _resolve_main_branch(repo, config.main_branch_name)
-        if main_head_hash:
-            logger.info(
-                f"Main branch resolved to {config.main_branch_name} "
-                f"({main_head_hash[:8]})"
-            )
-        else:
-            logger.warning(
-                "Could not resolve main branch – falling back to tag_scope='all'"
-            )
-
     raw_anchors: Dict[str, TagAnchor] = {}  # keyed by commit_hash
 
     for tag_ref in repo.tags:
         tag_name = tag_ref.name
-        version_info = parse_version_tag(tag_name)
 
-        # Optionally skip non-semver tags
-        if version_info is None:
-            if config.filter_non_semver:
-                continue
-            else:
-                # Keep unknown tags with a synthetic version_info so they sort
-                # after all real semver tags (gives them lowest selection
-                # priority in DP, but doesn't discard information).
-                version_info = {
-                    "major": 999999, "minor": 999999, "patch": 999999,
-                    "prerelease": tag_name, "build": None,
-                    "type": "unknown",
-                }
+        version_tuple, status = parse_release_tag(tag_name)
+        if version_tuple is None:
+            logger.debug(f"Skipping tag {tag_name}: {status}")
+            continue
+
+        # Build version_info dict for backward compatibility
+        version_info = {
+            "major": version_tuple[0],
+            "minor": version_tuple[1],
+            "patch": version_tuple[2],
+            "prerelease": None,
+            "build": None,
+            "type": (
+                "major" if version_tuple[1] == 0 and version_tuple[2] == 0
+                else "minor" if version_tuple[2] == 0
+                else "patch"
+            ),
+        }
 
         try:
             tag_commit = tag_ref.commit
@@ -396,32 +389,16 @@ def collect_tag_anchors(
 
         commit_hash = tag_commit.hexsha
 
-        # main_only reachability check
-        if main_head_hash is not None:
-            if not _is_ancestor(repo, commit_hash, main_head_hash):
-                logger.debug(
-                    f"Skipping tag {tag_name}: not reachable from main branch"
-                )
-                continue
-
         commit_date = tag_commit.committed_datetime
 
-        # De-duplicate: keep the tag with the *highest* semver when multiple
-        # tags point at the same commit.
+        # SHA de-duplicate: keep the tag with the *highest* version tuple
         existing = raw_anchors.get(commit_hash)
         if existing is not None:
-            try:
-                # Only compare if both are real semver
-                if (
-                    existing.version_info.get("type") != "unknown"
-                    and version_info.get("type") != "unknown"
-                ):
-                    if _compare_version_tags(tag_name, existing.tag_name) <= 0:
-                        continue
-                elif version_info.get("type") == "unknown":
-                    # Existing is real semver, new is unknown – keep existing
-                    continue
-            except ValueError:
+            if (
+                existing.version_tuple is not None
+                and version_tuple is not None
+                and version_tuple <= existing.version_tuple
+            ):
                 continue
 
         raw_anchors[commit_hash] = TagAnchor(
@@ -429,43 +406,27 @@ def collect_tag_anchors(
             commit_hash=commit_hash,
             commit_date=commit_date,
             version_info=version_info,
+            version_tuple=version_tuple,
         )
 
     anchors = list(raw_anchors.values())
 
-    # Chronological order by commit timestamp (tie-breaker: tag name)
+    # Sort by integer version tuple – NEVER by string.
+    # Commit date as tiebreaker for identical version tuples.
     sorted_anchors = sorted(
         anchors,
-        key=lambda a: (a.commit_date, a.tag_name),
+        key=lambda a: (
+            a.version_tuple if a.version_tuple is not None else (999999, 999999, 999999),
+            a.commit_date,
+        ),
+    )
+    logger.info(
+        f"Tag anchors after filtering & sorting: {len(sorted_anchors)} tags"
     )
     logger.debug(
-        f"Tag anchors after filtering & sorting: "
-        f"{[a.tag_name for a in sorted_anchors]}"
+        f"Tag anchors: {[a.tag_name for a in sorted_anchors]}"
     )
     return sorted_anchors
-
-
-def _resolve_main_branch(repo: Repo, preferred_name: str) -> Optional[str]:
-    """Return the HEAD commit hash of the main branch, or *None*."""
-    for name in (preferred_name, "master", "main"):
-        try:
-            return repo.commit(name).hexsha
-        except Exception:
-            continue
-    # Last resort: try the repo HEAD
-    try:
-        return repo.head.commit.hexsha
-    except Exception:
-        return None
-
-
-def _is_ancestor(repo: Repo, maybe_ancestor: str, descendant: str) -> bool:
-    """Check if *maybe_ancestor* is an ancestor of *descendant*."""
-    try:
-        repo.git.merge_base("--is-ancestor", maybe_ancestor, descendant)
-        return True
-    except Exception:
-        return False
 
 
 # Compute adjacent tag-pair metrics
@@ -614,10 +575,17 @@ def _create_slice_from_anchor(
         score_breakdown: Dict[str, object] = {
             "strategy": "tag_distance_dp",
             "tag_name": anchor.tag_name,
+            "source_tag": anchor.tag_name,
+            "tag_version": list(anchor.version_tuple) if anchor.version_tuple else None,
             "version_info": anchor.version_info,
         }
         if segment_info:
             score_breakdown["segment"] = segment_info
+            score_breakdown["distance_detail"] = {
+                "lines": segment_info.get("delta_lines", 0),
+                "files": segment_info.get("delta_files", 0),
+                "api_break": segment_info.get("api_break", 0),
+            }
 
         metadata = SliceMetadata(
             total_files=0,  # Will be populated by enrich_slice_with_files

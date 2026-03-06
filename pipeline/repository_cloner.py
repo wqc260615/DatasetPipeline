@@ -15,6 +15,7 @@ Example:
 
 import logging
 import shutil
+import sys
 from pathlib import Path
 from typing import Optional
 from git import Repo, GitCommandError
@@ -26,7 +27,8 @@ logger = logging.getLogger(__name__)
 def clone_repository(
     url: str,
     target_dir: str,
-    max_retries: int = 3
+    max_retries: int = 3,
+    existing_repo_action: str = "ask"
 ) -> Optional[str]:
     """
     Clone a Git repository with retry logic.
@@ -35,6 +37,10 @@ def clone_repository(
         url: Repository URL (HTTPS or SSH)
         target_dir: Target directory for cloning
         max_retries: Maximum number of retry attempts
+        existing_repo_action: Action when target exists.
+            - "update": run git pull and reuse repository
+            - "skip": reuse existing repository without updating
+            - "ask": prompt user to choose update or skip
         
     Returns:
         Path to cloned repository, or None if cloning failed
@@ -44,10 +50,53 @@ def clone_repository(
     """
     target_path = Path(target_dir)
     
-    # Remove existing directory if it exists
+    # Handle existing directory
     if target_path.exists():
-        logger.warning(f"Target directory exists, removing: {target_path}")
-        shutil.rmtree(target_path)
+        try:
+            Repo(str(target_path))
+            repo_exists = True
+        except InvalidGitRepositoryError:
+            repo_exists = False
+
+        if repo_exists:
+            action = existing_repo_action.lower().strip()
+            if action not in {"ask", "update", "skip"}:
+                logger.warning(
+                    f"Unknown existing_repo_action '{existing_repo_action}', fallback to 'ask'"
+                )
+                action = "ask"
+
+            if action == "ask":
+                if sys.stdin.isatty():
+                    answer = input(
+                        f"Repository already exists at {target_path}. Update from remote? [y/N]: "
+                    ).strip().lower()
+                    action = "update" if answer in {"y", "yes"} else "skip"
+                else:
+                    logger.info(
+                        "Repository exists and terminal is non-interactive; defaulting to skip update"
+                    )
+                    action = "skip"
+
+            if action == "skip":
+                logger.info(f"Using existing repository without update: {target_path}")
+                return str(target_path)
+
+            logger.info(f"Updating existing repository: {target_path}")
+            for attempt in range(1, max_retries + 1):
+                try:
+                    repo = Repo(str(target_path))
+                    if repo.remotes:
+                        repo.remotes.origin.pull()
+                    logger.info(f"Successfully updated repository: {target_path}")
+                    return str(target_path)
+                except Exception as e:
+                    logger.error(f"Failed to update repository on attempt {attempt}: {e}")
+                    if attempt == max_retries:
+                        raise
+        else:
+            logger.warning(f"Target directory exists but is not a Git repo, removing: {target_path}")
+            shutil.rmtree(target_path)
     
     target_path.parent.mkdir(parents=True, exist_ok=True)
     

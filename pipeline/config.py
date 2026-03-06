@@ -6,7 +6,7 @@ Loads and validates configuration from config.yaml.
 
 import yaml
 from pathlib import Path
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Literal
 from pydantic import BaseModel, Field
 
 
@@ -27,14 +27,6 @@ class SlicingConfig(BaseModel):
     """Configuration for semantic slicing."""
     # --- Tag-Distance + DP fields ---
     target_slices: int = Field(default=20, description="Target number of slices to select (budget N)")
-    tag_scope: str = Field(
-        default="main_only",
-        description="Tag filtering scope: 'main_only' | 'all'"
-    )
-    main_branch_name: str = Field(
-        default="main",
-        description="Main branch name; auto-fallback to 'master' if not found"
-    )
     distance_weights: DistanceWeightsConfig = Field(
         default_factory=DistanceWeightsConfig,
         description="Weights for tag-pair semantic distance"
@@ -46,10 +38,6 @@ class SlicingConfig(BaseModel):
     force_first_release_tag: bool = Field(
         default=True,
         description="Force the first release tag to be selected"
-    )
-    filter_non_semver: bool = Field(
-        default=False,
-        description="Exclude tags that cannot be parsed as semver"
     )
     min_days_between_selected: int = Field(
         default=0,
@@ -78,6 +66,10 @@ class StorageConfig(BaseModel):
     output_dir: str = Field(default="./data/slices", description="Output directory for slices")
     cache_dir: str = Field(default="./data/cache", description="Cache directory")
     repositories_dir: str = Field(default="./data/repositories", description="Directory for cloned repositories")
+    existing_repo_action: Literal["ask", "update", "skip"] = Field(
+        default="ask",
+        description="Action when repository already exists locally: ask/update/skip"
+    )
 
 
 class RepositorySelectionConfig(BaseModel):

@@ -12,7 +12,7 @@ This project implements an automated pipeline that:
 
 ## Features
 
-- **Semantic Slicing**: Uses release tags as anchors, computes adjacent-tag semantic distance, and selects slices under budget with DP
+- **Semantic Slicing**: Uses all release-like tags as anchors, computes adjacent-tag semantic distance, and selects slices under budget with DP
 - **Multi-language Support**: Currently supports Python and Java
 - **AST Parsing**: Extracts structured code information using tree-sitter
 - **Validation**: Ensures slice quality and code parseability
@@ -71,12 +71,13 @@ python -m pipeline.main --repo-list repos.txt
 - `--repo-list`: Path to file containing repository URLs (one per line)
 - `--config`: Path to configuration file (default: `config.yaml`)
 - `--output-dir`: Output directory for results (default: `./data/slices`)
+- `--existing-repo-action`: Action when local repo already exists: `ask` / `update` / `skip` (if omitted, uses `storage.existing_repo_action` from config)
 
 ## Configuration
 
 Edit `config.yaml` to customize:
 
-- **Slicing parameters**: Target slices, tag scope, distance weights, and DP gain function
+- **Slicing parameters**: Target slices, distance weights, and DP gain function
 - **Language support**: Configure which languages to parse and their file extensions
 - **Storage paths**: Set output, cache, and repository directories
 - **Repository selection**: Criteria for filtering repositories (commit counts, licenses, etc.)
@@ -86,15 +87,12 @@ Example configuration:
 ```yaml
 slicing:
   target_slices: 20
-  tag_scope: "main_only"
-  main_branch_name: "main"
   distance_weights:
     lines: 0.45
     files: 0.45
     api_break: 0.10
   segment_gain: "log1p"
   force_first_release_tag: true
-  filter_non_semver: false
   min_days_between_selected: 0
 
 parsing:
@@ -105,7 +103,15 @@ storage:
   output_dir: "./data/slices"
   cache_dir: "./data/cache"
   repositories_dir: "./data/repositories"
+  existing_repo_action: "ask"   # ask | update | skip
 ```
+
+`existing_repo_action` behavior:
+- `ask`: Prompt whether to update existing local repository
+- `update`: Run `git pull` and continue
+- `skip`: Reuse local repository without pulling
+
+Note: In non-interactive environments, `ask` automatically falls back to `skip`.
 
 ## Project Structure
 
