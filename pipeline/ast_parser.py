@@ -54,12 +54,16 @@ def _should_traverse_node(node_type: str, language: str) -> bool:
         return node_type in symbol_container_types
     
     elif language == "java":
-        # Only traverse: compilation_unit (root), class_declaration, interface_declaration, method_declaration
-        # Do NOT traverse: statements, expressions, etc.
+        # Traverse Java root/body/container nodes that can legally contain
+        # classes or methods. Different tree-sitter-java versions may expose
+        # the root as either ``program`` or ``compilation_unit``.
         symbol_container_types = {
+            "program",  # Root node in newer tree-sitter-java grammars
             "compilation_unit",  # Root node
             "class_declaration",
             "interface_declaration",
+            "class_body",
+            "interface_body",
             "method_declaration"
         }
         return node_type in symbol_container_types
@@ -251,7 +255,7 @@ def _extract_functions_internal(
                     break
         elif language == "java" and node.type in ["class_declaration", "interface_declaration"]:
             for child in node.children:
-                if child.type == "type_identifier":
+                if child.type in {"type_identifier", "identifier"}:
                     current_container = child.text.decode('utf-8', errors='ignore')
                     break
         
@@ -339,8 +343,19 @@ def _extract_function_symbol(
     # Extract return type (Java only, Python uses type hints if available)
     return_type = None
     if language == "java":
+        java_return_type_nodes = {
+            "type_identifier",
+            "void",
+            "void_type",
+            "integral_type",
+            "floating_point_type",
+            "boolean_type",
+            "generic_type",
+            "scoped_type",
+            "array_type",
+        }
         for child in node.children:
-            if child.type == "type_identifier" or child.type == "void":
+            if child.type in java_return_type_nodes:
                 return_type = child.text.decode('utf-8', errors='ignore')
                 break
     
@@ -349,7 +364,17 @@ def _extract_function_symbol(
     is_static = False
     if language == "java":
         for child in node.children:
-            if child.type in ["public", "private", "protected"]:
+            child_text = child.text.decode('utf-8', errors='ignore')
+            if child.type == "modifiers":
+                if "public" in child_text.split():
+                    visibility = "public"
+                elif "protected" in child_text.split():
+                    visibility = "protected"
+                elif "private" in child_text.split():
+                    visibility = "private"
+                if "static" in child_text.split():
+                    is_static = True
+            elif child.type in ["public", "private", "protected"]:
                 visibility = child.type
             elif child.type == "static":
                 is_static = True
@@ -443,7 +468,7 @@ def _extract_class_symbol(
         if language == "python" and child.type == "identifier":
             name = child.text.decode('utf-8', errors='ignore')
             break
-        elif language == "java" and child.type == "type_identifier":
+        elif language == "java" and child.type in {"type_identifier", "identifier"}:
             name = child.text.decode('utf-8', errors='ignore')
             break
     
@@ -470,12 +495,16 @@ def _extract_class_symbol(
         for child in node.children:
             if child.type == "superclass":
                 for schild in child.children:
-                    if schild.type == "type_identifier":
+                    if schild.type in {"type_identifier", "identifier", "generic_type", "scoped_type"}:
                         base_classes.append(schild.text.decode('utf-8', errors='ignore'))
                         break
             elif child.type == "super_interfaces":
                 for iface in child.children:
-                    if iface.type == "type_identifier":
+                    if iface.type == "type_list":
+                        for iface_child in iface.children:
+                            if iface_child.type in {"type_identifier", "identifier", "generic_type", "scoped_type"}:
+                                implemented_interfaces.append(iface_child.text.decode('utf-8', errors='ignore'))
+                    elif iface.type in {"type_identifier", "identifier", "generic_type", "scoped_type"}:
                         implemented_interfaces.append(iface.text.decode('utf-8', errors='ignore'))
     
     start_line = node.start_point[0] + 1  # 1-indexed
