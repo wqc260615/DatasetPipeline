@@ -14,7 +14,7 @@ This project implements an automated pipeline that:
 
 - **Semantic Slicing**: Uses all release-like tags as anchors, computes adjacent-tag semantic distance, and selects slices under budget with DP
 - **Multi-language Support**: Currently supports Python and Java
-- **AST Parsing**: Extracts structured code information using tree-sitter
+- **AST Parsing**: Extracts structured code information using tree-sitter, including rich metadata for QA generation (function parameters, return types, decorators, class fields, and imports)
 - **Validation**: Ensures slice quality and code parseability
 - **Flexible Configuration**: Customizable slicing and parsing settings via YAML config
 
@@ -149,10 +149,11 @@ data/slices/{repo_name}/
     ├── slice_0001/
     │   ├── metadata.json      # Individual slice metadata
     │   ├── files.json         # File list with content hashes
-    │   └── symbols/           # Symbol-level data
-    │       ├── functions.json # Extracted functions
-    │       ├── classes.json   # Extracted classes
-    │       └── comments.json  # Extracted comments
+    │   └── symbols/           # QA-enriched symbol data
+    │       ├── functions.json # Typed params, decorators, documentation
+    │       ├── classes.json   # Fields, method lists, documentation
+    │       ├── imports.json   # Import statements
+    │       └── module_docs.json # Module-level docstrings
     └── slice_0002/
         └── ...
 ```
@@ -163,19 +164,7 @@ data/slices/{repo_name}/
 - **`summary.json`**: Overall statistics including total slices, files, lines, functions, classes, and language distribution
 - **`slices/slice_XXXX/metadata.json`**: Individual slice metadata (commit hash, date, type, version tag, etc.)
 - **`slices/slice_XXXX/files.json`**: List of files in the slice with their paths, content hashes, and languages
-- **`slices/slice_XXXX/symbols/`**: Symbol-level extracted data (functions, classes, comments) from all files in the slice
-
-## Testing
-
-Run unit tests:
-```bash
-pytest tests/
-```
-
-Run with coverage:
-```bash
-pytest tests/ --cov=pipeline --cov-report=html
-```
+- **`slices/slice_XXXX/symbols/`**: QA-enriched symbol data (functions, classes, imports, module docstrings) from all files in the slice
 
 
 ## License

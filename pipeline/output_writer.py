@@ -12,10 +12,8 @@ Example:
     >>> save_repository_dataset(dataset, Path("./output"))
 """
 
-import hashlib
 import json
 import logging
-import re
 from pathlib import Path
 from typing import List, Dict, Any
 
@@ -35,10 +33,11 @@ def save_repository_dataset(dataset: RepositoryDataset, output_dir: Path) -> Non
     │   ├── slice_0001/
     │   │   ├── metadata.json      # Slice metadata
     │   │   ├── files.json         # File list and hashes
-    │   │   └── symbols/           # Symbol-level data only
-    │   │       ├── functions.json
-    │   │       ├── classes.json
-    │   │       └── comments.json
+    │   │   └── symbols/           # QA-enriched symbol data
+    │   │       ├── functions.json  # Typed params, decorators, doc, ...
+    │   │       ├── classes.json    # Fields, method list, doc, ...
+    │   │       ├── imports.json    # Import statements
+    │   │       └── module_docs.json # Module-level docstrings
     │   └── slice_0002/
     │       └── ...
     └── summary.json               # Overall statistics
@@ -96,8 +95,8 @@ def save_repository_dataset(dataset: RepositoryDataset, output_dir: Path) -> Non
 
 def _save_slice_data(slice: SemanticSlice, slice_dir: Path) -> None:
     """
-    Save individual slice data to its directory (symbol-level only).
-    
+    Save individual slice data to its directory (QA-enriched symbol data).
+
     Args:
         slice: SemanticSlice to save
         slice_dir: Directory for this slice
@@ -116,7 +115,7 @@ def _save_slice_data(slice: SemanticSlice, slice_dir: Path) -> None:
     with open(metadata_path, 'w', encoding='utf-8') as f:
         json.dump(metadata, f, indent=2, default=str, ensure_ascii=False)
     
-    # Save files.json (file list and hashes)
+    # Save files.json (file list, hashes, language)
     files_data = [
         {
             "path": file.path,
@@ -130,46 +129,59 @@ def _save_slice_data(slice: SemanticSlice, slice_dir: Path) -> None:
     with open(files_path, 'w', encoding='utf-8') as f:
         json.dump(files_data, f, indent=2, default=str, ensure_ascii=False)
     
-    # Save symbol-level data to symbols/ directory
+    # Save QA-enriched symbol data to symbols/ directory
     symbols_dir = slice_dir / "symbols"
     symbols_dir.mkdir(parents=True, exist_ok=True)
     
-    # Collect all functions, classes, and comments from all files
     all_functions = []
     all_classes = []
-    all_comments = []
+    all_imports = []
+    module_docs = []
     
     for file in slice.files:
-        # Add file path to each symbol for traceability
+        rel_path = file.path
+        
+        # Functions: use model_dump() to flatten Pydantic objects to plain dicts
         for func in file.functions:
-            func_with_file = func.copy()
-            func_with_file["file_path"] = file.path
-            all_functions.append(func_with_file)
+            func_dict = func.model_dump()
+            func_dict["file_path"] = rel_path
+            all_functions.append(func_dict)
         
+        # Classes
         for cls in file.classes:
-            cls_with_file = cls.copy()
-            cls_with_file["file_path"] = file.path
-            all_classes.append(cls_with_file)
+            cls_dict = cls.model_dump()
+            cls_dict["file_path"] = rel_path
+            all_classes.append(cls_dict)
         
-        for comment in file.comments:
-            comment_with_file = comment.copy()
-            comment_with_file["file_path"] = file.path
-            all_comments.append(comment_with_file)
+        # Imports
+        for imp in file.imports:
+            imp_dict = imp.model_dump()
+            imp_dict["file_path"] = rel_path
+            all_imports.append(imp_dict)
+        
+        # Module-level docstrings
+        if file.module_doc:
+            module_docs.append({
+                "file_path": rel_path,
+                "doc": file.module_doc
+            })
     
-    # Save functions.json
+    # Write JSON files
     functions_path = symbols_dir / "functions.json"
     with open(functions_path, 'w', encoding='utf-8') as f:
         json.dump(all_functions, f, indent=2, default=str, ensure_ascii=False)
     
-    # Save classes.json
     classes_path = symbols_dir / "classes.json"
     with open(classes_path, 'w', encoding='utf-8') as f:
         json.dump(all_classes, f, indent=2, default=str, ensure_ascii=False)
     
-    # Save comments.json
-    comments_path = symbols_dir / "comments.json"
-    with open(comments_path, 'w', encoding='utf-8') as f:
-        json.dump(all_comments, f, indent=2, default=str, ensure_ascii=False)
+    imports_path = symbols_dir / "imports.json"
+    with open(imports_path, 'w', encoding='utf-8') as f:
+        json.dump(all_imports, f, indent=2, default=str, ensure_ascii=False)
+    
+    module_docs_path = symbols_dir / "module_docs.json"
+    with open(module_docs_path, 'w', encoding='utf-8') as f:
+        json.dump(module_docs, f, indent=2, default=str, ensure_ascii=False)
 
 
 def generate_summary(dataset: RepositoryDataset) -> dict:

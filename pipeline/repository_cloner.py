@@ -153,31 +153,4 @@ def validate_repository(repo_path: str) -> bool:
         return False
 
 
-def get_repository_info(repo_path: str) -> Optional[dict]:
-    """
-    Extract basic information about a repository.
-    
-    Args:
-        repo_path: Path to repository
-        
-    Returns:
-        Dictionary with repository info, or None if error
-    """
-    try:
-        repo = Repo(repo_path)
-        remotes = repo.remotes
-        
-        url = None
-        if remotes:
-            url = remotes[0].url
-        
-        return {
-            "path": repo_path,
-            "url": url,
-            "branch": repo.active_branch.name if repo.head.is_valid() else None,
-            "commit_count": len(list(repo.iter_commits())),
-            "is_bare": repo.bare
-        }
-    except Exception as e:
-        logger.error(f"Error getting repository info: {e}")
-        return None
+

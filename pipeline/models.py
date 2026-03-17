@@ -3,6 +3,11 @@ Data models for representing repositories, slices, and metadata.
 
 This module defines Pydantic models for type-safe data structures
 used throughout the pipeline.
+
+File-level symbol data uses the QA-enriched models (QACodeFile,
+QAFunctionSymbol, QAClassSymbol, QAImport, etc.) which carry richer
+metadata than the legacy CodeFile: typed parameters, return types,
+decorators, class fields, imports, and module-level docstrings.
 """
 
 from datetime import datetime
@@ -14,9 +19,6 @@ from pydantic import BaseModel, Field, field_validator
 class SliceType(str, Enum):
     """Types of semantic evolution slices."""
     VERSION_RELEASE = "version_release"
-    FEATURE = "feature"
-    API_CHANGE = "api_change"
-    REFACTORING = "refactoring"
 
 
 class RepositoryInfo(BaseModel):
@@ -37,14 +39,9 @@ class RepositoryInfo(BaseModel):
         return v
 
 
-class CodeFile(BaseModel):
-    """Representation of a source code file in a slice (symbol-level only)."""
-    path: str = Field(..., description="Relative path from repository root")
-    content_hash: str = Field(..., description="SHA256 hash of file content")
-    functions: List[Dict[str, Any]] = Field(default_factory=list, description="Extracted function symbols")
-    classes: List[Dict[str, Any]] = Field(default_factory=list, description="Extracted class symbols")
-    comments: List[Dict[str, Any]] = Field(default_factory=list, description="Extracted comments")
-    language: Optional[str] = Field(None, description="Detected programming language")
+# CodeFile has been removed — use QACodeFile instead.
+# QACodeFile (defined below) is the single authoritative file-level model
+# and carries all data previously in CodeFile plus richer QA metadata.
 
 
 class SliceMetadata(BaseModel):
@@ -78,7 +75,7 @@ class SemanticSlice(BaseModel):
     commit_date: str = Field(..., description="ISO format commit timestamp")
     slice_type: SliceType = Field(..., description="Type of semantic change")
     version_tag: Optional[str] = Field(None, description="Version tag if applicable")
-    files: List[CodeFile] = Field(default_factory=list, description="Code files in this slice")
+    files: List["QACodeFile"] = Field(default_factory=list, description="Code files in this slice (QA-enriched)")
     metadata: SliceMetadata = Field(..., description="Slice metadata")
     
     @field_validator('commit_date')
@@ -97,26 +94,85 @@ class RepositoryDataset(BaseModel):
     repository: RepositoryInfo = Field(..., description="Repository information")
     slices: List[SemanticSlice] = Field(default_factory=list, description="Semantic evolution slices")
     
-    def get_slice_by_id(self, slice_id: str) -> Optional[SemanticSlice]:
-        """Get a slice by its ID."""
-        for slice in self.slices:
-            if slice.slice_id == slice_id:
-                return slice
-        return None
+# ============================================================
+# QA-specific models (richer metadata for QA pair generation)
+# ============================================================
+
+
+class QAParameter(BaseModel):
+    """A function/method parameter with optional type and default value."""
+    name: str = Field(..., description="Parameter name")
+    type_annotation: Optional[str] = Field(None, description="Type annotation string, e.g. 'int', 'List[str]'")
+    default_value: Optional[str] = Field(None, description="Default value as source text, e.g. 'None', '42'")
+
+
+class QAFunctionSymbol(BaseModel):
+    """Enriched function/method symbol for QA generation."""
+    name: str = Field(..., description="Function or method name")
+    kind: str = Field(..., description="'function', 'method', or 'constructor'")
+    container: Optional[str] = Field(None, description="Enclosing class name, if any")
+    signature: str = Field(..., description="Full signature line")
+    parameters: List[QAParameter] = Field(default_factory=list, description="Parameters with types and defaults")
+    return_type: Optional[str] = Field(None, description="Return type annotation")
+    decorators: List[str] = Field(default_factory=list, description="Decorator names, e.g. ['staticmethod', 'override']")
+    visibility: Optional[str] = Field(None, description="'public', 'protected', 'private'")
+    is_static: bool = Field(default=False)
+    is_abstract: bool = Field(default=False)
+    start_line: int = Field(..., description="1-indexed start line")
+    end_line: int = Field(..., description="1-indexed end line")
+    doc: Optional[str] = Field(None, description="Associated docstring / Javadoc text")
+    file: str = Field(..., description="File path")
+
+
+class QAFieldSymbol(BaseModel):
+    """A class-level field or attribute."""
+    name: str = Field(..., description="Field name")
+    type_annotation: Optional[str] = Field(None, description="Type annotation")
+    default_value: Optional[str] = Field(None, description="Default value as source text")
+    visibility: Optional[str] = Field(None, description="'public', 'protected', 'private'")
+    is_static: bool = Field(default=False)
+
+
+class QAClassSymbol(BaseModel):
+    """Enriched class/interface symbol for QA generation."""
+    name: str = Field(..., description="Class or interface name")
+    kind: str = Field(..., description="'class', 'interface', or 'abstract_class'")
+    base_classes: List[str] = Field(default_factory=list, description="Superclass names")
+    implemented_interfaces: List[str] = Field(default_factory=list, description="Implemented interface names")
+    decorators: List[str] = Field(default_factory=list, description="Class-level decorators")
+    fields: List[QAFieldSymbol] = Field(default_factory=list, description="Class-level fields/attributes")
+    methods: List[str] = Field(default_factory=list, description="Method names defined in this class")
+    visibility: Optional[str] = Field(None, description="Java visibility modifier")
+    is_abstract: bool = Field(default=False)
+    start_line: int = Field(..., description="1-indexed start line")
+    end_line: int = Field(..., description="1-indexed end line")
+    doc: Optional[str] = Field(None, description="Associated docstring / Javadoc text")
+    file: str = Field(..., description="File path")
+
+
+class QAImport(BaseModel):
+    """An import statement."""
+    module: str = Field(..., description="Imported module or package")
+    names: List[str] = Field(default_factory=list, description="Specific names imported (from X import a, b)")
+    alias: Optional[str] = Field(None, description="Import alias")
+    is_wildcard: bool = Field(default=False, description="True for 'from X import *'")
+
+
+class QACodeFile(BaseModel):
+    """A source file with QA-enriched metadata.
     
-    def get_slices_by_type(self, slice_type: SliceType) -> List[SemanticSlice]:
-        """Get all slices of a specific type."""
-        return [s for s in self.slices if s.slice_type == slice_type]
+    This is the authoritative file-level model used throughout the pipeline.
+    It replaces the former CodeFile and includes all its fields plus richer
+    QA data.
+    """
+    path: str = Field(..., description="Relative path from repository root")
+    content_hash: str = Field(..., description="SHA256 hash of file content")
+    language: Optional[str] = Field(None, description="Detected programming language")
+    module_doc: Optional[str] = Field(None, description="Module-level docstring")
+    functions: List[QAFunctionSymbol] = Field(default_factory=list, description="QA function symbols")
+    classes: List[QAClassSymbol] = Field(default_factory=list, description="QA class symbols")
+    imports: List[QAImport] = Field(default_factory=list, description="Import statements")
 
 
-class CommitInfo(BaseModel):
-    """Information about a Git commit."""
-    hash: str = Field(..., description="Commit hash")
-    message: str = Field(..., description="Commit message")
-    author: str = Field(..., description="Author name and email")
-    date: datetime = Field(..., description="Commit timestamp")
-    files_changed: int = Field(..., description="Number of files changed")
-    lines_added: int = Field(..., description="Lines added")
-    lines_deleted: int = Field(..., description="Lines deleted")
-    is_merge: bool = Field(default=False, description="Whether this is a merge commit")
-    tags: List[str] = Field(default_factory=list, description="Git tags pointing to this commit")
+# Resolve the forward reference 'QACodeFile' used in SemanticSlice
+SemanticSlice.model_rebuild()

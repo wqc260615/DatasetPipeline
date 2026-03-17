@@ -124,10 +124,16 @@ def check_slice_quality(
         )
     
     # Check symbol parsing success (we store symbol-level data, not full AST)
-    # A file is considered successfully parsed if it has language detected and has symbols or comments
+    # A file is considered successfully parsed if it has language detected and
+    # has symbols, imports, or module-level documentation.
     files_with_symbols = sum(
         1 for f in slice.files 
-        if f.language and (len(f.functions) > 0 or len(f.classes) > 0 or len(f.comments) > 0)
+        if f.language and (
+            len(f.functions) > 0
+            or len(f.classes) > 0
+            or len(f.imports) > 0
+            or bool(f.module_doc)
+        )
     )
     # For code files, also count files that have language but no symbols (might be empty or only comments)
     code_files = [f for f in slice.files if f.language]

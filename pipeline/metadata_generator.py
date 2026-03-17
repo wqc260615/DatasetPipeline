@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import List
 from git import Repo
 
-from pipeline.models import SemanticSlice, SliceMetadata, CodeFile
+from pipeline.models import SemanticSlice, SliceMetadata, QACodeFile, QAFunctionSymbol, QAClassSymbol, QAImport
 from pipeline.config import Config
 from pipeline.ast_parser import parse_slice_files, detect_language
 
@@ -96,18 +96,31 @@ def enrich_slice_with_files(
         # Repository-wide totals (all files in snapshot)
         repo_total_files, repo_total_lines = _calculate_repository_totals(repo_path)
 
-        # Convert parsed target-language files to CodeFile objects
+        # Convert parsed target-language files to QACodeFile objects
         code_files = []
         target_language_total_lines = 0
         
         for parsed_file in parsed_files:
-            # parse_file now returns symbol-level data directly
+            # parse_file() now returns QA-enriched data from parse_file_for_qa()
             file_path = parsed_file["file_path"]
             language = parsed_file["language"]
             content_hash = parsed_file["content_hash"]
-            functions = parsed_file["functions"]
-            classes = parsed_file["classes"]
-            comments = parsed_file["comments"]
+            module_doc = parsed_file.get("module_doc")
+            
+            # Build typed model instances for functions
+            functions = [
+                QAFunctionSymbol(**f) for f in parsed_file.get("functions", [])
+            ]
+            
+            # Build typed model instances for classes
+            classes = [
+                QAClassSymbol(**c) for c in parsed_file.get("classes", [])
+            ]
+            
+            # Build typed model instances for imports
+            imports = [
+                QAImport(**i) for i in parsed_file.get("imports", [])
+            ]
             
             # Make path relative to repo root
             rel_path = str(Path(file_path).relative_to(repo_path))
@@ -120,13 +133,14 @@ def enrich_slice_with_files(
             except Exception:
                 pass
             
-            code_file = CodeFile(
+            code_file = QACodeFile(
                 path=rel_path,
                 content_hash=content_hash,
+                language=language,
+                module_doc=module_doc,
                 functions=functions,
                 classes=classes,
-                comments=comments,
-                language=language
+                imports=imports,
             )
             
             code_files.append(code_file)
@@ -187,34 +201,3 @@ def calculate_slice_statistics(slice: SemanticSlice) -> dict:
         stats["languages"][lang] = stats["languages"].get(lang, 0) + 1
     
     return stats
-
-
-def compare_slices(prev_slice: SemanticSlice, curr_slice: SemanticSlice) -> dict:
-    """
-    Compare two slices to identify changes.
-    
-    Args:
-        prev_slice: Previous slice
-        curr_slice: Current slice
-        
-    Returns:
-        Dictionary with comparison results
-    """
-    prev_files = {f.path: f.content_hash for f in prev_slice.files}
-    curr_files = {f.path: f.content_hash for f in curr_slice.files}
-    
-    added_files = set(curr_files.keys()) - set(prev_files.keys())
-    removed_files = set(prev_files.keys()) - set(curr_files.keys())
-    modified_files = {
-        path for path in set(prev_files.keys()) & set(curr_files.keys())
-        if prev_files[path] != curr_files[path]
-    }
-    
-    return {
-        "added_files": list(added_files),
-        "removed_files": list(removed_files),
-        "modified_files": list(modified_files),
-        "files_added_count": len(added_files),
-        "files_removed_count": len(removed_files),
-        "files_modified_count": len(modified_files)
-    }
