@@ -72,6 +72,7 @@ def make_qa(
     slice_id: str | None = None,
     from_slice_id: str | None = None,
     to_slice_id: str | None = None,
+    question_key: str | None = None,
 ) -> Dict[str, Any]:
     evidence_key = json.dumps(evidence or {}, ensure_ascii=False, sort_keys=True)
     qa_id = stable_id(
@@ -95,5 +96,6 @@ def make_qa(
         "slice_id": slice_id,
         "from_slice_id": from_slice_id,
         "to_slice_id": to_slice_id,
+        "question_key": question_key,
         "evidence": evidence,
     }

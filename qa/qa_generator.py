@@ -10,7 +10,7 @@ from qa.extrinsic_generator import build_extrinsic_qas
 from qa.intrinsic_generator import build_intrinsic_qas
 from qa.qa_common import public_class, public_function, symbol_ref
 from qa.qa_types import SliceContext
-from qa.temporal_generator import build_temporal_qas
+from qa.temporal_generator import build_evolution_qas, build_ordering_qas, build_temporal_qas
 
 
 def _load_json(path: Path, default: Any) -> Any:
@@ -120,6 +120,12 @@ def generate_qa_dataset(
             t_qas = build_temporal_qas(contexts[i - 1], contexts[i])
             temporal_qas.extend(t_qas)
             temporal_n += len(t_qas)
+
+        ordering_qas = build_ordering_qas(contexts)
+        evolution_qas = build_evolution_qas(contexts)
+        temporal_qas.extend(ordering_qas)
+        temporal_qas.extend(evolution_qas)
+        temporal_n += len(ordering_qas) + len(evolution_qas)
 
         repo_qas = intrinsic_qas + extrinsic_qas + temporal_qas
 
