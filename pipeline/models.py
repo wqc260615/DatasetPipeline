@@ -122,6 +122,10 @@ class QAFunctionSymbol(BaseModel):
     end_line: int = Field(..., description="1-indexed end line")
     doc: Optional[str] = Field(None, description="Associated docstring / Javadoc text")
     file: str = Field(..., description="File path")
+    calls: List[str] = Field(default_factory=list, description="Method/function calls made inside this function")
+    instantiations: List[str] = Field(default_factory=list, description="Classes instantiated inside this function")
+    field_accesses: List[str] = Field(default_factory=list, description="Fields/attributes accessed inside this function")
+    string_literals: List[str] = Field(default_factory=list, description="String literals defined inside this function")
 
 
 class QAFieldSymbol(BaseModel):

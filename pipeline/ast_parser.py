@@ -519,11 +519,7 @@ def _extract_function_symbol_qa(
     if language == "java":
         signature = _extract_java_method_signature(node, content)
     else:
-        start_byte = node.start_byte
-        first_line_end = content.find(b'\n', start_byte)
-        if first_line_end == -1 or first_line_end > node.end_byte:
-            first_line_end = node.end_byte
-        signature = content[start_byte:first_line_end].decode('utf-8', errors='ignore').strip()
+        signature = _extract_python_full_signature(node, content)
 
     # --- Parameters (with types and defaults) ---
     if language == "python":
@@ -591,6 +587,16 @@ def _extract_function_symbol_qa(
     elif language == "java":
         doc = _find_javadoc_before_node(node, content)
 
+    # --- Method Body Details ---
+    calls = []
+    instantiations = []
+    field_accesses = []
+    string_literals = []
+    if language == "python":
+        calls, instantiations, field_accesses, string_literals = _extract_python_body_details(node, content)
+    elif language == "java":
+        calls, instantiations, field_accesses, string_literals = _extract_java_body_details(node, content)
+
     return {
         "name": name,
         "kind": kind,
@@ -605,8 +611,96 @@ def _extract_function_symbol_qa(
         "start_line": start_line,
         "end_line": end_line,
         "doc": doc,
-        "file": file_path
+        "file": file_path,
+        "calls": calls,
+        "instantiations": instantiations,
+        "field_accesses": field_accesses,
+        "string_literals": string_literals
     }
+
+
+def _extract_python_body_details(node: tree_sitter.Node, content: bytes):
+    calls = set()
+    instantiations = set()
+    field_accesses = set()
+    string_literals = set()
+
+    for child in node.children:
+        if child.type in ["block", "suite"]:
+            def traverse(n: tree_sitter.Node):
+                # Strings
+                if n.type == "string":
+                    string_text = content[n.start_byte:n.end_byte].decode("utf-8", errors="ignore")
+                    string_literals.add(string_text)
+
+                # Calls / Instantiations
+                elif n.type == "call":
+                    func_name = None
+                    for ch in n.children:
+                        if ch.type == "identifier":
+                            func_name = ch.text.decode("utf-8", errors="ignore")
+                            break
+                        elif ch.type == "attribute":
+                            func_name = content[ch.start_byte:ch.end_byte].decode("utf-8", errors="ignore")
+                            break
+                    if func_name:
+                        # Simple heuristic: if capitalized CamelCase, likely an instantiation in Python
+                        if func_name != func_name.lower() and func_name[0].isupper() and not "_" in func_name:
+                            instantiations.add(func_name)
+                        else:
+                            calls.add(func_name)
+
+                # Field Accesses
+                elif n.type == "attribute":
+                    attr_text = content[n.start_byte:n.end_byte].decode("utf-8", errors="ignore")
+                    # We usually care about obj.field -> just keep the raw text, e.g. "self.val" or "obj.method"
+                    # But it will also catch method calls like "obj.get()". The `call` node traversal will pick up "obj.get",
+                    # so here we just conservatively collect all attributes.
+                    field_accesses.add(attr_text)
+
+                for ch in n.children:
+                    traverse(ch)
+            traverse(child)
+
+    return list(calls), list(instantiations), list(field_accesses), list(string_literals)
+
+
+def _extract_java_body_details(node: tree_sitter.Node, content: bytes):
+    calls = set()
+    instantiations = set()
+    field_accesses = set()
+    string_literals = set()
+
+    for child in node.children:
+        if child.type == "block":
+            def traverse(n: tree_sitter.Node):
+                if n.type == "string_literal":
+                    string_text = content[n.start_byte:n.end_byte].decode("utf-8", errors="ignore")
+                    string_literals.add(string_text)
+
+                elif n.type == "method_invocation":
+                    for ch in n.children:
+                        if ch.type == "identifier":
+                            method_name = ch.text.decode("utf-8", errors="ignore")
+                            calls.add(method_name)
+                            break
+
+                elif n.type == "object_creation_expression":
+                    for ch in n.children:
+                        if ch.type == "type_identifier":
+                            class_name = ch.text.decode("utf-8", errors="ignore")
+                            instantiations.add(class_name)
+                            break
+
+                elif n.type == "field_access":
+                    attr_text = content[n.start_byte:n.end_byte].decode("utf-8", errors="ignore")
+                    field_accesses.add(attr_text)
+
+                for ch in n.children:
+                    traverse(ch)
+            traverse(child)
+
+    return list(calls), list(instantiations), list(field_accesses), list(string_literals)
 
 
 def _extract_java_method_signature(
@@ -800,6 +894,40 @@ def _extract_python_return_type(
         if child.type == "type":
             return child.text.decode('utf-8', errors='ignore')
     return None
+
+
+def _extract_python_full_signature(
+    node: tree_sitter.Node,
+    content: bytes,
+) -> str:
+    """
+    Build a complete, single-line Python function signature.
+    Uses the `parameters` and optional `type` (return annotation) child nodes
+    so multi-line signatures are collapsed correctly instead of being truncated
+    at the first newline.
+    """
+    import re
+
+    params_node = None
+    type_node = None
+    for child in node.children:
+        if child.type == "parameters":
+            params_node = child
+        elif child.type == "type":
+            type_node = child
+
+    if params_node is not None:
+        sig_end = type_node.end_byte if type_node is not None else params_node.end_byte
+        raw = content[node.start_byte:sig_end].decode("utf-8", errors="ignore")
+        # Collapse internal whitespace/newlines to a single space
+        sig = re.sub(r"\s+", " ", raw).strip()
+        return sig + ":"
+
+    # Fallback: first line only
+    first_line_end = content.find(b"\n", node.start_byte)
+    if first_line_end == -1 or first_line_end > node.end_byte:
+        first_line_end = node.end_byte
+    return content[node.start_byte:first_line_end].decode("utf-8", errors="ignore").strip()
 
 
 def _extract_decorators(
@@ -1533,6 +1661,12 @@ def parse_slice_files_for_qa(
 
         for file_path in source_files:
             if any(part.startswith('.') for part in file_path.parts):
+                continue
+
+            # Filter out test files
+            file_path_str = str(file_path).lower()
+            # Common test directory and file patterns
+            if "test/" in file_path_str or "tests/" in file_path_str or "/test_" in file_path_str or "_test." in file_path_str:
                 continue
 
             language = detect_language(str(file_path), config_extensions)

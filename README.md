@@ -73,6 +73,30 @@ python -m pipeline.main --repo-list repos.txt
 - `--output-dir`: Output directory for results (default: `./data/slices`)
 - `--existing-repo-action`: Action when local repo already exists: `ask` / `update` / `skip` (if omitted, uses `storage.existing_repo_action` from config)
 
+### Generate QA Pairs From Slices
+
+After the slicing pipeline has produced `data/slices/{repo_name}/...`, you can generate QA pairs from those precomputed slice artifacts with:
+
+```bash
+python -m qa.qa_main --repos repos_name
+```
+
+Optional arguments:
+
+- `--slices-root`: Root directory that contains repository slices (default: `data/slices`)
+- `--output-dir`: Directory for generated QA data (default: `data/qa`)
+- `--repos`: Comma-separated repository names to process, for example `colorama,fastapi`
+
+The QA generator reads each repository's `slices/slice_XXXX/symbols/` data, then writes the following files under `data/qa/{repo_name}/`:
+
+- `intrinsic_qa_pairs.jsonl`: symbol- and structure-based QA pairs
+- `extrinsic_qa_pairs.jsonl`: docstring-derived QA pairs
+- `temporal_qa_pairs.jsonl`: cross-slice evolution QA pairs
+- `qa_pairs.jsonl`: combined output of all QA pairs
+- `summary.json`: per-repository QA statistics
+
+The top-level `data/qa/summary.json` aggregates totals across all processed repositories.
+
 ## Configuration
 
 Edit `config.yaml` to customize:
