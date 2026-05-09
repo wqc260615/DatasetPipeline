@@ -97,6 +97,76 @@ The QA generator reads each repository's `slices/slice_XXXX/symbols/` data, then
 
 The top-level `data/qa/summary.json` aggregates totals across all processed repositories.
 
+### Sample High-Quality QA Pairs
+
+After generating QA pairs, use the stratified sampler to select a fixed number of high-quality, representative pairs from one or more repositories:
+
+```bash
+# Single repository — outputs data/qa/fastapi/sampled.jsonl
+python scripts/sample_qa.py --repo fastapi --budget 5000
+
+# Multiple repositories — each gets its own sampled.jsonl, plus a merged file
+python scripts/sample_qa.py --repo fastapi spring-boot kafka keras transformers --budget 5000
+
+# Custom output path and budget
+python scripts/sample_qa.py --repo spring-boot --budget 3000 --output data/qa/spring-boot/sampled_3k.jsonl
+```
+
+The sampler applies three quality filters before drawing samples:
+
+1. **Binary questions balanced** — for Yes/No subtypes (e.g. `symbol_existence`), Yes and No answers are sampled 1:1 to avoid label skew.
+2. **Per-file cap** — at most 8 QA pairs per source file, preventing tutorial-heavy repos from dominating.
+
+The type-level budget split and per-subtype weights are fully configurable at the top of `scripts/sample_qa.py` (`TYPE_ALLOC` and `SUBTYPE_WEIGHTS`). Default allocation:
+
+| Type | Share | Rationale |
+|------|-------|-----------|
+| intrinsic | 55 % | Largest and most diverse pool |
+| temporal | 35 % | High-value evolution questions |
+| extrinsic | 10 % | Scarce but high-quality docstring questions |
+
+Any shortfall in one type (e.g. too few extrinsic QAs) is automatically redistributed to the remaining types so the total always reaches the requested `--budget`.
+
+### Evaluate LLM on QA Pairs
+
+After sampling, run the evaluator against a local HuggingFace model:
+
+```bash
+python -m eval.eval_main \
+    --repo fastapi \
+    --qa-type all \
+    --model Qwen/Qwen2.5-Coder-7B-Instruct \
+    --batch-size 8 \
+    --max-tokens 256
+```
+
+Or evaluate against a pre-sampled file directly:
+
+```bash
+python -m eval.eval_main \
+    --repo fastapi \
+    --qa-file data/qa/fastapi/sampled.jsonl \
+    --model Qwen/Qwen2.5-Coder-7B-Instruct \
+    --batch-size 8
+```
+
+Key arguments:
+
+| Argument | Default | Description |
+|---|---|---|
+| `--repo` | *(required)* | Repository name matching `data/qa/{repo}/` |
+| `--qa-type` | `intrinsic` | `intrinsic` / `extrinsic` / `temporal` / `all` |
+| `--qa-file` | — | Direct path to a QA JSONL file (overrides `--qa-type`) |
+| `--model` | `Qwen/Qwen2.5-Coder-7B-Instruct` | HuggingFace model ID |
+| `--device-map` | `auto` | Passed to the HuggingFace pipeline |
+| `--batch-size` | `8` | Prompts per inference batch (increase for larger VRAM) |
+| `--max-tokens` | `256` | Max new tokens per answer |
+| `--sample` | — | Randomly sample N pairs before evaluation |
+| `--subtype` | — | Restrict to a specific `qa_subtype` |
+| `--output-dir` | `data/eval_results` | Directory for result JSONL files |
+
+Results are written to `data/eval_results/{repo}_{tag}_{timestamp}.jsonl`. Each line contains the question, ground truth, model prediction, and per-item metrics (Exact Match, Token F1, ROUGE-L). An aggregate summary is printed to stdout at the end.
+
 ## Configuration
 
 Edit `config.yaml` to customize:
@@ -154,6 +224,16 @@ DatasetPipeline/
 │   └── validation/               # Validation modules
 │       ├── slice_validator.py    # Slice quality validation
 │       └── build_checker.py      # Build/compilation checking
+├── eval/                  # LLM evaluation
+│   ├── eval_main.py          # CLI entry point
+│   ├── llm_client.py         # HuggingFace inference client (batched)
+│   ├── evaluator.py          # Batch evaluation loop
+│   ├── context_retriever.py  # Fetch source at commit via git
+│   ├── prompt_builder.py     # Per-type/subtype prompt templates
+│   └── metrics.py            # Exact Match, Token F1, ROUGE-L
+├── scripts/               # Utility scripts
+│   ├── sample_qa.py          # Stratified QA sampler
+│   └── distance_ablation.py  # Slice distance ablation
 ├── tests/                 # Unit tests
 ├── config.yaml           # Configuration file
 ├── requirements.txt      # Python dependencies

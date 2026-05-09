@@ -671,33 +671,34 @@ def _extract_java_body_details(node: tree_sitter.Node, content: bytes):
     field_accesses = set()
     string_literals = set()
 
+    def traverse(n: tree_sitter.Node):
+        if n.type == "string_literal":
+            string_text = content[n.start_byte:n.end_byte].decode("utf-8", errors="ignore")
+            string_literals.add(string_text)
+
+        elif n.type == "method_invocation":
+            # Use named field 'name' to get the method being called, not the receiver object.
+            # e.g. obj.method() → name field = "method"; method() → name field = "method"
+            name_node = n.child_by_field_name("name")
+            if name_node:
+                calls.add(name_node.text.decode("utf-8", errors="ignore"))
+
+        elif n.type == "object_creation_expression":
+            for ch in n.children:
+                if ch.type == "type_identifier":
+                    class_name = ch.text.decode("utf-8", errors="ignore")
+                    instantiations.add(class_name)
+                    break
+
+        elif n.type == "field_access":
+            attr_text = content[n.start_byte:n.end_byte].decode("utf-8", errors="ignore")
+            field_accesses.add(attr_text)
+
+        for ch in n.children:
+            traverse(ch)
+
     for child in node.children:
         if child.type == "block":
-            def traverse(n: tree_sitter.Node):
-                if n.type == "string_literal":
-                    string_text = content[n.start_byte:n.end_byte].decode("utf-8", errors="ignore")
-                    string_literals.add(string_text)
-
-                elif n.type == "method_invocation":
-                    for ch in n.children:
-                        if ch.type == "identifier":
-                            method_name = ch.text.decode("utf-8", errors="ignore")
-                            calls.add(method_name)
-                            break
-
-                elif n.type == "object_creation_expression":
-                    for ch in n.children:
-                        if ch.type == "type_identifier":
-                            class_name = ch.text.decode("utf-8", errors="ignore")
-                            instantiations.add(class_name)
-                            break
-
-                elif n.type == "field_access":
-                    attr_text = content[n.start_byte:n.end_byte].decode("utf-8", errors="ignore")
-                    field_accesses.add(attr_text)
-
-                for ch in n.children:
-                    traverse(ch)
             traverse(child)
 
     return list(calls), list(instantiations), list(field_accesses), list(string_literals)

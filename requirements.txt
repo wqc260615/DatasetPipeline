@@ -10,6 +10,12 @@ pandas>=2.0.0
 requests>=2.31.0
 spacy>=3.7.0
 
+# Evaluation (eval/)
+torch>=2.2.0
+transformers>=4.40.0
+accelerate>=0.30.0
+rouge-score>=0.1.2
+
 # Testing
 pytest>=7.4.3
 pytest-cov>=4.1.0
