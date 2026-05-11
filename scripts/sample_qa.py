@@ -12,9 +12,11 @@ from __future__ import annotations
 import argparse
 import json
 import logging
-import random
 from collections import defaultdict
 from pathlib import Path
+
+from sklearn.utils import resample as sk_resample
+from sklearn.utils import shuffle as sk_shuffle
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
@@ -202,7 +204,6 @@ def _sample_type(
     if not pool:
         return []
 
-    rng = random.Random(seed)
     weights = SUBTYPE_WEIGHTS.get(qa_type, {})
     binary_subtypes = FILTERS["binary_subtypes"]
     max_per_file = FILTERS["max_per_file"]
@@ -233,7 +234,7 @@ def _sample_type(
             items = _balance_binary(items)
 
         # Shuffle before file-cap so the cap isn't biased toward file-sorted order
-        rng.shuffle(items)
+        items = list(sk_shuffle(items, random_state=seed))
         items = _cap_per_file(items, max_per_file)
         if items:
             filtered[subtype] = items
@@ -272,7 +273,12 @@ def _sample_type(
     for st in subtypes_sorted:
         n = allocations.get(st, 0)
         if n > 0:
-            sampled = rng.sample(filtered[st], min(n, len(filtered[st])))
+            sampled = sk_resample(
+                filtered[st],
+                n_samples=min(n, len(filtered[st])),
+                replace=False,
+                random_state=seed,
+            )
             result.extend(sampled)
             logger.info("    %-40s  drawn=%4d / pool=%6d", st, len(sampled), len(filtered[st]))
 
@@ -283,7 +289,6 @@ def _estimate_drawable(pool: dict[str, list[dict]], qa_type: str, seed: int) -> 
     """Estimate how many items are actually drawable after all filters."""
     if not pool:
         return 0
-    rng = random.Random(seed)
     weights = SUBTYPE_WEIGHTS.get(qa_type, {})
     binary_subtypes = FILTERS["binary_subtypes"]
     max_per_file = FILTERS["max_per_file"]
@@ -302,8 +307,7 @@ def _estimate_drawable(pool: dict[str, list[dict]], qa_type: str, seed: int) -> 
                      if x.get("answer", "").strip().lower() not in trivial_answers]
         if subtype in binary_subtypes:
             items = _balance_binary(items)
-        shuffled = list(items)
-        rng.shuffle(shuffled)
+        shuffled = list(sk_shuffle(items, random_state=seed))
         items = _cap_per_file(shuffled, max_per_file)
         total += len(items)
     return total

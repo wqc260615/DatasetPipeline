@@ -40,10 +40,39 @@ class ContextRetriever:
         entry = self._index.get(repo, {}).get(slice_id)
         return entry["version_tag"] if entry else None
 
+    @staticmethod
+    def _extract_around_symbol(content: str, symbol: str, window: int) -> str:
+        """Return a window of *window* chars centred on the line defining *symbol*.
+
+        *symbol* may be 'ClassName.method_name' or just 'func_name'.
+        We search for the innermost name (e.g. 'delete' from 'FastAPI.delete')
+        as a `def <name>(` pattern.  If not found, fall back to plain truncation.
+        """
+        method = symbol.split(".")[-1]
+        # Find the earliest `def <method>(` line
+        search = f"def {method}("
+        idx = content.find(search)
+        if idx == -1:
+            return content[:window] + "\n# [truncated]"
+        start = max(0, idx - window // 4)
+        end = min(len(content), idx + window * 3 // 4)
+        prefix = "# [...leading content omitted...]\n" if start > 0 else ""
+        suffix = "\n# [truncated]" if end < len(content) else ""
+        return prefix + content[start:end] + suffix
+
     def get_file_content(
-        self, repo: str, commit_hash: str, file_path: str
+        self,
+        repo: str,
+        commit_hash: str,
+        file_path: str,
+        target_symbol: Optional[str] = None,
     ) -> Optional[str]:
-        """Fetch file content at a specific commit via `git show`."""
+        """Fetch file content at a specific commit via `git show`.
+
+        If *target_symbol* is given and the full file exceeds *max_chars*,
+        extract a window around the symbol definition instead of truncating
+        from the top.
+        """
         repo_path = self.repos_root / repo
         try:
             result = subprocess.run(
@@ -57,7 +86,12 @@ class ContextRetriever:
                 return None
             content = result.stdout
             if len(content) > self.max_chars:
-                content = content[: self.max_chars] + "\n# [truncated]"
+                if target_symbol:
+                    content = self._extract_around_symbol(
+                        content, target_symbol, self.max_chars
+                    )
+                else:
+                    content = content[: self.max_chars] + "\n# [truncated]"
             return content
         except Exception:
             return None
@@ -73,7 +107,9 @@ class ContextRetriever:
              "from_version": str|None, "to_version": str|None, "file_path": str}
         """
         repo = qa_pair["repo"]
-        file_path = qa_pair["evidence"]["file_path"]
+        evidence = qa_pair["evidence"]
+        file_path = evidence["file_path"]
+        target_symbol: Optional[str] = evidence.get("name")
         qa_type = qa_pair["qa_type"]
 
         if qa_type == "temporal":
@@ -84,12 +120,14 @@ class ContextRetriever:
             to_hash = self.get_commit_hash(repo, to_slice_id)
 
             from_content = (
-                self.get_file_content(repo, from_hash, file_path)
+                self.get_file_content(repo, from_hash, file_path, target_symbol)
                 if from_hash
                 else None
             )
             to_content = (
-                self.get_file_content(repo, to_hash, file_path) if to_hash else None
+                self.get_file_content(repo, to_hash, file_path, target_symbol)
+                if to_hash
+                else None
             )
 
             return {
@@ -107,7 +145,7 @@ class ContextRetriever:
             slice_id = qa_pair["slice_id"]
             commit_hash = self.get_commit_hash(repo, slice_id) if slice_id else None
             content = (
-                self.get_file_content(repo, commit_hash, file_path)
+                self.get_file_content(repo, commit_hash, file_path, target_symbol)
                 if commit_hash
                 else None
             )

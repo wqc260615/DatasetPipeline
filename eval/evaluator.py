@@ -13,9 +13,9 @@ from typing import Iterator
 from tqdm import tqdm
 
 from eval.context_retriever import ContextRetriever
-from eval.llm_client import LLMClient
+from eval.llm_client import LLMClient, RemoteClient
 from eval.metrics import compute_metrics
-from eval.prompt_builder import build_prompt
+from eval.prompt_builder import CONTEXT_UNAVAILABLE, build_prompt
 
 logger = logging.getLogger(__name__)
 
@@ -28,15 +28,26 @@ def load_qa_pairs(qa_file: Path) -> Iterator[dict]:
                 yield json.loads(line)
 
 
-_CODE_FENCE_RE = re.compile(r"```(?:\w+)?\n?(.*?)```", re.DOTALL)
+# Match only properly-formed fences: optional language tag MUST be followed by a newline.
+# This prevents greedily consuming answer words like "from" as a language identifier.
+_CODE_FENCE_RE = re.compile(r"```\w*\n(.*?)```", re.DOTALL)
+# Single-backtick wrapping: `answer`
+_SINGLE_BACKTICK_RE = re.compile(r"^`([^`\n]+)`$")
 
 
 def _strip_code_fence(text: str) -> str:
-    """Remove markdown code fences, keeping only the inner content."""
+    """Remove markdown code fences or single-backtick wrapping, keeping inner content."""
+    text = text.strip()
     match = _CODE_FENCE_RE.search(text)
     if match:
-        return match.group(1).strip()
-    return text.strip()
+        content = match.group(1).strip()
+        if content:
+            return content
+    # Handle single-backtick-wrapped answer, e.g. `No` or `0.75.2`
+    m = _SINGLE_BACKTICK_RE.match(text)
+    if m:
+        return m.group(1).strip()
+    return text
 
 
 def _context_retrieved(context: dict) -> bool:
@@ -49,10 +60,10 @@ def _context_retrieved(context: dict) -> bool:
 
 def evaluate_batch(
     qa_pairs: list[dict],
-    client: LLMClient,
+    client: LLMClient | RemoteClient,
     retriever: ContextRetriever,
     max_tokens: int = 256,
-    batch_size: int = 8,
+    batch_size: int = 1,
 ) -> list[dict]:
     """Evaluate a list of QA pairs in batches; return a result record for each."""
     # 1. Pre-compute contexts and prompts
@@ -60,12 +71,23 @@ def evaluate_batch(
     contexts = [retriever.get_context_for_qa(qa) for qa in qa_pairs]
     prompts = [build_prompt(qa, ctx) for qa, ctx in zip(qa_pairs, contexts)]
 
-    # 2. Batch inference with progress bar
-    n_batches = math.ceil(len(prompts) / batch_size)
-    predictions = []
+    # 2. Batch inference — skip items with no context (prompt is None)
+    answerable_indices = [i for i, p in enumerate(prompts) if p is not None]
+    answerable_prompts = [prompts[i] for i in answerable_indices]
+    n_skipped = len(prompts) - len(answerable_prompts)
+    if n_skipped:
+        logger.warning("Skipping %d QA pairs with no retrievable context.", n_skipped)
+
+    n_batches = math.ceil(len(answerable_prompts) / batch_size) if answerable_prompts else 0
+    answerable_predictions: list = []
     for i in tqdm(range(n_batches), desc="Inferring"):
-        batch = prompts[i * batch_size : (i + 1) * batch_size]
-        predictions.extend(client.complete_batch(batch, max_tokens=max_tokens))
+        batch = answerable_prompts[i * batch_size : (i + 1) * batch_size]
+        answerable_predictions.extend(client.complete_batch(batch, max_tokens=max_tokens))
+
+    # Reconstruct full prediction list; unanswerable slots get the sentinel
+    predictions: list = [CONTEXT_UNAVAILABLE] * len(prompts)
+    for idx, pred in zip(answerable_indices, answerable_predictions):
+        predictions[idx] = pred
 
     # 3. Assemble result records
     results: list[dict] = []
@@ -84,7 +106,10 @@ def evaluate_batch(
             "to_slice_id": qa.get("to_slice_id"),
             "metrics": {},
         }
-        if prediction is not None:
+        if prediction == CONTEXT_UNAVAILABLE:
+            # No source code available; skip metrics, keep sentinel as prediction
+            logger.warning("No context for qa_id=%s — prediction set to %r", qa["qa_id"], CONTEXT_UNAVAILABLE)
+        elif prediction is not None:
             pred = _strip_code_fence(prediction)
             result["prediction"] = pred
             result["metrics"] = compute_metrics(pred, qa["answer"], qa["qa_type"], qa.get("qa_subtype", ""))

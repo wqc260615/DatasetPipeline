@@ -11,7 +11,7 @@ from pathlib import Path
 
 from eval.context_retriever import ContextRetriever
 from eval.evaluator import aggregate_metrics, evaluate_batch, load_qa_pairs
-from eval.llm_client import LLMClient
+from eval.llm_client import LLMClient, RemoteClient
 
 logging.basicConfig(
     level=logging.INFO,
@@ -64,8 +64,8 @@ def main() -> None:
     parser.add_argument(
         "--batch-size",
         type=int,
-        default=8,
-        help="Number of prompts per inference batch (default: 8)",
+        default=1,
+        help="Number of prompts per inference batch (default: 1)",
     )
     parser.add_argument(
         "--max-tokens", type=int, default=256, help="Max tokens for each LLM response"
@@ -90,6 +90,30 @@ def main() -> None:
         "--output-dir",
         default="data/eval_results",
         help="Directory to write result JSONL files",
+    )
+
+    # Remote OpenAI-compatible API options
+    parser.add_argument(
+        "--api-key",
+        default=None,
+        metavar="API_KEY",
+        help="API key for a remote OpenAI-compatible endpoint. When provided, use remote inference instead of local.",
+    )
+    parser.add_argument(
+        "--api-model",
+        default=RemoteClient.DEFAULT_MODEL,
+        help=f"Remote model ID (default: {RemoteClient.DEFAULT_MODEL})",
+    )
+    parser.add_argument(
+        "--api-base-url",
+        default=RemoteClient.DEFAULT_BASE_URL,
+        help=f"Remote API base URL (default: {RemoteClient.DEFAULT_BASE_URL})",
+    )
+    parser.add_argument(
+        "--api-workers",
+        type=int,
+        default=1,
+        help="Max concurrent API requests when using remote inference (default: 1)",
     )
     args = parser.parse_args()
 
@@ -119,11 +143,19 @@ def main() -> None:
         slices_root=Path(args.slices_dir),
         repos_root=Path(args.repos_dir),
     )
-    client = LLMClient(
-        model=args.model,
-        device_map=args.device_map,
-        batch_size=args.batch_size,
-    )
+    if args.api_key:
+        client: LLMClient | RemoteClient = RemoteClient(
+            api_key=args.api_key,
+            model=args.api_model,
+            base_url=args.api_base_url,
+            max_workers=args.api_workers,
+        )
+    else:
+        client = LLMClient(
+            model=args.model,
+            device_map=args.device_map,
+            batch_size=args.batch_size,
+        )
 
     results = evaluate_batch(
         qa_pairs, client, retriever,
