@@ -648,10 +648,17 @@ def build_evolution_qas(all_ctxs: List[SliceContext]) -> List[Dict[str, Any]]:
 
     for ctx in all_ctxs:
         v = ctx.version_tag or ctx.slice_id
+        seen_in_version: set = set()
         for f in ctx.functions:
             if not _prod_function(f):
                 continue
             key = _function_key(f)
+            # Skip overloads: only the first occurrence of each key per version
+            # is used to avoid Java method overloads polluting the trajectory.
+            if key in seen_in_version:
+                continue
+            seen_in_version.add(key)
+
             if key not in func_repr:
                 func_repr[key] = f
 
@@ -721,10 +728,14 @@ def build_evolution_qas(all_ctxs: List[SliceContext]) -> List[Dict[str, Any]]:
 
     for ctx in all_ctxs:
         v = ctx.version_tag or ctx.slice_id
+        seen_cls_in_version: set = set()
         for c in ctx.classes:
             if not _prod_class(c):
                 continue
             key = _class_key(c)
+            if key in seen_cls_in_version:
+                continue
+            seen_cls_in_version.add(key)
             if key not in cls_repr:
                 cls_repr[key] = c
             bases = str(sorted(c.get("base_classes") or []))
