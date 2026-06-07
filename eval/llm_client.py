@@ -212,16 +212,30 @@ class RemoteClient:
 
     def complete(self, prompt: str, max_tokens: int = 256) -> Optional[str]:
         """Single-turn chat completion; returns the assistant reply or None on error."""
-        try:
-            response = self._client.chat.completions.create(
-                model=self.model,
-                messages=[{"role": "user", "content": prompt}],
-                max_tokens=max_tokens,
-            )
-            return response.choices[0].message.content
-        except Exception as e:
-            logger.warning("Remote API error: %s", e)
-            return None
+        import time
+        max_retries = 3
+        for attempt in range(1, max_retries + 1):
+            try:
+                response = self._client.chat.completions.create(
+                    model=self.model,
+                    messages=[{"role": "user", "content": prompt}],
+                    max_tokens=max_tokens,
+                )
+                content = response.choices[0].message.content
+                if content is None or not content.strip():
+                    logger.warning("Remote API returned empty content (attempt %d/%d)", attempt, max_retries)
+                    if attempt < max_retries:
+                        time.sleep(2 ** attempt)
+                        continue
+                    return None
+                return content
+            except Exception as e:
+                logger.warning("Remote API error (attempt %d/%d): %s", attempt, max_retries, e)
+                if attempt < max_retries:
+                    time.sleep(2 ** attempt)
+                    continue
+                return None
+        return None
 
     def complete_batch(
         self, prompts: list[str], max_tokens: int = 256

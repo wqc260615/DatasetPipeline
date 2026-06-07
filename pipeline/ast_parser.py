@@ -1643,6 +1643,9 @@ def parse_slice_files_for_qa(
     """
     from git import Repo
 
+    import errno
+    import time
+
     parsed_files = []
 
     try:
@@ -1653,7 +1656,18 @@ def parse_slice_files_for_qa(
         else:
             original_ref = repo.active_branch.name
 
-        repo.git.checkout(slice_commit_hash)
+        # Retry checkout on EAGAIN (errno 35 on macOS / errno 11 on Linux)
+        for attempt in range(3):
+            try:
+                repo.git.checkout(slice_commit_hash)
+                break
+            except Exception as e:
+                cause = getattr(e, 'errno', None) or (getattr(e, '__cause__', None) and getattr(e.__cause__, 'errno', None))
+                if cause == errno.EAGAIN and attempt < 2:
+                    logger.warning(f"EAGAIN on checkout (attempt {attempt+1}/3), retrying in 2s...")
+                    time.sleep(2)
+                else:
+                    raise
 
         source_files = []
         for ext_list in config_extensions.values():
@@ -1680,6 +1694,11 @@ def parse_slice_files_for_qa(
 
         repo.git.checkout(original_ref)
 
+    except OSError as e:
+        if e.errno == errno.EAGAIN:
+            logger.error(f"Resource temporarily unavailable (EAGAIN) parsing slice files for QA after retries: {e}")
+        else:
+            logger.error(f"Error parsing slice files for QA: {e}")
     except Exception as e:
         logger.error(f"Error parsing slice files for QA: {e}")
 

@@ -97,6 +97,115 @@ def yesno_em(prediction: str, ground_truth: str) -> float:
 
 
 # ---------------------------------------------------------------------------
+# Subtype-specific pre-normalisation
+# ---------------------------------------------------------------------------
+
+def _normalize_version_str(s: str) -> str:
+    """Strip leading 'v' from version numbers, e.g. 'v2.2.15' -> '2.2.15'."""
+    return re.sub(r"\bv(\d)", r"\1", s)
+
+
+def _normalize_temporal_change(s: str) -> str:
+    """Normalise 'added: X; removed: Y' strings.
+
+    Drops entries whose value is null/none/n/a, and lower-cases the key.
+    E.g. 'added: release; removed: none' -> 'added: release'.
+    """
+    _NULL = {"null", "none", "n/a", ""}
+    parts = [p.strip() for p in s.split(";") if p.strip()]
+    kept = []
+    for part in parts:
+        m = re.match(r"^(added|removed)\s*:\s*(.+)$", part, re.IGNORECASE)
+        if m:
+            value = m.group(2).strip()
+            if value.lower() not in _NULL:
+                kept.append(f"{m.group(1).lower()}: {value}")
+        else:
+            kept.append(part)
+    return "; ".join(kept)
+
+
+def _normalize_item_list(s: str) -> str:
+    """Normalise a comma/semicolon-separated list of identifiers.
+
+    Strips backtick wrapping and 'this.' prefix from each item, deduplicates
+    while preserving order, and rejoins with ', '.
+    """
+    parts = [p.strip() for p in re.split(r"[,;]", s) if p.strip()]
+    seen: set[str] = set()
+    result = []
+    for p in parts:
+        p = p.strip("`").strip()
+        p = re.sub(r"^this\.", "", p)
+        if p and p not in seen:
+            seen.add(p)
+            result.append(p)
+    return ", ".join(sorted(result))
+
+
+def _normalize_caller_list(s: str) -> str:
+    """Normalise a comma/semicolon-separated list of caller method names.
+
+    In addition to the item-list normalisations, strips class/object qualifiers
+    such as 'new Foo().method' or 'Foo.method' -> 'method', and trailing '()'.
+    """
+    parts = [p.strip() for p in re.split(r"[,;]", s) if p.strip()]
+    seen: set[str] = set()
+    result = []
+    for p in parts:
+        p = p.strip("`").strip()
+        # Strip 'new ClassName(...).' qualifier
+        p = re.sub(r"^new\s+\w+\([^)]*\)\.", "", p)
+        # Strip 'ClassName.' qualifier (single level only)
+        p = re.sub(r"^\w+\.", "", p)
+        # Strip trailing call parens
+        p = re.sub(r"\(.*\)$", "", p).strip()
+        if p and p not in seen:
+            seen.add(p)
+            result.append(p)
+    return ", ".join(sorted(result))
+
+
+# Subtypes where the answer is a version string or contains version strings
+_VERSION_SUBTYPES = {
+    "function_first_introduced",
+    "class_first_introduced",
+    "function_last_present",
+    "class_last_present",
+    "function_introduced",
+    "class_introduced",
+    "function_not_introduced",
+    "function_not_removed",
+    "class_not_removed",
+    "function_return_type_evolution",
+}
+# Subtypes whose answers list added/removed items
+_CHANGE_SUBTYPES = {
+    "function_calls_changed",
+    "function_instantiations_changed",
+}
+
+
+def _apply_subtype_normalization(
+    pred: str, gt: str, qa_type: str, qa_subtype: str
+) -> tuple[str, str]:
+    """Apply subtype-specific pre-normalisation before metric computation."""
+    if qa_type == "temporal":
+        if qa_subtype in _VERSION_SUBTYPES:
+            return _normalize_version_str(pred), _normalize_version_str(gt)
+        if qa_subtype in _CHANGE_SUBTYPES:
+            pred = _normalize_temporal_change(_normalize_version_str(pred))
+            gt = _normalize_temporal_change(_normalize_version_str(gt))
+            return pred, gt
+    if qa_type == "intrinsic":
+        if qa_subtype == "field_accesses":
+            return _normalize_item_list(pred), _normalize_item_list(gt)
+        if qa_subtype == "symbol_callers":
+            return _normalize_caller_list(pred), _normalize_caller_list(gt)
+    return pred, gt
+
+
+# ---------------------------------------------------------------------------
 # Dispatch
 # ---------------------------------------------------------------------------
 
@@ -104,6 +213,9 @@ def compute_metrics(
     prediction: str, ground_truth: str, qa_type: str, qa_subtype: str = ""
 ) -> dict:
     """Return the appropriate metrics dict for a given QA type/subtype."""
+    prediction, ground_truth = _apply_subtype_normalization(
+        prediction, ground_truth, qa_type, qa_subtype
+    )
     if qa_type == "extrinsic":
         if qa_subtype == "yesno":
             return {"yesno_em": yesno_em(prediction, ground_truth)}
