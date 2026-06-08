@@ -15,7 +15,7 @@ import logging
 import platform
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import Optional
+from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -190,6 +190,9 @@ class RemoteClient:
         model: str = DEFAULT_MODEL,
         base_url: str = DEFAULT_BASE_URL,
         max_workers: int = 1,
+        temperature: float = 0.0,
+        reasoning_effort: Optional[str] = None,
+        thinking: Optional[str] = None,
     ) -> None:
         try:
             from openai import OpenAI  # type: ignore
@@ -201,14 +204,111 @@ class RemoteClient:
 
         self.model = model
         self.max_workers = max_workers
+        self.base_url = base_url
+        self.temperature = temperature
+        self.reasoning_effort = reasoning_effort
+        self.thinking = thinking
         self._client = OpenAI(api_key=api_key, base_url=base_url)
         logger.info(
-            "RemoteClient ready: model=%s base_url=%s", model, base_url
+            "RemoteClient ready: model=%s base_url=%s temperature=%s "
+            "reasoning_effort=%s thinking=%s",
+            model,
+            base_url,
+            temperature,
+            reasoning_effort,
+            thinking,
         )
 
     # ------------------------------------------------------------------
     # Public API (same interface as LLMClient)
     # ------------------------------------------------------------------
+
+    @staticmethod
+    def _as_dict(obj: Any) -> dict:
+        if obj is None:
+            return {}
+        if isinstance(obj, dict):
+            return obj
+        if hasattr(obj, "model_dump"):
+            return obj.model_dump()
+        if hasattr(obj, "dict"):
+            return obj.dict()
+        return {}
+
+    @staticmethod
+    def _message_content_text(message: Any) -> Optional[str]:
+        """Return text content from OpenAI-compatible message shapes."""
+        content = getattr(message, "content", None)
+        if isinstance(content, str) or content is None:
+            return content
+        if isinstance(content, list):
+            parts: list[str] = []
+            for item in content:
+                item_dict = RemoteClient._as_dict(item)
+                text = item_dict.get("text")
+                if isinstance(text, str):
+                    parts.append(text)
+            return "".join(parts) if parts else None
+        return str(content)
+
+    @classmethod
+    def _empty_response_diagnostics(cls, response: Any) -> dict[str, Any]:
+        response_dict = cls._as_dict(response)
+        choice = response.choices[0] if getattr(response, "choices", None) else None
+        choice_dict = cls._as_dict(choice)
+        message = getattr(choice, "message", None) if choice is not None else None
+        message_dict = cls._as_dict(message)
+
+        usage = response_dict.get("usage") or {}
+        completion_details = usage.get("completion_tokens_details") or {}
+        reasoning_text = (
+            message_dict.get("reasoning")
+            or message_dict.get("reasoning_content")
+            or message_dict.get("reasoning_details")
+        )
+        return {
+            "finish_reason": getattr(choice, "finish_reason", None)
+            or choice_dict.get("finish_reason"),
+            "completion_tokens": usage.get("completion_tokens"),
+            "reasoning_tokens": completion_details.get("reasoning_tokens"),
+            "reasoning_present": bool(reasoning_text),
+            "tool_calls": bool(message_dict.get("tool_calls")),
+            "refusal": bool(message_dict.get("refusal")),
+        }
+
+    def _is_deepseek_api(self) -> bool:
+        return "deepseek.com" in self.base_url
+
+    def _extra_body(self) -> dict[str, Any]:
+        extra_body: dict[str, Any] = {}
+        reasoning_effort = self.reasoning_effort
+
+        if self.thinking == "disabled":
+            extra_body["thinking"] = {"type": "disabled"}
+            return extra_body
+
+        if self.thinking == "enabled":
+            extra_body["thinking"] = {"type": "enabled"}
+
+        if reasoning_effort == "none" and self._is_deepseek_api():
+            # DeepSeek V4 disables thinking via `thinking`, not via
+            # `reasoning_effort=none`.
+            extra_body["thinking"] = {"type": "disabled"}
+        elif reasoning_effort:
+            extra_body["reasoning_effort"] = reasoning_effort
+
+        return extra_body
+
+    @staticmethod
+    def _is_retryable_error(exc: Exception) -> bool:
+        status_code = getattr(exc, "status_code", None)
+        if status_code is None:
+            return True
+        try:
+            code = int(status_code)
+        except (TypeError, ValueError):
+            return True
+        return code == 429 or code >= 500
 
     def complete(self, prompt: str, max_tokens: int = 256) -> Optional[str]:
         """Single-turn chat completion; returns the assistant reply or None on error."""
@@ -216,22 +316,47 @@ class RemoteClient:
         max_retries = 3
         for attempt in range(1, max_retries + 1):
             try:
-                response = self._client.chat.completions.create(
-                    model=self.model,
-                    messages=[{"role": "user", "content": prompt}],
-                    max_tokens=max_tokens,
-                )
-                content = response.choices[0].message.content
+                request_args: dict[str, Any] = {
+                    "model": self.model,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "max_tokens": max_tokens,
+                    "temperature": self.temperature,
+                }
+                extra_body = self._extra_body()
+                if extra_body:
+                    request_args["extra_body"] = extra_body
+                response = self._client.chat.completions.create(**request_args)
+                content = self._message_content_text(response.choices[0].message)
                 if content is None or not content.strip():
-                    logger.warning("Remote API returned empty content (attempt %d/%d)", attempt, max_retries)
+                    diag = self._empty_response_diagnostics(response)
+                    logger.warning(
+                        "Remote API returned empty content "
+                        "(attempt %d/%d, finish_reason=%s, completion_tokens=%s, "
+                        "reasoning_tokens=%s, reasoning_present=%s, tool_calls=%s, refusal=%s)",
+                        attempt,
+                        max_retries,
+                        diag["finish_reason"],
+                        diag["completion_tokens"],
+                        diag["reasoning_tokens"],
+                        diag["reasoning_present"],
+                        diag["tool_calls"],
+                        diag["refusal"],
+                    )
                     if attempt < max_retries:
                         time.sleep(2 ** attempt)
                         continue
                     return None
                 return content
             except Exception as e:
-                logger.warning("Remote API error (attempt %d/%d): %s", attempt, max_retries, e)
-                if attempt < max_retries:
+                retryable = self._is_retryable_error(e)
+                logger.warning(
+                    "Remote API error (attempt %d/%d, retryable=%s): %s",
+                    attempt,
+                    max_retries,
+                    retryable,
+                    e,
+                )
+                if retryable and attempt < max_retries:
                     time.sleep(2 ** attempt)
                     continue
                 return None
