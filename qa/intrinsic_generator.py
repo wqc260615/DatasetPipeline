@@ -36,7 +36,6 @@ def build_intrinsic_qas(
     subclass_map: Dict[str, List[str]] = {}
     interface_impl_map: Dict[str, List[str]] = {}
     
-    # --- Reverse Mappings for Call Graph & Instantiations ---
     method_callers_map: Dict[str, List[str]] = {}
     class_instantiators_map: Dict[str, List[str]] = {}
 
@@ -47,7 +46,6 @@ def build_intrinsic_qas(
         for interface in cls.get("implemented_interfaces") or []:
             interface_impl_map.setdefault(interface, []).append(cls_name)
             
-    # Build reverse maps
     for func in public_functions:
         ref = symbol_ref(func)
         for call in func.get("calls") or []:
@@ -119,7 +117,6 @@ def build_intrinsic_qas(
             )
         )
         
-        # --- New QA Types based on Method Bodies ---
         calls = func.get("calls") or []
         instantiations = func.get("instantiations") or []
         field_accesses = func.get("field_accesses") or []
@@ -138,7 +135,6 @@ def build_intrinsic_qas(
                 )
             )
         
-        # Reverse query for callers
         callers = method_callers_map.get(ref, [])
         if callers:
             qas.append(
@@ -266,7 +262,6 @@ def build_intrinsic_qas(
             )
         )
         
-        # Reverse instantiation map
         instantiators = class_instantiators_map.get(name, [])
         if instantiators:
             qas.append(
@@ -293,7 +288,6 @@ def build_intrinsic_qas(
             )
         )
 
-    # --- Negative existence examples ---
     version_label = ctx.version_tag or ctx.slice_id
     for neg_ref in (neg_func_refs or []):
         qas.append(

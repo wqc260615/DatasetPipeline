@@ -1,18 +1,4 @@
-"""
-Module: slice_validator.py
-
-Purpose: Verify slice coherence and quality.
-
-Key Functions:
-- validate_slice(slice: SemanticSlice) -> bool
-- validate_slice_temporal_consistency(slices: List[SemanticSlice]) -> bool
-- check_slice_quality(slice: SemanticSlice, config: ValidationConfig) -> dict
-
-Example:
-    >>> is_valid = validate_slice(slice)
-    >>> print(is_valid)
-    True
-"""
+"""Validation helpers for semantic slices."""
 
 import logging
 from datetime import datetime
@@ -35,19 +21,16 @@ def validate_slice(slice: SemanticSlice) -> bool:
     Returns:
         True if valid, False otherwise
     """
-    # Check required fields
     if not slice.slice_id or not slice.commit_hash:
         logger.warning(f"Slice missing required fields: {slice.slice_id}")
         return False
     
-    # Validate date format
     try:
         datetime.fromisoformat(slice.commit_date.replace('Z', '+00:00'))
     except ValueError:
         logger.warning(f"Slice has invalid date format: {slice.slice_id}")
         return False
     
-    # Check slice ID format
     if len(slice.slice_id) < 5:
         logger.warning(f"Slice ID too short: {slice.slice_id}")
         return False
@@ -68,13 +51,11 @@ def validate_slice_temporal_consistency(slices: List[SemanticSlice]) -> bool:
     if not slices:
         return True
     
-    # Check for duplicate commit hashes
     commit_hashes = [s.commit_hash for s in slices]
     if len(commit_hashes) != len(set(commit_hashes)):
         logger.error("Duplicate commit hashes found in slices")
         return False
     
-    # Check temporal ordering
     dates = []
     for slice in slices:
         try:
@@ -84,7 +65,6 @@ def validate_slice_temporal_consistency(slices: List[SemanticSlice]) -> bool:
             logger.warning(f"Invalid date in slice: {slice.slice_id}")
             return False
     
-    # Check if dates are in order
     for i in range(1, len(dates)):
         if dates[i][1] < dates[i-1][1]:
             logger.error(f"Slices not in temporal order: {dates[i-1][0]} > {dates[i][0]}")
@@ -116,14 +96,12 @@ def check_slice_quality(
         "parsing_success_rate": 0.0
     }
     
-    # Check minimum code files
     if quality["code_file_count"] < config.min_code_files_per_slice:
         quality["valid"] = False
         quality["issues"].append(
             f"Too few code files: {quality['code_file_count']} < {config.min_code_files_per_slice}"
         )
     
-    # Check symbol parsing success (we store symbol-level data, not full AST)
     # A file is considered successfully parsed if it has language detected and
     # has symbols, imports, or module-level documentation.
     files_with_symbols = sum(
@@ -135,7 +113,6 @@ def check_slice_quality(
             or bool(f.module_doc)
         )
     )
-    # For code files, also count files that have language but no symbols (might be empty or only comments)
     code_files = [f for f in slice.files if f.language]
     if code_files:
         quality["parsing_success_rate"] = files_with_symbols / len(code_files) if code_files else 0.0
@@ -173,10 +150,8 @@ def validate_all_slices(
         "quality_issues": []
     }
     
-    # Check temporal consistency
     results["temporal_consistent"] = validate_slice_temporal_consistency(slices)
     
-    # Check each slice
     for slice in slices:
         if validate_slice(slice):
             quality = check_slice_quality(slice, config)

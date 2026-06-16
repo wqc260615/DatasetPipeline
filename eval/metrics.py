@@ -7,10 +7,6 @@ import string
 from collections import Counter
 
 
-# ---------------------------------------------------------------------------
-# Answer normalisation (SQuAD convention)
-# ---------------------------------------------------------------------------
-
 def _normalize(s: str) -> str:
     """Lowercase, replace punctuation (excluding underscore) with spaces, strip articles."""
     s = s.lower()
@@ -20,17 +16,9 @@ def _normalize(s: str) -> str:
     return " ".join(s.split())
 
 
-# ---------------------------------------------------------------------------
-# Exact Match
-# ---------------------------------------------------------------------------
-
 def exact_match(prediction: str, ground_truth: str) -> float:
     return float(_normalize(prediction) == _normalize(ground_truth))
 
-
-# ---------------------------------------------------------------------------
-# Token-level F1  (SQuAD)
-# ---------------------------------------------------------------------------
 
 def token_f1(prediction: str, ground_truth: str) -> float:
     pred_tokens = _normalize(prediction).split()
@@ -48,10 +36,6 @@ def token_f1(prediction: str, ground_truth: str) -> float:
     recall = num_same / len(truth_tokens)
     return (2 * precision * recall) / (precision + recall)
 
-
-# ---------------------------------------------------------------------------
-# ROUGE-L  (F-measure via token LCS)
-# ---------------------------------------------------------------------------
 
 def _lcs_length(x: list[str], y: list[str]) -> int:
     """Space-efficient LCS length via rolling DP."""
@@ -83,10 +67,6 @@ def rouge_l(prediction: str, ground_truth: str) -> float:
     return (2 * precision * recall) / (precision + recall)
 
 
-# ---------------------------------------------------------------------------
-# Yes/No  (first-word EM)
-# ---------------------------------------------------------------------------
-
 def yesno_em(prediction: str, ground_truth: str) -> float:
     """Extract the first word of the prediction and compare to Yes/No ground truth."""
     words = prediction.strip().split()
@@ -95,10 +75,6 @@ def yesno_em(prediction: str, ground_truth: str) -> float:
     first = words[0].lower().rstrip(".,!?:;")
     return float(first == ground_truth.strip().lower())
 
-
-# ---------------------------------------------------------------------------
-# Subtype-specific pre-normalisation
-# ---------------------------------------------------------------------------
 
 def _normalize_version_str(s: str) -> str:
     """Strip leading 'v' from version numbers, e.g. 'v2.2.15' -> '2.2.15'."""
@@ -154,11 +130,8 @@ def _normalize_caller_list(s: str) -> str:
     result = []
     for p in parts:
         p = p.strip("`").strip()
-        # Strip 'new ClassName(...).' qualifier
         p = re.sub(r"^new\s+\w+\([^)]*\)\.", "", p)
-        # Strip 'ClassName.' qualifier (single level only)
         p = re.sub(r"^\w+\.", "", p)
-        # Strip trailing call parens
         p = re.sub(r"\(.*\)$", "", p).strip()
         if p and p not in seen:
             seen.add(p)
@@ -166,7 +139,6 @@ def _normalize_caller_list(s: str) -> str:
     return ", ".join(sorted(result))
 
 
-# Subtypes where the answer is a version string or contains version strings
 _VERSION_SUBTYPES = {
     "function_first_introduced",
     "class_first_introduced",
@@ -179,7 +151,6 @@ _VERSION_SUBTYPES = {
     "class_not_removed",
     "function_return_type_evolution",
 }
-# Subtypes whose answers list added/removed items
 _CHANGE_SUBTYPES = {
     "function_calls_changed",
     "function_instantiations_changed",
@@ -204,10 +175,6 @@ def _apply_subtype_normalization(
             return _normalize_caller_list(pred), _normalize_caller_list(gt)
     return pred, gt
 
-
-# ---------------------------------------------------------------------------
-# Dispatch
-# ---------------------------------------------------------------------------
 
 def compute_metrics(
     prediction: str, ground_truth: str, qa_type: str, qa_subtype: str = ""

@@ -35,7 +35,6 @@ def load_qa_pairs(qa_file: Path) -> Iterator[dict]:
 # Match only properly-formed fences: optional language tag MUST be followed by a newline.
 # This prevents greedily consuming answer words like "from" as a language identifier.
 _CODE_FENCE_RE = re.compile(r"```\w*\n(.*?)```", re.DOTALL)
-# Single-backtick wrapping: `answer`
 _SINGLE_BACKTICK_RE = re.compile(r"^`([^`\n]+)`$")
 
 
@@ -47,7 +46,6 @@ def _strip_code_fence(text: str) -> str:
         content = match.group(1).strip()
         if content:
             return content
-    # Handle single-backtick-wrapped answer, e.g. `No` or `0.75.2`
     m = _SINGLE_BACKTICK_RE.match(text)
     if m:
         return m.group(1).strip()
@@ -72,7 +70,6 @@ def evaluate_batch(
     question_only: bool = False,
 ) -> list[dict]:
     """Evaluate a list of QA pairs in batches; return a result record for each."""
-    # 1. Pre-compute contexts and prompts
     prompt_mode = "question_only" if question_only else "slice_context"
     if question_only:
         logger.info(
@@ -87,7 +84,6 @@ def evaluate_batch(
         contexts = [retriever.get_context_for_qa(qa) for qa in qa_pairs]
         prompts = [build_prompt(qa, ctx) for qa, ctx in zip(qa_pairs, contexts)]
 
-    # 2. Batch inference — skip items with no context (prompt is None)
     answerable_indices = [i for i, p in enumerate(prompts) if p is not None]
     answerable_prompts = [prompts[i] for i in answerable_indices]
     n_skipped = len(prompts) - len(answerable_prompts)
@@ -100,7 +96,6 @@ def evaluate_batch(
         batch = answerable_prompts[i * batch_size : (i + 1) * batch_size]
         answerable_predictions.extend(client.complete_batch(batch, max_tokens=max_tokens))
 
-    # Reconstruct full prediction list; unanswerable slots get the sentinel
     predictions: list = [CONTEXT_UNAVAILABLE] * len(prompts)
     for idx, pred in zip(answerable_indices, answerable_predictions):
         predictions[idx] = pred
@@ -136,7 +131,6 @@ def evaluate_batch(
                 len(null_retry_indices),
             )
 
-    # 3. Assemble result records
     results: list[dict] = []
     for qa, ctx, prediction in zip(qa_pairs, contexts, predictions):
         result: dict = {
@@ -155,7 +149,6 @@ def evaluate_batch(
             "metrics": {},
         }
         if prediction == CONTEXT_UNAVAILABLE:
-            # No source code available; skip metrics, keep sentinel as prediction
             logger.warning("No context for qa_id=%s — prediction set to %r", qa["qa_id"], CONTEXT_UNAVAILABLE)
         elif prediction is not None:
             pred = _strip_code_fence(prediction)

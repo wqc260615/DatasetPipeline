@@ -37,9 +37,7 @@ class ContextRetriever:
         self.slices_root = slices_root
         self.repos_root = repos_root
         self.max_chars = max_chars
-        # repo -> {slice_id -> {"commit_hash": str, "version_tag": str | None, "slice_dir": Path}}
         self._index: dict[str, dict[str, dict]] = {}
-        # (repo, slice_id) -> {"classes": [...], "functions": [...]}
         self._symbol_cache: dict[tuple, dict] = {}
 
     def _load_index(self, repo: str) -> None:
@@ -81,14 +79,12 @@ class ContextRetriever:
         related: list = []
 
         if subtype == "class_subclasses":
-            # Files that define a class inheriting from class_name
             for cls in symbols.get("classes", []):
                 if class_name in (cls.get("base_classes") or []):
                     fp = cls.get("file_path", "")
                     if fp and fp != primary_file and fp not in related:
                         related.append(fp)
         elif subtype == "class_instantiation_sites":
-            # Files that contain functions which instantiate class_name
             for func in symbols.get("functions", []):
                 if class_name in (func.get("instantiations") or []):
                     fp = func.get("file_path", "")
@@ -202,7 +198,6 @@ class ContextRetriever:
         as a `def <name>(` pattern.  If not found, fall back to plain truncation.
         """
         method = symbol.split(".")[-1]
-        # Find the earliest `def <method>(` line
         search = f"def {method}("
         idx = content.find(search)
         if idx == -1:
@@ -340,7 +335,6 @@ class ContextRetriever:
             version = (
                 self.get_version_tag(repo, slice_id) or slice_id if slice_id else None
             )
-            # For cross-file subtypes, fetch related files from slice symbols
             related_contents: list = []
             if qa_subtype in self._CROSS_FILE_SUBTYPES and slice_id and commit_hash:
                 symbols = self._load_slice_symbols(repo, slice_id)

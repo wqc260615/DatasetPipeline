@@ -1,12 +1,4 @@
-"""
-Module: commit_extractor.py
-
-Purpose: Parses Git tags and computes diffs for semantic slicing.
-
-Key Functions:
-- parse_release_tag(tag_name: str) -> Tuple[Optional[Tuple[int, int, int]], str]
-- get_diff_between_refs(repo: Repo, old_ref: str, new_ref: str)
-"""
+"""Git tag parsing and diff helpers for semantic slicing."""
 
 import logging
 import re
@@ -45,9 +37,7 @@ def parse_release_tag(tag_name: str) -> Tuple[Optional[Tuple[int, int, int]], st
         ``(version_tuple, "release")`` on success, or ``(None, "discard")``.
     """
     cleaned = re.sub(r'^[vV]', '', tag_name)
-    # Strip 'release' prefix: release-1.2, release_1.2, release.1.2
     cleaned = re.sub(r'^release[-_.]?', '', cleaned, flags=re.IGNORECASE)
-    # Strip 'release' suffix: 1.2-release, 1.2_release
     cleaned = re.sub(r'[-_.]?release$', '', cleaned, flags=re.IGNORECASE)
 
     m = re.match(r'^(\d+)(?:\.(\d+))?(?:\.(\d+))?', cleaned)

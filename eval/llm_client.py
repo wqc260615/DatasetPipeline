@@ -1,13 +1,4 @@
-"""LLM client with automatic backend selection.
-
-Backend priority:
-  1. Apple Silicon (macOS arm64) → mlx_lm
-  2. CUDA available             → HuggingFace transformers (GPU)
-  3. Fallback                   → HuggingFace transformers (CPU)
-
-For remote inference, use SenseNovaClient which calls the SenseNova
-OpenAI-compatible API endpoint.
-"""
+"""Local and remote LLM clients for evaluation."""
 
 from __future__ import annotations
 
@@ -19,7 +10,6 @@ from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
-# Special tokens that mlx_lm may leak into generated text
 _SPECIAL_TOKEN_RE = re.compile(
     r"<\|(?:im_end|endoftext|end|eos|pad|user|assistant|system)\|>.*",
     re.DOTALL,
@@ -64,10 +54,6 @@ class LLMClient:
 
         logger.info("Model loaded via backend=%s.", self._backend)
 
-    # ------------------------------------------------------------------
-    # Backend loaders
-    # ------------------------------------------------------------------
-
     def _load_mlx(self, model: str) -> None:
         try:
             from mlx_lm import load  # type: ignore
@@ -93,10 +79,6 @@ class LLMClient:
         )
         self._tokenizer = self._pipe.tokenizer
 
-    # ------------------------------------------------------------------
-    # Inference helpers
-    # ------------------------------------------------------------------
-
     def _messages_to_prompt(self, messages: list[dict]) -> str:
         """Apply chat template to convert messages to a single prompt string."""
         return self._tokenizer.apply_chat_template(
@@ -120,10 +102,6 @@ class LLMClient:
         if isinstance(generated, list):
             return _strip_special_tokens(generated[-1]["content"])
         return _strip_special_tokens(generated)
-
-    # ------------------------------------------------------------------
-    # Public API
-    # ------------------------------------------------------------------
 
     def complete(self, prompt: str, max_tokens: int = 256) -> Optional[str]:
         """Run a single-turn chat completion; return the assistant reply."""
@@ -173,13 +151,7 @@ class LLMClient:
 
 
 class RemoteClient:
-    """Remote inference client for any OpenAI-compatible API endpoint.
-
-    Usage::
-
-        client = RemoteClient(api_key="<your-key>", base_url="https://...", model="...")
-        reply = client.complete("What is FastAPI?")
-    """
+    """Remote inference client for OpenAI-compatible API endpoints."""
 
     DEFAULT_BASE_URL = "https://token.sensenova.cn/v1"
     DEFAULT_MODEL = "deepseek-v4-flash"
@@ -219,10 +191,6 @@ class RemoteClient:
             reasoning_effort,
             thinking,
         )
-
-    # ------------------------------------------------------------------
-    # Public API (same interface as LLMClient)
-    # ------------------------------------------------------------------
 
     @staticmethod
     def _as_dict(obj: Any) -> dict:

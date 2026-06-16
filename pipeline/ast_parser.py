@@ -1,33 +1,4 @@
-"""
-Module: ast_parser.py
-
-Purpose: Parse source code to extract QA-enriched symbol-level information
-(functions, classes, imports, module docstrings). Does NOT store full AST
-trees - only extracts symbols and discards the rest immediately.
-
-All parsing flows through the unified `parse_file_for_qa()` entrypoint.
-The legacy `parse_file()` and `parse_slice_files()` are kept as thin wrappers
-for backwards-compatibility but delegate to their QA equivalents.
-
-Key Functions:
-- parse_file(file_path, language) -> Optional[Dict]
-  Wrapper around parse_file_for_qa(); returns QA-enriched symbol data.
-- parse_file_for_qa(file_path, language) -> Optional[Dict]
-  Extracts: functions (typed params, return type, decorators, doc),
-            classes (fields, method list, decorators, doc),
-            imports, module_doc.
-- parse_slice_files(repo_path, commit, extensions, timeout) -> List[Dict]
-  Wrapper around parse_slice_files_for_qa().
-- parse_slice_files_for_qa(repo_path, commit, extensions, timeout) -> List[Dict]
-  Parses all source files at a commit using QA-enriched extraction.
-
-Example:
-    >>> result = parse_file("src/main.py", "python")
-    >>> if result:
-    ...     print(f"Functions: {len(result['functions'])}")
-    ...     print(f"Classes: {len(result['classes'])}")
-    ...     print(f"Imports: {len(result['imports'])}")
-"""
+"""Parse source files into QA-enriched symbol metadata."""
 
 import logging
 import hashlib
@@ -38,29 +9,7 @@ from tree_sitter import Language, Parser
 
 logger = logging.getLogger(__name__)
 
-# Tree-sitter language modules (will be loaded dynamically)
 _languages = {}
-
-
-# ===========================================================================
-# REMOVED: Legacy API-break-detection helpers
-# The following functions were removed as part of the metadata consolidation:
-#   _should_traverse_node()           - replaced by _should_traverse_node_qa()
-#   _extract_functions_internal()     - replaced by _extract_functions_for_qa()
-#   _extract_function_symbol()        - replaced by _extract_function_symbol_qa()
-#   _extract_classes_internal()       - replaced by _extract_classes_for_qa()
-#   _extract_class_symbol()           - replaced by _extract_class_symbol_qa()
-#   _extract_comments_internal()      - docstrings are now inlined in function/class doc field
-#   _extract_python_docstrings()      - see above
-#   _extract_java_javadoc()           - see above
-# Shared helpers still used by the QA path are kept below:
-#   _find_docstring_in_node()         - used by _extract_function_symbol_qa
-#   _find_string_literal()            - used by _find_docstring_in_node
-#   _clean_docstring_text()           - used by _find_docstring_in_node
-#   _find_javadoc_before_node()       - used by _extract_function_symbol_qa
-#   _clean_javadoc_text()             - used by _find_javadoc_before_node
-# ===========================================================================
-
 
 
 def _load_language(lang_name: str) -> Optional[Language]:
@@ -77,7 +26,6 @@ def _load_language(lang_name: str) -> Optional[Language]:
         return _languages[lang_name]
     
     try:
-        # Try to load from installed packages
         # tree-sitter language bindings return a PyCapsule that needs to be wrapped in Language()
         if lang_name == "python":
             import tree_sitter_python
@@ -167,23 +115,19 @@ def _find_docstring_in_node(node: tree_sitter.Node, content: bytes) -> Optional[
     Returns:
         Docstring text (cleaned) or None if not found
     """
-    # Find the body of the function/class
     body = None
     for child in node.children:
-        if child.type in ["block", "suite"]:  # Python function/class body
+        if child.type in ["block", "suite"]:
             body = child
             break
     
     if not body:
         return None
     
-    # Look for the first expression_statement containing a string literal
     for child in body.children:
         if child.type == "expression_statement":
-            # Check if it contains a string literal
             string_node = _find_string_literal(child)
             if string_node:
-                # Extract and clean the docstring
                 docstring_text = content[string_node.start_byte:string_node.end_byte].decode('utf-8', errors='ignore')
                 return _clean_docstring_text(docstring_text)
     
@@ -210,12 +154,10 @@ def _clean_docstring_text(text: str) -> str:
     Clean Python docstring text (remove triple quotes).
     """
     text = text.strip()
-    # Remove opening triple quotes
     if text.startswith('"""'):
         text = text[3:]
     elif text.startswith("'''"):
         text = text[3:]
-    # Remove closing triple quotes
     if text.endswith('"""'):
         text = text[:-3]
     elif text.endswith("'''"):
@@ -239,7 +181,6 @@ def _find_javadoc_before_node(node: tree_sitter.Node, content: bytes) -> Optiona
     if not node.parent:
         return None
     
-    # Find this node's index in parent's children
     parent = node.parent
     node_index = -1
     for i, child in enumerate(parent.children):
@@ -250,15 +191,12 @@ def _find_javadoc_before_node(node: tree_sitter.Node, content: bytes) -> Optiona
     if node_index <= 0:
         return None
     
-    # Check previous siblings for Javadoc comment
     for i in range(node_index - 1, -1, -1):
         sibling = parent.children[i]
         if sibling.type in ["block_comment", "comment"]:
             comment_text = content[sibling.start_byte:sibling.end_byte].decode('utf-8', errors='ignore')
-            # Check if it's Javadoc (starts with /**)
             if comment_text.strip().startswith('/**'):
                 return _clean_javadoc_text(comment_text)
-        # Skip whitespace/newlines, but stop at other significant nodes
         elif sibling.type not in ["\n", "line_break"]:
             break
     
@@ -270,13 +208,10 @@ def _clean_javadoc_text(text: str) -> str:
     Clean Java Javadoc text (remove /** and */ markers).
     """
     text = text.strip()
-    # Remove opening /**
     if text.startswith('/**'):
         text = text[3:]
-    # Remove closing */
     if text.endswith('*/'):
         text = text[:-2]
-    # Remove leading * from each line (common Javadoc style)
     lines = text.split('\n')
     cleaned_lines = []
     for line in lines:
@@ -286,10 +221,6 @@ def _clean_javadoc_text(text: str) -> str:
         else:
             cleaned_lines.append(line)
     return '\n'.join(cleaned_lines).strip()
-
-
-# Removed unused functions: _clean_comment_text, _determine_comment_kind, _find_comment_owner
-# These were replaced by language-specific extraction functions for docstrings and Javadoc only
 
 
 def calculate_content_hash(content: bytes) -> str:
@@ -329,13 +260,6 @@ def parse_slice_files(
     return parse_slice_files_for_qa(
         repo_path, slice_commit_hash, config_extensions, timeout_seconds
     )
-
-
-# ============================================================
-# Unified QA-enriched parsing
-# These are the authoritative parsing implementations.
-# parse_file() and parse_slice_files() above are thin wrappers.
-# ============================================================
 
 
 def _should_traverse_node_qa(node_type: str, language: str) -> bool:
@@ -437,9 +361,6 @@ def parse_file_for_qa(
         return None
 
 
-# --- QA Function Extraction ---
-
-
 def _extract_functions_for_qa(
     tree: tree_sitter.Tree,
     content: bytes,
@@ -495,7 +416,6 @@ def _extract_function_symbol_qa(
     Extract QA-enriched function/method symbol.
     Adds: typed parameters, Python return type, decorators, docstring association.
     """
-    # --- Name ---
     name = None
     for child in node.children:
         if child.type == "identifier":
@@ -505,7 +425,6 @@ def _extract_function_symbol_qa(
     if not name:
         return None
 
-    # --- Kind ---
     if container:
         kind = "method"
         if language == "java" and name == container:
@@ -513,7 +432,6 @@ def _extract_function_symbol_qa(
     else:
         kind = "function"
 
-    # --- Signature ---
     start_line = node.start_point[0] + 1
     end_line = node.end_point[0] + 1
     if language == "java":
@@ -521,7 +439,6 @@ def _extract_function_symbol_qa(
     else:
         signature = _extract_python_full_signature(node, content)
 
-    # --- Parameters (with types and defaults) ---
     if language == "python":
         parameters = _extract_python_params_qa(node, content)
     elif language == "java":
@@ -529,7 +446,6 @@ def _extract_function_symbol_qa(
     else:
         parameters = []
 
-    # --- Return type ---
     return_type = None
     if language == "python":
         return_type = _extract_python_return_type(node, content)
@@ -544,7 +460,6 @@ def _extract_function_symbol_qa(
                 return_type = child.text.decode('utf-8', errors='ignore')
                 break
 
-    # --- Visibility and static (Java) ---
     visibility = None
     is_static = False
     is_abstract = False
@@ -565,7 +480,6 @@ def _extract_function_symbol_qa(
         if visibility is None:
             visibility = "package"
     elif language == "python":
-        # Convention-based visibility
         if name.startswith('__') and not name.endswith('__'):
             visibility = "private"
         elif name.startswith('_'):
@@ -573,21 +487,18 @@ def _extract_function_symbol_qa(
         else:
             visibility = "public"
 
-    # --- Decorators ---
     decorators = _extract_decorators(node, language, content)
     if "staticmethod" in decorators:
         is_static = True
     if "abstractmethod" in decorators:
         is_abstract = True
 
-    # --- Docstring ---
     doc = None
     if language == "python":
         doc = _find_docstring_in_node(node, content)
     elif language == "java":
         doc = _find_javadoc_before_node(node, content)
 
-    # --- Method Body Details ---
     calls = []
     instantiations = []
     field_accesses = []
@@ -628,12 +539,10 @@ def _extract_python_body_details(node: tree_sitter.Node, content: bytes):
     for child in node.children:
         if child.type in ["block", "suite"]:
             def traverse(n: tree_sitter.Node):
-                # Strings
                 if n.type == "string":
                     string_text = content[n.start_byte:n.end_byte].decode("utf-8", errors="ignore")
                     string_literals.add(string_text)
 
-                # Calls / Instantiations
                 elif n.type == "call":
                     func_name = None
                     for ch in n.children:
@@ -650,7 +559,6 @@ def _extract_python_body_details(node: tree_sitter.Node, content: bytes):
                         else:
                             calls.add(func_name)
 
-                # Field Accesses
                 elif n.type == "attribute":
                     attr_text = content[n.start_byte:n.end_byte].decode("utf-8", errors="ignore")
                     # We usually care about obj.field -> just keep the raw text, e.g. "self.val" or "obj.method"
@@ -758,7 +666,6 @@ def _extract_python_params_qa(
             continue
 
         for param in child.children:
-            # Skip parentheses and commas
             if param.type in {"(", ")", ","}:
                 continue
 
@@ -950,11 +857,9 @@ def _extract_decorators(
         if parent and parent.type == "decorated_definition":
             for child in parent.children:
                 if child.type == "decorator":
-                    # Extract decorator text after '@'
                     dec_text = child.text.decode('utf-8', errors='ignore').strip()
                     if dec_text.startswith('@'):
                         dec_text = dec_text[1:]
-                    # Strip arguments: @decorator(args) → decorator
                     paren_idx = dec_text.find('(')
                     if paren_idx != -1:
                         dec_text = dec_text[:paren_idx]
@@ -974,9 +879,6 @@ def _extract_decorators(
                         decorators.append(ann_text.strip())
 
     return decorators
-
-
-# --- QA Class Extraction ---
 
 
 def _extract_classes_for_qa(
@@ -1021,7 +923,6 @@ def _extract_class_symbol_qa(
     Extract QA-enriched class/interface symbol.
     Adds: fields, method list, decorators, docstring, abstract/visibility.
     """
-    # --- Name ---
     name = None
     for child in node.children:
         if language == "python" and child.type == "identifier":
@@ -1034,7 +935,6 @@ def _extract_class_symbol_qa(
     if not name:
         return None
 
-    # --- Kind ---
     kind = "class"
     is_abstract = False
     visibility = None
@@ -1055,7 +955,6 @@ def _extract_class_symbol_qa(
                 elif "private" in mod_text:
                     visibility = "private"
 
-    # --- Base classes / interfaces ---
     base_classes = []
     implemented_interfaces = []
 
@@ -1083,15 +982,12 @@ def _extract_class_symbol_qa(
                     elif iface.type in {"type_identifier", "identifier", "generic_type", "scoped_type"}:
                         implemented_interfaces.append(iface.text.decode('utf-8', errors='ignore'))
 
-    # --- Decorators ---
     decorators = _extract_decorators(node, language, content)
 
-    # Check Python ABC
     if language == "python":
         if "ABCMeta" in base_classes or "ABC" in base_classes or "abstractmethod" in decorators:
             is_abstract = True
 
-    # --- Fields ---
     if language == "python":
         fields = _extract_python_class_fields(node, content)
     elif language == "java":
@@ -1099,10 +995,8 @@ def _extract_class_symbol_qa(
     else:
         fields = []
 
-    # --- Method list ---
     methods = _extract_class_methods(node, language, content)
 
-    # --- Docstring ---
     doc = None
     if language == "python":
         doc = _find_docstring_in_node(node, content)
@@ -1141,7 +1035,6 @@ def _extract_python_class_fields(
     fields = []
     seen_names = set()
 
-    # Find class body
     body = None
     for child in node.children:
         if child.type in {"block", "suite"}:
@@ -1152,7 +1045,6 @@ def _extract_python_class_fields(
         return fields
 
     for stmt in body.children:
-        # Class-level assignments: x = value or x: type = value
         if stmt.type == "expression_statement":
             expr = None
             for ch in stmt.children:
@@ -1165,11 +1057,9 @@ def _extract_python_class_fields(
                     fields.append(field)
                     seen_names.add(field["name"])
 
-        # Annotated assignment: x: int = 5
         elif stmt.type == "type_alias_statement":
-            pass  # skip type aliases
+            pass
 
-        # Look into __init__ for self.x assignments
         elif stmt.type == "function_definition":
             func_name = None
             for ch in stmt.children:
@@ -1196,19 +1086,15 @@ def _parse_python_assignment_as_field(
     default_value = None
 
     children = list(node.children)
-    # Simple assignment: x = value
     if len(children) >= 3 and children[0].type == "identifier":
         name = children[0].text.decode('utf-8', errors='ignore')
-        # Last child after '=' is the value
         default_value = children[-1].text.decode('utf-8', errors='ignore')
-    # Pattern variables: ignore complex patterns
     elif len(children) >= 1 and children[0].type == "pattern_list":
         return None
 
     if not name:
         return None
 
-    # Determine visibility by convention
     visibility = "public"
     if name.startswith('__') and not name.endswith('__'):
         visibility = "private"
@@ -1220,7 +1106,7 @@ def _parse_python_assignment_as_field(
         "type_annotation": type_annotation,
         "default_value": default_value,
         "visibility": visibility,
-        "is_static": True  # class-level variables are class/static attributes
+        "is_static": True
     }
 
 
@@ -1233,7 +1119,6 @@ def _extract_init_self_fields(
     """
     fields = []
 
-    # Find body
     body = None
     for child in init_node.children:
         if child.type in {"block", "suite"}:
@@ -1273,7 +1158,7 @@ def _parse_self_assignment(
     if not lhs_text.startswith("self."):
         return None
 
-    attr_name = lhs_text[5:]  # strip "self."
+    attr_name = lhs_text[5:]
     if not attr_name:
         return None
 
@@ -1303,7 +1188,6 @@ def _extract_java_class_fields(
     """
     fields = []
 
-    # Find class_body or interface_body
     body = None
     for child in node.children:
         if child.type in {"class_body", "interface_body"}:
@@ -1377,7 +1261,6 @@ def _extract_class_methods(
         if body:
             for stmt in body.children:
                 target = stmt
-                # Handle decorated_definition
                 if stmt.type == "decorated_definition":
                     for dchild in stmt.children:
                         if dchild.type == "function_definition":
@@ -1407,9 +1290,6 @@ def _extract_class_methods(
     return methods
 
 
-# --- QA Import Extraction ---
-
-
 def _extract_imports(
     tree: tree_sitter.Tree,
     content: bytes,
@@ -1437,7 +1317,6 @@ def _extract_imports(
                 if imp:
                     imports.append(imp)
 
-        # Only traverse top-level for imports
         for child in node.children:
             if child.type in {
                 "module", "program", "compilation_unit",
@@ -1497,7 +1376,6 @@ def _parse_python_import_from(
     for child in node.children:
         child_text = child.text.decode('utf-8', errors='ignore')
 
-        # The 'import' keyword separates module part from imported names
         if child.type == "import":
             seen_import_keyword = True
             continue
@@ -1505,11 +1383,9 @@ def _parse_python_import_from(
             continue
 
         if not seen_import_keyword:
-            # Before 'import' keyword → this is the module
             if child.type in {"dotted_name", "relative_import"}:
                 module = child_text
         else:
-            # After 'import' keyword → these are imported names
             if child.type == "wildcard_import":
                 is_wildcard = True
             elif child.type == "dotted_name":
@@ -1520,7 +1396,7 @@ def _parse_python_import_from(
                 for achild in child.children:
                     if achild.type in {"identifier", "dotted_name"}:
                         names.append(achild.text.decode('utf-8', errors='ignore'))
-                        break  # just get the original name
+                        break
 
     if not module:
         return None
@@ -1540,7 +1416,6 @@ def _parse_java_import(
     """Parse Java import declaration."""
     import_text = node.text.decode('utf-8', errors='ignore').strip()
 
-    # Remove 'import ' prefix and ';' suffix
     if import_text.startswith("import "):
         import_text = import_text[7:]
     if import_text.startswith("static "):
@@ -1553,7 +1428,6 @@ def _parse_java_import(
     if is_wildcard:
         module = import_text[:-2]
     else:
-        # Split: com.example.ClassName → module=com.example, name=ClassName
         last_dot = import_text.rfind('.')
         if last_dot != -1:
             module = import_text[:last_dot]
@@ -1577,9 +1451,6 @@ def _parse_java_import(
     }
 
 
-# --- Module-level Docstring ---
-
-
 def _extract_module_doc(
     tree: tree_sitter.Tree,
     content: bytes,
@@ -1601,14 +1472,13 @@ def _extract_module_doc(
                         'utf-8', errors='ignore'
                     )
                     return _clean_docstring_text(text)
-                break  # Only check the very first statement
+                break
             elif child.type in {"import_statement", "import_from_statement", "comment"}:
-                continue  # Skip imports and comments at top
+                continue
             else:
-                break  # First non-import/non-comment that isn't a docstring → no module doc
+                break
 
     elif language == "java":
-        # Look for Javadoc comment before first class/interface
         for child in root.children:
             if child.type in {"class_declaration", "interface_declaration"}:
                 javadoc = _find_javadoc_before_node(child, content)
@@ -1617,9 +1487,6 @@ def _extract_module_doc(
                 continue
 
     return None
-
-
-# --- Slice-level QA parsing ---
 
 
 def parse_slice_files_for_qa(
@@ -1678,9 +1545,7 @@ def parse_slice_files_for_qa(
             if any(part.startswith('.') for part in file_path.parts):
                 continue
 
-            # Filter out test files
             file_path_str = str(file_path).lower()
-            # Common test directory and file patterns
             if "test/" in file_path_str or "tests/" in file_path_str or "/test_" in file_path_str or "_test." in file_path_str:
                 continue
 

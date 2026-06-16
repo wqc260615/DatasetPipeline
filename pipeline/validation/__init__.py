@@ -1,3 +1,1 @@
-"""
-Validation modules for slice quality assurance.
-"""
+"""Slice validation helpers."""

@@ -1,8 +1,3 @@
-"""
-Temporal Question-Answering Dataset Pipeline
-
-A pipeline for extracting semantic evolution slices from Git repositories
-and generating snapshot-grounded question-answer pairs.
-"""
+"""Temporal question-answering dataset pipeline."""
 
 __version__ = "0.1.0"

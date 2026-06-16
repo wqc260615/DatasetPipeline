@@ -1,37 +1,4 @@
-"""Generate extrinsic QA pairs from function / class docstrings.
-
-Implements the template-based Wh-question and Yes/No question generation approach
-described in:
-
-    Liu et al. (2021). "CodeQA: A Question Answering Dataset for Source Code
-    Comprehension". EMNLP 2021 Findings.
-
-Pipeline:
-  1. Extract and clean the docstring; take only the first paragraph.
-  2. If a sentence lacks an explicit subject (imperative verb), prepend
-     "The function " / "The class " (same strategy as CodeQA's "the code" prefix).
-  3. Parse each sentence with spaCy (en_core_web_sm) for Universal-Dependency
-     structure.
-  4. Classify the root verb's arguments and adjuncts:
-       - nsubj / nsubjpass  → subject
-       - dobj / obj        → direct object
-       - xcomp             → open clausal complement
-       - prep + temporal preps        → ARGM-TMP  (temporal)
-       - prep + locative preps        → ARGM-LOC  (locative)
-       - prep / acl + manner preps    → ARGM-MNR  (manner)
-       - advcl + causal conjunctions  → ARGM-CAU  (cause)
-       - advcl + to-infinitive        → ARGM-PRP  (purpose)
-  5. Apply interrogative templates to generate:
-       wh_object   "What does <subj> <verb> [other_mods]?"
-       wh_subject  "What <aux> <vp>?"         (only for informative subjects)
-       wh_xcomp    "What does <subj> <verb> [cond]?"
-       wh_temporal "When does <subj> <verb> <obj> [other_mods]?"
-       wh_locative "Where does <subj> <verb> <obj> [other_mods]?"
-       wh_manner   "How does <subj> <verb> <obj-core> [other_mods]?"
-       wh_cause    "Why does <subj> <verb> <obj> [other_mods]?"
-       wh_purpose  "For what purpose does <subj> <verb> <obj> [other_mods]?"
-       yesno       "Does <subj> <verb> <obj> [mods]?" → Yes / No
-"""
+"""Generate CodeQA-style extrinsic QA pairs from docstrings."""
 
 from __future__ import annotations
 
@@ -44,9 +11,6 @@ from qa.qa_types import SliceContext
 
 logger = logging.getLogger(__name__)
 
-# ---------------------------------------------------------------------------
-# Lazy spaCy loader
-# ---------------------------------------------------------------------------
 _NLP: Any = None
 
 
@@ -77,9 +41,6 @@ def _get_nlp() -> Any:
     return _NLP
 
 
-# ---------------------------------------------------------------------------
-# Semantic-role classification tables
-# ---------------------------------------------------------------------------
 _TEMPORAL_PREPS: FrozenSet[str] = frozenset({
     "after", "before", "when", "while", "during", "once", "until",
     "upon", "whenever", "following",
@@ -150,10 +111,6 @@ def _classify_advcl(token: Any) -> Optional[str]:
     return None
 
 
-# ---------------------------------------------------------------------------
-# Text-reconstruction helpers
-# ---------------------------------------------------------------------------
-
 def _subtree_text(token: Any) -> str:
     """Return the full text of a token's dependency subtree."""
     tokens = sorted(token.subtree, key=lambda t: t.i)
@@ -167,10 +124,6 @@ def _subtree_text_excluding(token: Any, excluded: Set[int]) -> str:
               if t.i not in excluded]
     return "".join(t.text_with_ws for t in tokens).strip()
 
-
-# ---------------------------------------------------------------------------
-# Interrogative construction
-# ---------------------------------------------------------------------------
 
 def _aux_and_lemma(root: Any) -> Tuple[str, str]:
     """Return *(auxiliary_string, verb_lemma)* for interrogative inversion.
@@ -227,10 +180,6 @@ def _assemble_question(*parts: str) -> str:
     return q[0].upper() + q[1:] + "?"
 
 
-# ---------------------------------------------------------------------------
-# Per-sentence QA builder
-# ---------------------------------------------------------------------------
-
 def _build_qas_from_sentence(
     sent: Any,
     symbol_ref_str: str,
@@ -242,7 +191,6 @@ def _build_qas_from_sentence(
     """Generate all applicable QA pairs for a single parsed spaCy sentence."""
     qas: List[Dict[str, Any]] = []
 
-    # --- Root verb ---
     roots = [t for t in sent if t.dep_ == "ROOT"]
     if not roots:
         return qas
@@ -250,7 +198,6 @@ def _build_qas_from_sentence(
     if root.pos_ not in ("VERB", "AUX"):
         return qas
 
-    # --- Subject (nsubj or nsubjpass) ---
     nsubj = next(
         (c for c in root.children if c.dep_ in ("nsubj", "nsubjpass")), None
     )
@@ -258,19 +205,15 @@ def _build_qas_from_sentence(
         return qas
     subj_text = _subtree_text(nsubj)
 
-    # --- Direct object ---
     obj = next((c for c in root.children if c.dep_ in ("dobj", "obj")), None)
 
-    # --- Auxiliary inversion + verb lemma ---
     aux, verb_lemma = _aux_and_lemma(root)
     aux_first, aux_rest = _split_aux(aux)
     negated = any(c.dep_ == "neg" for c in root.children)
 
-    # Lowercase first letter of subject – it never opens the question sentence.
     if subj_text:
         subj_text = subj_text[0].lower() + subj_text[1:]
 
-    # --- Collect direct-child modifiers (all non-structural deps) ---
     structural_deps = {
         "nsubj", "nsubjpass", "dobj", "obj",
         "aux", "auxpass", "neg", "punct", "cc", "conj",
@@ -278,7 +221,6 @@ def _build_qas_from_sentence(
     direct_mods: List[Any] = [c for c in root.children
                               if c.dep_ not in structural_deps]
 
-    # Classify each modifier into semantic roles.
     temporal: List[Any] = []
     locative: List[Any] = []
     manner: List[Any] = []
@@ -338,17 +280,12 @@ def _build_qas_from_sentence(
             question,
             flags=re.IGNORECASE,
         )
-        # Skip questions/answers that contain newlines or HTML fragments.
         if _RE_MULTILINE_NOISE.search(question) or _RE_MULTILINE_NOISE.search(answer):
             return {}
-        # Skip QAs whose question/answer still contains raw code braces ({...}).
         if "{" in question or "{" in answer:
             return {}
-        # Require at least 4 words in the question (avoids "What saved?"-style stubs).
         if len(question.split()) < 4:
             return {}
-        # Require at least 3 words in the answer for WH questions (single-word answers
-        # like "user" or "credentials" degrade ROUGE-L evaluation to near exact-match).
         if subtype != "yesno" and len(answer.split()) < 3:
             return {}
         return make_qa(
@@ -361,7 +298,6 @@ def _build_qas_from_sentence(
             evidence=evidence,
         )
 
-    # Helper: text of direct_mods excluding one specific mod and the obj subtree.
     obj_indices: Set[int] = {t.i for t in obj.subtree} if obj else set()
 
     def _other_mods(*exclude: Any) -> str:
@@ -375,13 +311,10 @@ def _build_qas_from_sentence(
             parts.append(_subtree_text(m))
         return " ".join(parts)
 
-    # -----------------------------------------------------------------------
-    # 1. WH-OBJECT  — "What does <subj> <verb> [other_mods]?"
-    # -----------------------------------------------------------------------
     if obj is not None:
         obj_text = _subtree_text(obj)
         if obj_text.lower() not in _PRONOUN_ANSWERS:
-            extra = _other_mods()  # all mods outside obj subtree
+            extra = _other_mods()
             q = _assemble_question(
                 "What", aux_first, subj_text, aux_rest, verb_lemma, extra
             )
@@ -389,9 +322,6 @@ def _build_qas_from_sentence(
             if r:
                 qas.append(r)
 
-    # -----------------------------------------------------------------------
-    # 2. WH-XCOMP  — "What does <subj> <verb> [cond]?"
-    # -----------------------------------------------------------------------
     for xc in xcomp_list:
         xcomp_text = _subtree_text(xc)
         if xcomp_text.lower() not in _PRONOUN_ANSWERS:
@@ -407,13 +337,10 @@ def _build_qas_from_sentence(
             if r:
                 qas.append(r)
 
-    # -----------------------------------------------------------------------
-    # 3. WH-SUBJECT  — "What <full_aux> <vp-without-subject>?"
     # For subject questions there is NO subject-auxiliary inversion; the
     # auxiliary and verb keep their original declarative order.  Only
     # generated for passive subjects (nsubjpass dep or auxpass present) to
     # avoid broken active-voice constructions like "What saved?".
-    # -----------------------------------------------------------------------
     _is_passive_subj = (
         nsubj.dep_ == "nsubjpass"
         or any(c.dep_ == "auxpass" for c in root.children)
@@ -447,10 +374,7 @@ def _build_qas_from_sentence(
             if r:
                 qas.append(r)
 
-    # -----------------------------------------------------------------------
-    # Helper: build a wh-adjunct question
     # Question keeps obj (core, minus nested manner mod) and other mods.
-    # -----------------------------------------------------------------------
     def _wh_adjunct(wh_word: str, target_mod: Any) -> str:
         if obj is not None:
             # If a manner modifier is nested inside the obj subtree, exclude it
@@ -469,9 +393,6 @@ def _build_qas_from_sentence(
             wh_word, aux_first, subj_text, aux_rest, verb_lemma, obj_core, other
         )
 
-    # -----------------------------------------------------------------------
-    # 4. WH-TEMPORAL
-    # -----------------------------------------------------------------------
     for mod in temporal:
         ans = _subtree_text(mod)
         q = _wh_adjunct("When", mod)
@@ -479,9 +400,6 @@ def _build_qas_from_sentence(
         if r:
             qas.append(r)
 
-    # -----------------------------------------------------------------------
-    # 5. WH-LOCATIVE
-    # -----------------------------------------------------------------------
     for mod in locative:
         ans = _subtree_text(mod)
         q = _wh_adjunct("Where", mod)
@@ -489,9 +407,6 @@ def _build_qas_from_sentence(
         if r:
             qas.append(r)
 
-    # -----------------------------------------------------------------------
-    # 6. WH-MANNER
-    # -----------------------------------------------------------------------
     for mod in manner:
         ans = _subtree_text(mod)
         q = _wh_adjunct("How", mod)
@@ -499,9 +414,6 @@ def _build_qas_from_sentence(
         if r:
             qas.append(r)
 
-    # -----------------------------------------------------------------------
-    # 7. WH-CAUSE
-    # -----------------------------------------------------------------------
     for mod in cause:
         ans = _subtree_text(mod)
         q = _wh_adjunct("Why", mod)
@@ -509,9 +421,6 @@ def _build_qas_from_sentence(
         if r:
             qas.append(r)
 
-    # -----------------------------------------------------------------------
-    # 8. WH-PURPOSE
-    # -----------------------------------------------------------------------
     for mod in purpose:
         ans = _subtree_text(mod)
         q = _assemble_question(
@@ -522,13 +431,10 @@ def _build_qas_from_sentence(
         if r:
             qas.append(r)
 
-    # -----------------------------------------------------------------------
-    # 9. YES/NO  — "[Aux] <subj> [aux_rest] <verb> <obj> [mods]?"
     # Only emit yes/no when the sentence also has adjunct modifiers so that
     # yes/no pairs co-occur with richer WH questions.  This keeps their
     # proportion low relative to WH-type questions (50 % random baseline
     # makes standalone yes/no questions a weak evaluation signal).
-    # -----------------------------------------------------------------------
     has_adjuncts = bool(temporal or locative or manner or cause or purpose)
     if obj is not None and has_adjuncts:
         obj_text_yn = _subtree_text(obj)
@@ -544,17 +450,11 @@ def _build_qas_from_sentence(
     return qas
 
 
-# ---------------------------------------------------------------------------
-# Docstring-to-QA conversion
-# ---------------------------------------------------------------------------
-
 _RE_QUOTE_STRIP = re.compile(r'^[\s"\' ]+|[\s"\' ]+$')
 _RE_BLANK_LINE = re.compile(r'\n\s*\n')
-_RE_CODE_EXAMPLE = re.compile(r'^\s*>>>.*$', re.MULTILINE)# Reject docstrings that are HTML or template code rather than prose.
+_RE_CODE_EXAMPLE = re.compile(r'^\s*>>>.*$', re.MULTILINE)
 _RE_HTML_TAG = re.compile(r'<[a-zA-Z][^>]*>', re.IGNORECASE)
-# Count {identifier} template variables; 3+ likely means f-string/template, not prose.
 _RE_TMPL_VAR = re.compile(r'\{[a-zA-Z_]\w*\}')
-# Answers/questions with embedded newlines or angle-bracket tags are noisy.
 _RE_MULTILINE_NOISE = re.compile(r'\n|<[a-zA-Z/]')
 
 def _clean_docstring(text: str) -> str:
@@ -565,16 +465,12 @@ def _clean_docstring(text: str) -> str:
     """
     text = _RE_QUOTE_STRIP.sub("", text)
     text = _RE_CODE_EXAMPLE.sub("", text).strip()
-    # Reject HTML-heavy content (e.g. tutorial functions that return HTML strings).
     if _RE_HTML_TAG.search(text):
         return ""
-    # Reject if 3+ template variables – likely an f-string, not prose.
     if len(_RE_TMPL_VAR.findall(text)) >= 3:
         return ""
-    # Reject if the text itself starts with an f-string literal (f"…" / f'…').
     if re.match(r'^f["\']', text.lstrip()):
         return ""
-    # Keep only the first paragraph (before any blank line).
     return _RE_BLANK_LINE.split(text)[0].strip()
 
 
@@ -613,7 +509,6 @@ def _docstring_to_qas(
     for sent in doc.sents:
         sent_str = _sentence_text(sent)
 
-        # If sentence lacks a subject (imperative), prepend "The {kind} ".
         if _needs_subject(sent):
             normalized = f"The {symbol_kind} {sent_str[0].lower()}{sent_str[1:]}"
             doc2 = nlp(normalized)
@@ -634,10 +529,6 @@ def _docstring_to_qas(
 
     return qas
 
-
-# ---------------------------------------------------------------------------
-# Public entry point
-# ---------------------------------------------------------------------------
 
 def build_extrinsic_qas(ctx: SliceContext) -> List[Dict[str, Any]]:
     """Generate extrinsic (docstring-derived) QA pairs for one slice context.

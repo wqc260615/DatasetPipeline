@@ -1,17 +1,4 @@
-"""
-Module: repository_cloner.py
-
-Purpose: Clones Git repositories with full clone strategy and error handling.
-
-Key Functions:
-- clone_repository(url: str, target_dir: str) -> str
-- validate_repository(repo_path: str) -> bool
-
-Example:
-    >>> repo_path = clone_repository("https://github.com/user/repo", "./data/repos/repo")
-    >>> print(repo_path)
-    ./data/repos/repo
-"""
+"""Repository cloning and validation helpers."""
 
 import logging
 import shutil
@@ -50,7 +37,6 @@ def clone_repository(
     """
     target_path = Path(target_dir)
     
-    # Handle existing directory
     if target_path.exists():
         try:
             Repo(str(target_path))
@@ -113,7 +99,6 @@ def clone_repository(
             if attempt == max_retries:
                 logger.error(f"Failed to clone repository after {max_retries} attempts")
                 raise
-            # Clean up partial clone
             if target_path.exists():
                 shutil.rmtree(target_path)
                 
@@ -140,7 +125,6 @@ def validate_repository(repo_path: str) -> bool:
     """
     try:
         repo = Repo(repo_path)
-        # Check if repository has commits
         if len(list(repo.iter_commits())) == 0:
             logger.warning(f"Repository has no commits: {repo_path}")
             return False
@@ -151,6 +135,5 @@ def validate_repository(repo_path: str) -> bool:
     except Exception as e:
         logger.error(f"Error validating repository {repo_path}: {e}")
         return False
-
 
 

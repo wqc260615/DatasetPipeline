@@ -1,18 +1,4 @@
-"""
-Module: semantic_slicer.py
-
-Purpose: Identifies semantic evolution slices from Git commit history.
-
-Key Functions:
-- identify_slices(repo_path: str, config: Config) -> List[SemanticSlice]
-
-Example:
-    >>> from pipeline.config import load_config
-    >>> config = load_config()
-    >>> slices = identify_slices("/path/to/repo", config)
-    >>> print(len(slices))
-    12
-"""
+"""Identify semantic evolution slices from Git history."""
 
 import logging
 import tempfile
@@ -39,8 +25,6 @@ logger = logging.getLogger(__name__)
 
 # Cache for parsed API symbols keyed by blob hash
 _api_symbol_cache: Dict[str, Dict[str, Dict[Tuple, Tuple]]] = {}
-
-# Tag-distance slicing data types
 
 class TagAnchor(NamedTuple):
     """Lightweight representation of a release-tag anchor point."""
@@ -232,14 +216,12 @@ def _has_symbol_diff(current: Dict[str, Dict[Tuple, Tuple]], previous: Dict[str,
     curr_classes = current.get("classes", {})
     prev_classes = previous.get("classes", {})
 
-    # Function changes: add/remove/signature change
     if set(curr_funcs.keys()) != set(prev_funcs.keys()):
         return True
     for key, sig in curr_funcs.items():
         if prev_funcs.get(key) != sig:
             return True
 
-    # Class changes: add/remove/base/interface change
     if set(curr_classes.keys()) != set(prev_classes.keys()):
         return True
     for key, sig in curr_classes.items():
@@ -249,7 +231,6 @@ def _has_symbol_diff(current: Dict[str, Dict[Tuple, Tuple]], previous: Dict[str,
     return False
 
 
-# Tag-Distance + DP slicing strategy
 def _identify_slices_impl(repo_path: str, config: Config) -> List[SemanticSlice]:
     """
     Tag-Distance + DP slicing strategy.
@@ -271,7 +252,6 @@ def _identify_slices_impl(repo_path: str, config: Config) -> List[SemanticSlice]
         repo = Repo(repo_path)
         slicing = config.slicing
 
-        # Step 1 – collect tag anchors
         anchors = collect_tag_anchors(repo, slicing)
         if not anchors:
             logger.warning("No tag anchors found for slicing strategy")
@@ -279,17 +259,14 @@ def _identify_slices_impl(repo_path: str, config: Config) -> List[SemanticSlice]
 
         logger.info(f"Collected {len(anchors)} tag anchors (sorted by version tuple)")
 
-        # Step 2 – compute raw metrics for each adjacent pair
         pair_metrics = compute_adjacent_tag_metrics(repo, anchors, slicing)
         logger.info(
             f"Computed metrics for {len(pair_metrics)} adjacent tag pairs"
         )
 
-        # Step 3 – normalise and compute distances
         normalised = normalize_tag_pair_metrics(pair_metrics, slicing)
         distances = [m.distance for m in normalised]
 
-        # Step 4 – DP selection
         n_target = min(slicing.target_slices, len(anchors))
         selected_indices = select_tag_slices_dp(
             anchors,
@@ -303,7 +280,6 @@ def _identify_slices_impl(repo_path: str, config: Config) -> List[SemanticSlice]
             f"(target={slicing.target_slices})"
         )
 
-        # Log each selected anchor
         for rank, idx in enumerate(selected_indices, 1):
             a = anchors[idx]
             logger.info(
@@ -311,8 +287,6 @@ def _identify_slices_impl(repo_path: str, config: Config) -> List[SemanticSlice]
                 f"date={a.commit_date.isoformat()}"
             )
 
-        # Step 5 – build SemanticSlice objects
-        # Pre-compute a lookup: anchor_index → left-segment normalised metrics
         seg_lookup = _build_segment_lookup(normalised, anchors, selected_indices)
 
         slices: List[SemanticSlice] = []
@@ -330,7 +304,6 @@ def _identify_slices_impl(repo_path: str, config: Config) -> List[SemanticSlice]
                 )
                 continue
 
-        # Sort by commit date (should already be in order)
         slices.sort(key=lambda s: s.commit_date)
         logger.info(f"Final slice count: {len(slices)}")
         return slices
@@ -367,7 +340,6 @@ def collect_tag_anchors(
             logger.debug(f"Skipping tag {tag_name}: {status}")
             continue
 
-        # Build version_info dict for backward compatibility
         version_info = {
             "major": version_tuple[0],
             "minor": version_tuple[1],
@@ -429,7 +401,6 @@ def collect_tag_anchors(
     return sorted_anchors
 
 
-# Compute adjacent tag-pair metrics
 def compute_adjacent_tag_metrics(
     repo: Repo,
     anchors: List[TagAnchor],
@@ -459,7 +430,6 @@ def compute_adjacent_tag_metrics(
             )
             delta_lines, delta_files = 0, 0
 
-        # API break detection (reuse existing symbol diff machinery)
         api_break = 0
         try:
             has_break, _details = compare_api_symbols_between_commits(
@@ -547,7 +517,6 @@ def select_tag_slices_dp(
     )
 
 
-# Helper: build SemanticSlice from a TagAnchor
 def _create_slice_from_anchor(
     anchor: TagAnchor,
     repo: Repo,
@@ -564,7 +533,6 @@ def _create_slice_from_anchor(
         date_str = anchor.commit_date.strftime("%Y%m%d")
         slice_id = f"{repo_name}_{anchor.commit_hash[:8]}_{date_str}"
 
-        # Get commit stats for metadata
         git_commit = repo.commit(anchor.commit_hash)
         stats = git_commit.stats.total
         lines_added = stats.get("insertions", 0)
@@ -588,15 +556,15 @@ def _create_slice_from_anchor(
             }
 
         metadata = SliceMetadata(
-            total_files=0,  # Will be populated by enrich_slice_with_files
-            total_lines=0,  # Will be populated by enrich_slice_with_files
-            target_language_total_files=0,  # Will be populated by enrich_slice_with_files
-            target_language_total_lines=0,  # Will be populated by enrich_slice_with_files
+            total_files=0,
+            total_lines=0,
+            target_language_total_files=0,
+            target_language_total_lines=0,
             changed_files_since_prev_slice=files_changed,
             commit_message=git_commit.message.strip(),
             lines_added=lines_added,
             lines_deleted=lines_deleted,
-            files_modified=None,  # populated later by enrich_slice_with_files
+            files_modified=None,
             slice_score=segment_info.get("distance", 0.0) if segment_info else 0.0,
             score_breakdown=score_breakdown,
         )
@@ -607,7 +575,7 @@ def _create_slice_from_anchor(
             commit_date=anchor.commit_date.isoformat(),
             slice_type=SliceType.VERSION_RELEASE,
             version_tag=anchor.tag_name,
-            files=[],  # populated later by enrich_slice_with_files
+            files=[],
             metadata=metadata,
         )
 
@@ -629,7 +597,6 @@ def _build_segment_lookup(
 
     Returns ``{anchor_index: segment_info_dict}``.
     """
-    # Pre-compute prefix-sum of distances keyed by anchor index
     # normalised[i] covers anchors[i] → anchors[i+1]
     dist_by_idx: Dict[int, float] = {}
     for i, nm in enumerate(normalised):
@@ -640,7 +607,6 @@ def _build_segment_lookup(
     for pos in range(len(selected_indices)):
         idx = selected_indices[pos]
         if pos == 0:
-            # First selected anchor – no preceding segment
             lookup[idx] = {
                 "position_in_selection": 0,
                 "is_first": True,
@@ -649,11 +615,9 @@ def _build_segment_lookup(
             continue
 
         prev_idx = selected_indices[pos - 1]
-        # Accumulate distances between prev_idx and idx
         seg_dist = sum(
             dist_by_idx.get(k, 0.0) for k in range(prev_idx, idx)
         )
-        # Accumulate raw deltas
         seg_lines = sum(
             normalised[k].delta_lines for k in range(prev_idx, idx)
             if k < len(normalised)

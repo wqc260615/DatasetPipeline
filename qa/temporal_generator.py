@@ -1,5 +1,4 @@
-"""Generate temporal QA pairs between two slice contexts (pairwise) and across the full slice chain (ordering and evolution).
-"""
+"""Generate temporal QA pairs across adjacent slices and full slice chains."""
 
 from __future__ import annotations
 
@@ -8,10 +7,6 @@ from typing import Any, Dict, List
 
 from qa.qa_common import format_params, make_qa, public_class, public_function, symbol_ref
 from qa.qa_types import SliceContext
-
-# ---------------------------------------------------------------------------
-# Test-path filter
-# ---------------------------------------------------------------------------
 
 _TEST_PATH_RE = re.compile(
     r"(?:^|[/\\])tests?[/\\]"       # Python: tests/ or test/ directory
@@ -38,11 +33,6 @@ def _prod_class(cls: Dict[str, Any]) -> bool:
     return public_class(cls) and not _is_test_path(cls.get("file_path") or "")
 
 
-# ---------------------------------------------------------------------------
-# Key helpers
-# ---------------------------------------------------------------------------
-
-
 def _function_key(func: Dict[str, Any]) -> str:
     return "{}|{}|{}|{}".format(
         func.get("file_path") or "",
@@ -65,11 +55,6 @@ def _question_key(repo: str, subtype: str, ref: str, file_path: str = "") -> str
     return f"{repo}||temporal||{subtype}||{ref}||{file_path}"
 
 
-# ---------------------------------------------------------------------------
-# deterministic uniform sampling of stable symbol keys
-# ---------------------------------------------------------------------------
-
-
 def _sample_stable(items: list, max_n: int) -> list:
     """Return at most *max_n* items with uniform deterministic stride."""
     if not items or max_n <= 0:
@@ -78,11 +63,6 @@ def _sample_stable(items: list, max_n: int) -> list:
         return items
     step = len(items) / max_n
     return [items[int(i * step)] for i in range(max_n)]
-
-
-# ---------------------------------------------------------------------------
-# Pairwise temporal QA builder
-# ---------------------------------------------------------------------------
 
 
 def build_temporal_qas(
@@ -104,9 +84,6 @@ def build_temporal_qas(
     prev_v = prev_ctx.version_tag or prev_ctx.slice_id
     curr_v = curr_ctx.version_tag or curr_ctx.slice_id
 
-    # ------------------------------------------------------------------ #
-    # Functions                                                            #
-    # ------------------------------------------------------------------ #
     prev_funcs = {_function_key(f): f for f in prev_ctx.functions if _prod_function(f)}
     curr_funcs = {_function_key(f): f for f in curr_ctx.functions if _prod_function(f)}
 
@@ -114,7 +91,6 @@ def build_temporal_qas(
     removed_func_keys = sorted(set(prev_funcs) - set(curr_funcs))
     stable_func_keys = sorted(set(prev_funcs) & set(curr_funcs))
 
-    # -- positive "introduced" --
     for key in added_func_keys:
         cf = curr_funcs[key]
         ref = symbol_ref(cf)
@@ -133,7 +109,6 @@ def build_temporal_qas(
             )
         )
 
-    # -- negative "not introduced" (sampled stable functions) --
     for key in _sample_stable(stable_func_keys, max_stable_per_type):
         cf = curr_funcs[key]
         ref = symbol_ref(cf)
@@ -152,7 +127,6 @@ def build_temporal_qas(
             )
         )
 
-    # -- positive "removed" --
     for key in removed_func_keys:
         pf = prev_funcs[key]
         ref = symbol_ref(pf)
@@ -171,7 +145,6 @@ def build_temporal_qas(
             )
         )
 
-    # -- negative "not removed" (sampled stable functions) --
     for key in _sample_stable(stable_func_keys, max_stable_per_type):
         pf = prev_funcs[key]
         ref = symbol_ref(pf)
@@ -190,7 +163,6 @@ def build_temporal_qas(
             )
         )
 
-    # -- Changed and stable properties for overlap functions --
     stable_sig_no_change: List[str] = []
     stable_ret_no_change: List[str] = []
 
@@ -200,7 +172,6 @@ def build_temporal_qas(
         ref = symbol_ref(cf)
         fp = cf.get("file_path") or ""
 
-        # Signature
         prev_sig = pf.get("signature") or format_params(pf.get("parameters", []))
         curr_sig = cf.get("signature") or format_params(cf.get("parameters", []))
         if prev_sig != curr_sig:
@@ -223,7 +194,6 @@ def build_temporal_qas(
         else:
             stable_sig_no_change.append(key)
 
-        # Return type
         prev_ret = pf.get("return_type") or "unknown"
         curr_ret = cf.get("return_type") or "unknown"
         if prev_ret != curr_ret:
@@ -246,7 +216,6 @@ def build_temporal_qas(
         else:
             stable_ret_no_change.append(key)
 
-        # calls set changed
         prev_calls = set(pf.get("calls") or [])
         curr_calls = set(cf.get("calls") or [])
         if prev_calls != curr_calls:
@@ -274,7 +243,6 @@ def build_temporal_qas(
                 )
             )
 
-        # instantiations set changed
         prev_insts = set(pf.get("instantiations") or [])
         curr_insts = set(cf.get("instantiations") or [])
         if prev_insts != curr_insts:
@@ -302,7 +270,6 @@ def build_temporal_qas(
                 )
             )
 
-    # stable signature confirmation (sampled)
     for key in _sample_stable(stable_sig_no_change, max_stable_per_type // 2):
         cf = curr_funcs[key]
         ref = symbol_ref(cf)
@@ -324,7 +291,6 @@ def build_temporal_qas(
             )
         )
 
-    # stable return type confirmation (sampled)
     for key in _sample_stable(stable_ret_no_change, max_stable_per_type // 2):
         cf = curr_funcs[key]
         ref = symbol_ref(cf)
@@ -346,9 +312,6 @@ def build_temporal_qas(
             )
         )
 
-    # ------------------------------------------------------------------ #
-    # Classes                                                              #
-    # ------------------------------------------------------------------ #
     prev_classes = {_class_key(c): c for c in prev_ctx.classes if _prod_class(c)}
     curr_classes = {_class_key(c): c for c in curr_ctx.classes if _prod_class(c)}
 
@@ -356,7 +319,6 @@ def build_temporal_qas(
     removed_cls_keys = sorted(set(prev_classes) - set(curr_classes))
     stable_cls_keys = sorted(set(prev_classes) & set(curr_classes))
 
-    # -- positive "class introduced" --
     for key in added_cls_keys:
         cc = curr_classes[key]
         name = cc.get("name", "")
@@ -375,7 +337,6 @@ def build_temporal_qas(
             )
         )
 
-    # -- negative "class not introduced" (sampled) --
     for key in _sample_stable(stable_cls_keys, max_stable_per_type):
         cc = curr_classes[key]
         name = cc.get("name", "")
@@ -394,7 +355,6 @@ def build_temporal_qas(
             )
         )
 
-    # -- positive "class removed" --
     for key in removed_cls_keys:
         pc = prev_classes[key]
         name = pc.get("name", "")
@@ -413,7 +373,6 @@ def build_temporal_qas(
             )
         )
 
-    # -- negative "class not removed" (sampled) --
     for key in _sample_stable(stable_cls_keys, max_stable_per_type):
         pc = prev_classes[key]
         name = pc.get("name", "")
@@ -432,7 +391,6 @@ def build_temporal_qas(
             )
         )
 
-    # -- Changed and stable class properties --
     stable_inh_no_change: List[str] = []
 
     for key in stable_cls_keys:
@@ -463,7 +421,6 @@ def build_temporal_qas(
         else:
             stable_inh_no_change.append(key)
 
-    # stable inheritance confirmation (sampled)
     for key in _sample_stable(stable_inh_no_change, max_stable_per_type // 2):
         cc = curr_classes[key]
         name = cc.get("name", "")
@@ -486,11 +443,6 @@ def build_temporal_qas(
         )
 
     return qas
-
-
-# ---------------------------------------------------------------------------
-# Ordering QAs (full slice chain required)
-# ---------------------------------------------------------------------------
 
 
 def build_ordering_qas(all_ctxs: List[SliceContext]) -> List[Dict[str, Any]]:
@@ -563,7 +515,6 @@ def build_ordering_qas(all_ctxs: List[SliceContext]) -> List[Dict[str, Any]]:
                 )
             )
 
-    # Classes
     first_ctx_cls_keys = {_class_key(c) for c in all_ctxs[0].classes if _prod_class(c)}
     last_ctx_cls_keys = {_class_key(c) for c in all_ctxs[-1].classes if _prod_class(c)}
 
@@ -621,13 +572,8 @@ def build_ordering_qas(all_ctxs: List[SliceContext]) -> List[Dict[str, Any]]:
     return qas
 
 
-# ---------------------------------------------------------------------------
-# Evolution QAs (full trajectory across all slices)
-# ---------------------------------------------------------------------------
-
-
 def build_evolution_qas(all_ctxs: List[SliceContext]) -> List[Dict[str, Any]]:
-    """Generate Scenario-3-style trajectory questions spanning the full range.
+    """Generate trajectory questions spanning the full slice range.
 
     Only emitted when there are ≥ 2 distinct values (i.e. actual evolution
     occurred), so these are never trivially answerable from a single slice.
@@ -722,7 +668,6 @@ def build_evolution_qas(all_ctxs: List[SliceContext]) -> List[Dict[str, Any]]:
             )
         )
 
-    # Class inheritance evolution
     cls_repr: Dict[str, Dict[str, Any]] = {}
     cls_inh_traj: Dict[str, List[tuple]] = {}
 

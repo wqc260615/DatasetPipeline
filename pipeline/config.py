@@ -1,8 +1,4 @@
-"""
-Configuration management for the pipeline.
-
-Loads and validates configuration from config.yaml.
-"""
+"""Pipeline configuration models and loading helpers."""
 
 import yaml
 from pathlib import Path
@@ -25,7 +21,6 @@ class ApiBreakConfig(BaseModel):
 
 class SlicingConfig(BaseModel):
     """Configuration for semantic slicing."""
-    # --- Tag-Distance + DP fields ---
     target_slices: int = Field(default=20, description="Target number of slices to select (budget N)")
     distance_weights: DistanceWeightsConfig = Field(
         default_factory=DistanceWeightsConfig,

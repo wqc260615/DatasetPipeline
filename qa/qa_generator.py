@@ -77,7 +77,6 @@ def generate_qa_dataset(
 
         contexts = [_load_slice_context(repo_name, d) for d in slice_dirs]
 
-        # Collect all public symbol refs across every slice for negative sampling.
         all_func_refs: set[str] = set()
         all_class_names: set[str] = set()
         for ctx in contexts:
@@ -101,7 +100,6 @@ def generate_qa_dataset(
             ctx_func_refs = {symbol_ref(f) for f in ctx.functions if public_function(f)}
             ctx_class_names = {c.get("name", "") for c in ctx.classes if public_class(c)}
 
-            # Deterministic negative samples: sorted complement, capped at 10% of positives.
             neg_funcs = sorted(all_func_refs - ctx_func_refs)
             neg_classes = sorted(all_class_names - ctx_class_names)
             n_neg_funcs = min(len(neg_funcs), max(1, len(ctx_func_refs) // 10))

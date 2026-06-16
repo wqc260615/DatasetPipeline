@@ -4,10 +4,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-# ---------------------------------------------------------------------------
-# Language detection
-# ---------------------------------------------------------------------------
-
 _LANG_MAP: dict[str, str] = {
     ".py": "python",
     ".java": "java",
@@ -18,10 +14,6 @@ def _get_lang(file_path: str) -> str:
     """Return a Markdown code-fence language tag from a file path."""
     return _LANG_MAP.get(Path(file_path).suffix.lower(), "")
 
-
-# ---------------------------------------------------------------------------
-# Intrinsic
-# ---------------------------------------------------------------------------
 
 _INTRINSIC_TEMPLATE = """\
 You are a code analysis assistant. Given the source code of a file, answer the \
@@ -36,7 +28,6 @@ Question: {question}
 
 {format_hint}"""
 
-# Multi-file variant used for cross-file subtypes (class_subclasses, class_instantiation_sites)
 _INTRINSIC_MULTIFILE_TEMPLATE = """\
 You are a code analysis assistant. Given the source code of several files from \
 the same codebase, answer the question precisely.
@@ -59,12 +50,9 @@ File: {file_path}
 ```
 """
 
-# Subtype-specific answer format instructions.
 # The model often outputs full signatures or code blocks when a concise value
 # is expected, so we spell out the exact expected format per subtype.
 _INTRINSIC_FORMAT_HINTS: dict[str, str] = {
-    # function_signature is language-specific — resolved at prompt-build time via
-    # _function_signature_hint(); this entry is a fallback only.
     "function_signature": (
         "Answer with the full method signature as it appears in the source code. "
         "Do NOT include the body or decorators. Do not wrap in code blocks. "
@@ -153,10 +141,6 @@ _INTRINSIC_DEFAULT_HINT = (
     "Do not wrap the answer in code blocks."
 )
 
-# ---------------------------------------------------------------------------
-# Extrinsic
-# ---------------------------------------------------------------------------
-
 _EXTRINSIC_TEMPLATE = """\
 You are a code documentation assistant. Answer the question based solely on \
 the docstrings and comments found in the source code below.
@@ -182,10 +166,6 @@ File: {file_path}
 Question: {question}
 
 Answer with only "Yes" or "No". No explanation."""
-
-# ---------------------------------------------------------------------------
-# Temporal — binary (Yes / No) subtypes
-# ---------------------------------------------------------------------------
 
 _TEMPORAL_YESNO_SUBTYPES = {
     "function_introduced", "function_not_introduced",
@@ -216,10 +196,6 @@ Question: {question}
 
 Answer only with "Yes" or "No". You MUST provide an answer — do not leave it blank. No explanation, no markdown."""
 
-# ---------------------------------------------------------------------------
-# Temporal — "how did X change" subtypes  (answer: "from: X ; to: Y")
-# ---------------------------------------------------------------------------
-
 _TEMPORAL_CHANGED_SUBTYPES = {
     "function_signature_changed",
     "function_return_type_changed",
@@ -227,7 +203,6 @@ _TEMPORAL_CHANGED_SUBTYPES = {
     "function_instantiations_changed",
 }
 
-# For most "changed" questions: just ask for exact before/after.
 _TEMPORAL_CHANGED_TEMPLATE = """\
 You are a code evolution analyst. Two versions of a source file are provided.
 
@@ -248,7 +223,6 @@ Question: {question}
 Answer in the exact format: `from: <old value> ; to: <new value>`
 Use the exact signature/type/value as it appears in the code. No extra explanation."""
 
-# For function_calls_changed: answer with added/removed diff to match ground-truth format.
 _TEMPORAL_CALLS_CHANGED_TEMPLATE = """\
 You are a code evolution analyst. Two versions of a source file are provided.
 
@@ -271,7 +245,6 @@ Answer using ONLY this exact format: `added: f1, f2; removed: f3`
 Omit "added: ..." if no calls were added. Omit "removed: ..." if no calls were removed.
 Use bare names only (no class/object prefix). No extra explanation."""
 
-# For return-type questions the value may not be annotated: use 'unknown' in that case.
 _TEMPORAL_RETURN_TYPE_CHANGED_TEMPLATE = """\
 You are a code evolution analyst. Two versions of a source file are provided.
 
@@ -291,10 +264,6 @@ Question: {question}
 
 Answer in the exact format: `from: <old value> ; to: <new value>`
 If a return type is not annotated in the code, write `unknown` for that side. No extra explanation."""
-
-# ---------------------------------------------------------------------------
-# Temporal — ordering subtypes  (answer: version string)
-# ---------------------------------------------------------------------------
 
 _TEMPORAL_VERSION_SUBTYPES = {
     "function_first_introduced",
@@ -320,10 +289,6 @@ Question: {question}
 Answer with only the version string shown in the snapshot header above \
 (e.g. `v2.2.15`). Do not leave blank, no other explanation."""
 
-# ---------------------------------------------------------------------------
-# Temporal — evolution subtypes  (answer: full trajectory)
-# ---------------------------------------------------------------------------
-
 _TEMPORAL_EVOLUTION_TEMPLATE = """\
 You are a code evolution analyst. Two file snapshots spanning a version range are provided.
 
@@ -346,8 +311,6 @@ List each distinct value with the version it first appeared. No extra explanatio
 
 _FILE_MISSING = "# [File did not exist in this version]"
 
-# Returned by build_prompt when context is completely unavailable.
-# The evaluator should skip LLM inference and use this string as the prediction.
 CONTEXT_UNAVAILABLE = "[context unavailable]"
 
 
@@ -367,7 +330,6 @@ def build_prompt(qa_pair: dict, context: dict) -> str | None:
     question = qa_pair["question"]
     file_path = context["file_path"]
 
-    # Early-exit when context retrieval failed completely
     if qa_type == "temporal":
         if context.get("from_content") is None and context.get("to_content") is None:
             return None
@@ -401,7 +363,6 @@ def build_prompt(qa_pair: dict, context: dict) -> str | None:
                 question=question,
             )
         else:
-            # evolution or unknown subtypes
             return _TEMPORAL_EVOLUTION_TEMPLATE.format(**kwargs)
 
     elif qa_type == "extrinsic":

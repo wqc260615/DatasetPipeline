@@ -1,14 +1,4 @@
-"""
-Data models for representing repositories, slices, and metadata.
-
-This module defines Pydantic models for type-safe data structures
-used throughout the pipeline.
-
-File-level symbol data uses the QA-enriched models (QACodeFile,
-QAFunctionSymbol, QAClassSymbol, QAImport, etc.) which carry richer
-metadata than the legacy CodeFile: typed parameters, return types,
-decorators, class fields, imports, and module-level docstrings.
-"""
+"""Pydantic models for repository slices and QA metadata."""
 
 from datetime import datetime
 from typing import List, Optional, Dict, Any
@@ -37,11 +27,6 @@ class RepositoryInfo(BaseModel):
         except ValueError:
             raise ValueError("Date must be in ISO format")
         return v
-
-
-# CodeFile has been removed — use QACodeFile instead.
-# QACodeFile (defined below) is the single authoritative file-level model
-# and carries all data previously in CodeFile plus richer QA metadata.
 
 
 class SliceMetadata(BaseModel):
@@ -93,11 +78,6 @@ class RepositoryDataset(BaseModel):
     """Complete dataset for a repository with all slices."""
     repository: RepositoryInfo = Field(..., description="Repository information")
     slices: List[SemanticSlice] = Field(default_factory=list, description="Semantic evolution slices")
-    
-# ============================================================
-# QA-specific models (richer metadata for QA pair generation)
-# ============================================================
-
 
 class QAParameter(BaseModel):
     """A function/method parameter with optional type and default value."""
@@ -163,12 +143,7 @@ class QAImport(BaseModel):
 
 
 class QACodeFile(BaseModel):
-    """A source file with QA-enriched metadata.
-    
-    This is the authoritative file-level model used throughout the pipeline.
-    It replaces the former CodeFile and includes all its fields plus richer
-    QA data.
-    """
+    """A source file with QA-enriched metadata."""
     path: str = Field(..., description="Relative path from repository root")
     content_hash: str = Field(..., description="SHA256 hash of file content")
     language: Optional[str] = Field(None, description="Detected programming language")
@@ -178,5 +153,4 @@ class QACodeFile(BaseModel):
     imports: List[QAImport] = Field(default_factory=list, description="Import statements")
 
 
-# Resolve the forward reference 'QACodeFile' used in SemanticSlice
 SemanticSlice.model_rebuild()

@@ -138,7 +138,6 @@ def main() -> None:
         ),
     )
 
-    # Remote OpenAI-compatible API options
     parser.add_argument(
         "--api-key",
         default=None,
@@ -262,7 +261,6 @@ def main() -> None:
         question_only=args.question_only,
     )
 
-    # Write per-item results
     model_output_dir = Path(args.output_dir) / _safe_model_dir_name(active_model)
     model_output_dir.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -277,7 +275,6 @@ def main() -> None:
             f.write(json.dumps(r) + "\n")
     logger.info("Results written to %s", out_file)
 
-    # Print and persist aggregate metrics
     agg = aggregate_metrics(results)
     summary = _format_summary(
         repo=args.repo,

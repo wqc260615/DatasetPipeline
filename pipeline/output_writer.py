@@ -1,16 +1,4 @@
-"""
-Module: output_writer.py
-
-Purpose: Save repository dataset to a structured directory layout.
-
-Key Functions:
-- save_repository_dataset(dataset: RepositoryDataset, output_dir: Path) -> None
-- generate_summary(dataset: RepositoryDataset) -> dict
-
-Example:
-    >>> from pathlib import Path
-    >>> save_repository_dataset(dataset, Path("./output"))
-"""
+"""Write repository slice datasets to disk."""
 
 import json
 import logging
@@ -50,12 +38,10 @@ def save_repository_dataset(dataset: RepositoryDataset, output_dir: Path) -> Non
     repo_output_dir = output_dir / repo_name
     slices_dir = repo_output_dir / "slices"
     
-    # Create directory structure
     slices_dir.mkdir(parents=True, exist_ok=True)
     
     logger.info(f"Saving dataset to: {repo_output_dir}")
     
-    # 1. Save metadata.json (lightweight: repository info + slice metadata only)
     metadata = {
         "repository": dataset.repository.model_dump(),
         "slices": [
@@ -76,14 +62,12 @@ def save_repository_dataset(dataset: RepositoryDataset, output_dir: Path) -> Non
         json.dump(metadata, f, indent=2, default=str, ensure_ascii=False)
     logger.info(f"Saved metadata.json: {metadata_path}")
     
-    # 2. Save each slice's data
     for idx, slice in enumerate(dataset.slices, 1):
         slice_dir = slices_dir / f"slice_{idx:04d}"
         slice_dir.mkdir(parents=True, exist_ok=True)
         
         _save_slice_data(slice, slice_dir)
     
-    # 3. Save summary.json
     summary = generate_summary(dataset)
     summary_path = repo_output_dir / "summary.json"
     with open(summary_path, 'w', encoding='utf-8') as f:
@@ -101,7 +85,6 @@ def _save_slice_data(slice: SemanticSlice, slice_dir: Path) -> None:
         slice: SemanticSlice to save
         slice_dir: Directory for this slice
     """
-    # Save metadata.json (slice metadata)
     metadata = {
         "slice_id": slice.slice_id,
         "commit_hash": slice.commit_hash,
@@ -115,7 +98,6 @@ def _save_slice_data(slice: SemanticSlice, slice_dir: Path) -> None:
     with open(metadata_path, 'w', encoding='utf-8') as f:
         json.dump(metadata, f, indent=2, default=str, ensure_ascii=False)
     
-    # Save files.json (file list, hashes, language)
     files_data = [
         {
             "path": file.path,
@@ -129,7 +111,6 @@ def _save_slice_data(slice: SemanticSlice, slice_dir: Path) -> None:
     with open(files_path, 'w', encoding='utf-8') as f:
         json.dump(files_data, f, indent=2, default=str, ensure_ascii=False)
     
-    # Save QA-enriched symbol data to symbols/ directory
     symbols_dir = slice_dir / "symbols"
     symbols_dir.mkdir(parents=True, exist_ok=True)
     
@@ -141,32 +122,27 @@ def _save_slice_data(slice: SemanticSlice, slice_dir: Path) -> None:
     for file in slice.files:
         rel_path = file.path
         
-        # Functions: use model_dump() to flatten Pydantic objects to plain dicts
         for func in file.functions:
             func_dict = func.model_dump()
             func_dict["file_path"] = rel_path
             all_functions.append(func_dict)
         
-        # Classes
         for cls in file.classes:
             cls_dict = cls.model_dump()
             cls_dict["file_path"] = rel_path
             all_classes.append(cls_dict)
         
-        # Imports
         for imp in file.imports:
             imp_dict = imp.model_dump()
             imp_dict["file_path"] = rel_path
             all_imports.append(imp_dict)
         
-        # Module-level docstrings
         if file.module_doc:
             module_docs.append({
                 "file_path": rel_path,
                 "doc": file.module_doc
             })
     
-    # Write JSON files
     functions_path = symbols_dir / "functions.json"
     with open(functions_path, 'w', encoding='utf-8') as f:
         json.dump(all_functions, f, indent=2, default=str, ensure_ascii=False)

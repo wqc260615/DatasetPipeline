@@ -1,8 +1,4 @@
-"""
-Main entry point for the dataset pipeline.
-
-Processes repositories to extract semantic evolution slices.
-"""
+"""CLI entry point for extracting semantic evolution slices."""
 
 import argparse
 import json
@@ -20,7 +16,6 @@ from pipeline.models import RepositoryDataset, RepositoryInfo
 from pipeline.output_writer import save_repository_dataset
 from datetime import datetime
 
-# Setup logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s [%(levelname)s] %(name)s: %(message)s'
@@ -48,11 +43,9 @@ def process_repository(
     logger.info(f"Processing repository: {repo_url}")
     
     try:
-        # Extract repo name from URL
         repo_name = repo_url.split('/')[-1].replace('.git', '')
         repo_dir = Path(config.storage.repositories_dir) / repo_name
         
-        # Clone repository
         logger.info("Cloning repository...")
         cloned_path = clone_repository(
             repo_url,
@@ -64,12 +57,10 @@ def process_repository(
             logger.error(f"Failed to clone repository: {repo_url}")
             return False
         
-        # Validate repository
         if not validate_repository(cloned_path):
             logger.error(f"Invalid repository: {repo_url}")
             return False
         
-        # Identify slices
         logger.info("Identifying semantic slices...")
         slices = identify_slices(cloned_path, config)
         
@@ -77,7 +68,6 @@ def process_repository(
             logger.warning(f"No slices identified for repository: {repo_url}")
             return False
         
-        # Enrich slices with file information
         logger.info(f"Enriching {len(slices)} slices with file information...")
         enriched_slices = []
         for i, slice in enumerate(slices, 1):
@@ -89,26 +79,22 @@ def process_repository(
                 logger.error(f"Error enriching slice {slice.slice_id}: {e}")
                 continue
         
-        # Validate slices
         logger.info("Validating slices...")
         validation_results = validate_all_slices(enriched_slices, config.validation)
         logger.info(f"Validation results: {validation_results['valid_slices']}/{validation_results['total_slices']} valid")
         
-        # Create repository info
         repo_info = RepositoryInfo(
             name=repo_name,
             url=repo_url,
-            language="unknown",  # Could be detected from files
+            language="unknown",
             clone_date=datetime.now().isoformat()
         )
         
-        # Create dataset
         dataset = RepositoryDataset(
             repository=repo_info,
             slices=enriched_slices
         )
         
-        # Save to structured directory layout
         output_path = Path(output_dir)
         save_repository_dataset(dataset, output_path)
         
@@ -157,19 +143,16 @@ def main():
     
     args = parser.parse_args()
     
-    # Load configuration
     try:
         config = load_config(args.config)
     except FileNotFoundError:
         logger.warning(f"Config file not found: {args.config}, using defaults")
         config = get_default_config()
     
-    # Setup logging from config
     logging.getLogger().setLevel(getattr(logging, config.logging.level))
 
     existing_repo_action = args.existing_repo_action or config.storage.existing_repo_action
     
-    # Get repository URLs
     repo_urls = []
     if args.repo_url:
         repo_urls.append(args.repo_url)
@@ -180,7 +163,6 @@ def main():
         logger.error("Must provide either --repo-url or --repo-list")
         sys.exit(1)
     
-    # Process repositories
     success_count = 0
     for repo_url in repo_urls:
         if process_repository(repo_url, config, args.output_dir, existing_repo_action):
