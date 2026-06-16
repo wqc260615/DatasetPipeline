@@ -1,0 +1,53 @@
+=== Evaluation summary (spring-boot / sampled) ===
+  Model           : mlx-community/Qwen2.5-Coder-7B-Instruct-4bit
+  Total evaluated : 500
+  No prediction   : 0
+  Context missing : 2
+
+  Metrics by subtype:
+    extrinsic/wh_locative: rouge_l=0.2429
+    extrinsic/wh_manner: rouge_l=0.3958
+    extrinsic/wh_object: rouge_l=0.4910
+    extrinsic/wh_purpose: rouge_l=0.8889
+    extrinsic/wh_subject: rouge_l=0.2600
+    extrinsic/wh_temporal: rouge_l=1.0000
+    extrinsic/wh_xcomp: rouge_l=0.6297
+    extrinsic/yesno: yesno_em=1.0000
+    intrinsic/class_existence: f1=1.0000, em=1.0000
+    intrinsic/class_fields: f1=0.8494, em=0.7059
+    intrinsic/class_implemented_interfaces: f1=0.9333, em=0.8571
+    intrinsic/class_inheritance: f1=0.5619, em=0.5238
+    intrinsic/class_instantiation_sites: f1=0.5693, em=0.5000
+    intrinsic/class_methods: f1=0.7722, em=0.6471
+    intrinsic/class_subclasses: f1=0.9439, em=0.7000
+    intrinsic/field_accesses: f1=0.7000, em=0.6429
+    intrinsic/function_parameters: f1=0.9048, em=0.5714
+    intrinsic/function_return_type: f1=0.9762, em=0.9643
+    intrinsic/function_signature: f1=0.9250, em=0.4167
+    intrinsic/interface_implementors: f1=0.5929, em=0.3571
+    intrinsic/object_instantiations: f1=0.5000, em=0.5000
+    intrinsic/symbol_callers: f1=0.3826, em=0.1429
+    intrinsic/symbol_existence: f1=1.0000, em=1.0000
+    intrinsic/symbol_location: f1=1.0000, em=1.0000
+    temporal/class_first_introduced: f1=1.0000, em=1.0000
+    temporal/class_inheritance_changed: f1=0.8413, em=0.3333
+    temporal/class_inheritance_unchanged: f1=0.8889, em=0.8889
+    temporal/class_introduced: f1=0.8333, em=0.8333
+    temporal/class_last_present: f1=1.0000, em=1.0000
+    temporal/class_not_introduced: f1=0.8750, em=0.8750
+    temporal/class_not_removed: f1=1.0000, em=1.0000
+    temporal/class_removed: f1=0.8333, em=0.8333
+    temporal/function_calls_changed: f1=0.4565, em=0.0938
+    temporal/function_first_introduced: f1=0.6429, em=0.5000
+    temporal/function_instantiations_changed: f1=0.1667, em=0.0000
+    temporal/function_introduced: f1=1.0000, em=1.0000
+    temporal/function_last_present: f1=1.0000, em=1.0000
+    temporal/function_not_introduced: f1=0.8571, em=0.8571
+    temporal/function_not_removed: f1=1.0000, em=1.0000
+    temporal/function_removed: f1=0.2500, em=0.2500
+    temporal/function_return_type_changed: f1=0.9375, em=0.7500
+    temporal/function_return_type_evolution: f1=0.6299, em=0.0000
+    temporal/function_return_type_unchanged: f1=1.0000, em=1.0000
+    temporal/function_signature_changed: f1=0.9314, em=0.7037
+    temporal/function_signature_evolution: f1=0.5047, em=0.0000
+    temporal/function_signature_unchanged: f1=1.0000, em=1.0000

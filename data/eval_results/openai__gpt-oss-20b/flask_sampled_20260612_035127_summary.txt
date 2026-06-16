@@ -1,0 +1,53 @@
+=== Evaluation summary (flask / sampled) ===
+  Model           : openai/gpt-oss-20b
+  Prompt mode     : slice_context
+  Total evaluated : 500
+  No prediction   : 2
+  Context missing: 1
+
+  Metrics by subtype:
+    extrinsic/wh_locative: rouge_l=0.4872
+    extrinsic/wh_manner: rouge_l=0.1136
+    extrinsic/wh_object: rouge_l=0.3147
+    extrinsic/wh_purpose: rouge_l=0.2885
+    extrinsic/wh_subject: rouge_l=0.3597
+    extrinsic/wh_temporal: rouge_l=0.1451
+    extrinsic/wh_xcomp: rouge_l=0.0794
+    extrinsic/yesno: yesno_em=1.0000
+    intrinsic/class_fields: f1=0.8789, em=0.5714
+    intrinsic/class_inheritance: f1=0.8636, em=0.8636
+    intrinsic/class_instantiation_sites: f1=0.4667, em=0.2000
+    intrinsic/class_methods: f1=0.9025, em=0.7647
+    intrinsic/class_subclasses: f1=1.0000, em=1.0000
+    intrinsic/field_accesses: f1=0.8231, em=0.4091
+    intrinsic/function_parameters: f1=0.9417, em=0.8182
+    intrinsic/function_return_type: f1=0.9111, em=0.8667
+    intrinsic/function_signature: f1=0.9977, em=0.9836
+    intrinsic/object_instantiations: f1=0.3462, em=0.1538
+    intrinsic/symbol_call_sites: f1=0.5067, em=0.2000
+    intrinsic/symbol_callers: f1=0.7138, em=0.2500
+    intrinsic/symbol_existence: f1=1.0000, em=1.0000
+    intrinsic/symbol_location: f1=1.0000, em=1.0000
+    temporal/class_first_introduced: f1=0.6667, em=0.0000
+    temporal/class_inheritance_changed: f1=0.9000, em=0.5000
+    temporal/class_inheritance_evolution: f1=0.3636, em=0.0000
+    temporal/class_inheritance_unchanged: f1=1.0000, em=1.0000
+    temporal/class_introduced: f1=0.5000, em=0.5000
+    temporal/class_last_present: f1=1.0000, em=1.0000
+    temporal/class_not_introduced: f1=1.0000, em=1.0000
+    temporal/class_not_removed: f1=0.9375, em=0.9375
+    temporal/class_removed: f1=1.0000, em=1.0000
+    temporal/function_calls_changed: f1=0.6330, em=0.0000
+    temporal/function_first_introduced: f1=0.6667, em=0.5000
+    temporal/function_instantiations_changed: f1=0.0000, em=0.0000
+    temporal/function_introduced: f1=0.8000, em=0.8000
+    temporal/function_last_present: f1=1.0000, em=1.0000
+    temporal/function_not_introduced: f1=1.0000, em=1.0000
+    temporal/function_not_removed: f1=1.0000, em=1.0000
+    temporal/function_removed: f1=1.0000, em=1.0000
+    temporal/function_return_type_changed: f1=1.0000, em=1.0000
+    temporal/function_return_type_evolution: f1=0.5348, em=0.0000
+    temporal/function_return_type_unchanged: f1=1.0000, em=1.0000
+    temporal/function_signature_changed: f1=0.9642, em=0.7273
+    temporal/function_signature_evolution: f1=0.4518, em=0.0000
+    temporal/function_signature_unchanged: f1=1.0000, em=1.0000

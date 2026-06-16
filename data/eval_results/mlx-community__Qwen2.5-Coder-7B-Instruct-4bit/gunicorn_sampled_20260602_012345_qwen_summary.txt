@@ -1,0 +1,49 @@
+=== Evaluation summary (gunicorn / sampled) ===
+  Total evaluated : 500
+  No prediction   : 0
+  Context missing : 0
+
+  Metrics by subtype:
+    extrinsic/wh_locative: rouge_l=0.4889
+    extrinsic/wh_manner: rouge_l=0.3158
+    extrinsic/wh_object: rouge_l=0.5801
+    extrinsic/wh_purpose: rouge_l=1.0000
+    extrinsic/wh_subject: rouge_l=0.1111
+    extrinsic/wh_temporal: rouge_l=0.4606
+    extrinsic/wh_xcomp: rouge_l=0.3000
+    extrinsic/yesno: yesno_em=1.0000
+    intrinsic/class_existence: f1=0.0000, em=0.0000
+    intrinsic/class_fields: f1=0.9434, em=0.6250
+    intrinsic/class_inheritance: f1=0.7391, em=0.7391
+    intrinsic/class_instantiation_sites: f1=0.6667, em=0.2857
+    intrinsic/class_methods: f1=0.9243, em=0.7222
+    intrinsic/class_subclasses: f1=0.9677, em=0.6667
+    intrinsic/field_accesses: f1=0.5254, em=0.0870
+    intrinsic/function_parameters: f1=0.6048, em=0.5000
+    intrinsic/function_return_type: f1=1.0000, em=1.0000
+    intrinsic/function_signature: f1=0.9960, em=0.9841
+    intrinsic/object_instantiations: f1=0.4103, em=0.3077
+    intrinsic/symbol_call_sites: f1=0.2500, em=0.2500
+    intrinsic/symbol_callers: f1=0.4364, em=0.1389
+    intrinsic/symbol_existence: f1=1.0000, em=1.0000
+    intrinsic/symbol_location: f1=1.0000, em=1.0000
+    temporal/class_first_introduced: f1=0.4000, em=0.0000
+    temporal/class_inheritance_changed: f1=0.7333, em=0.3333
+    temporal/class_inheritance_evolution: f1=0.3525, em=0.0000
+    temporal/class_inheritance_unchanged: f1=0.9091, em=0.9091
+    temporal/class_introduced: f1=1.0000, em=1.0000
+    temporal/class_not_introduced: f1=0.6875, em=0.6875
+    temporal/class_not_removed: f1=1.0000, em=1.0000
+    temporal/class_removed: f1=0.0000, em=0.0000
+    temporal/function_calls_changed: f1=0.3676, em=0.0625
+    temporal/function_first_introduced: f1=1.0000, em=1.0000
+    temporal/function_instantiations_changed: f1=0.0989, em=0.0000
+    temporal/function_introduced: f1=1.0000, em=1.0000
+    temporal/function_last_present: f1=0.4000, em=0.0000
+    temporal/function_not_introduced: f1=0.4500, em=0.4500
+    temporal/function_not_removed: f1=1.0000, em=1.0000
+    temporal/function_removed: f1=0.1667, em=0.1667
+    temporal/function_return_type_unchanged: f1=1.0000, em=1.0000
+    temporal/function_signature_changed: f1=0.9881, em=0.7500
+    temporal/function_signature_evolution: f1=0.6638, em=0.0000
+    temporal/function_signature_unchanged: f1=0.9167, em=0.9167

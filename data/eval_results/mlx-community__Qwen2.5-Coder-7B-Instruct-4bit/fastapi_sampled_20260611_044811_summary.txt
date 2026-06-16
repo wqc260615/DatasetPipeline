@@ -1,0 +1,50 @@
+=== Evaluation summary (fastapi / sampled) ===
+  Model           : mlx-community/Qwen2.5-Coder-7B-Instruct-4bit
+  Total evaluated : 500
+  No prediction   : 0
+  Context missing : 0
+
+  Metrics by subtype:
+    extrinsic/wh_cause: rouge_l=0.6000
+    extrinsic/wh_manner: rouge_l=0.2786
+    extrinsic/wh_object: rouge_l=0.6781
+    extrinsic/wh_purpose: rouge_l=0.7619
+    extrinsic/wh_subject: rouge_l=0.2958
+    extrinsic/wh_temporal: rouge_l=0.4118
+    extrinsic/wh_xcomp: rouge_l=0.6061
+    extrinsic/yesno: yesno_em=1.0000
+    intrinsic/class_fields: em=0.8333, f1=0.9486
+    intrinsic/class_inheritance: em=0.8276, f1=0.8966
+    intrinsic/class_instantiation_sites: em=0.1579, f1=0.2211
+    intrinsic/class_methods: em=0.8333, f1=0.8333
+    intrinsic/class_subclasses: em=0.0000, f1=0.1774
+    intrinsic/field_accesses: em=0.3158, f1=0.6285
+    intrinsic/function_parameters: em=1.0000, f1=1.0000
+    intrinsic/function_return_type: em=1.0000, f1=1.0000
+    intrinsic/function_signature: em=1.0000, f1=1.0000
+    intrinsic/object_instantiations: em=0.4118, f1=0.6415
+    intrinsic/symbol_call_sites: em=0.6667, f1=0.6667
+    intrinsic/symbol_callers: em=0.1724, f1=0.2695
+    intrinsic/symbol_existence: em=1.0000, f1=1.0000
+    intrinsic/symbol_location: em=1.0000, f1=1.0000
+    temporal/class_first_introduced: em=1.0000, f1=1.0000
+    temporal/class_inheritance_unchanged: em=0.9000, f1=0.9000
+    temporal/class_introduced: em=1.0000, f1=1.0000
+    temporal/class_last_present: em=1.0000, f1=1.0000
+    temporal/class_not_introduced: em=0.7500, f1=0.7500
+    temporal/class_not_removed: em=1.0000, f1=1.0000
+    temporal/class_removed: em=0.3750, f1=0.3750
+    temporal/function_calls_changed: em=0.0000, f1=0.3600
+    temporal/function_first_introduced: em=1.0000, f1=1.0000
+    temporal/function_instantiations_changed: em=0.0000, f1=0.5000
+    temporal/function_introduced: em=1.0000, f1=1.0000
+    temporal/function_last_present: em=1.0000, f1=1.0000
+    temporal/function_not_introduced: em=0.8462, f1=0.8462
+    temporal/function_not_removed: em=1.0000, f1=1.0000
+    temporal/function_removed: em=0.6190, f1=0.6190
+    temporal/function_return_type_changed: em=1.0000, f1=1.0000
+    temporal/function_return_type_evolution: em=0.0000, f1=0.5244
+    temporal/function_return_type_unchanged: em=0.9286, f1=0.9286
+    temporal/function_signature_changed: em=0.3889, f1=0.9100
+    temporal/function_signature_evolution: em=0.0000, f1=0.5712
+    temporal/function_signature_unchanged: em=1.0000, f1=1.0000

@@ -37,8 +37,17 @@ pip-log.txt
 dataset/
 output/
 snapshots/
-data/
 *.json
+data/*
+!data/eval_results/
+!data/eval_results/**
+!data/qa/
+data/qa/**
+!data/qa/*/
+!data/qa/*/sampled*.jsonl
+!data/qa/sampled*.jsonl
+data/**/.DS_Store
+data/**/.mplconfig/
 
 # ------------------------
 # Logs
