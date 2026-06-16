@@ -263,11 +263,28 @@ def _sample_type(
         allocations[st] = n
         allocated += n
 
-    # Fix rounding drift: add/remove from the highest-weight subtype
-    drift = allocated - budget
-    if drift != 0:
-        anchor = max(subtypes_sorted, key=lambda s: weights.get(s, 1.0))
-        allocations[anchor] = max(0, allocations[anchor] - drift)
+    # Fix rounding drift exactly.  The first pass can still miss the target
+    # when a single anchor subtype cannot absorb the whole correction, so keep
+    # adjusting deterministically until the allocation reaches the drawable
+    # target for this type.
+    target = min(budget, sum(len(items) for items in filtered.values()))
+    while allocated > target:
+        candidates = [st for st in subtypes_sorted if allocations.get(st, 0) > 0]
+        if not candidates:
+            break
+        anchor = max(candidates, key=lambda s: weights.get(s, weights.get("__all__", 1.0)))
+        allocations[anchor] -= 1
+        allocated -= 1
+    while allocated < target:
+        candidates = [
+            st for st in subtypes_sorted
+            if allocations.get(st, 0) < len(filtered[st])
+        ]
+        if not candidates:
+            break
+        anchor = max(candidates, key=lambda s: weights.get(s, weights.get("__all__", 1.0)))
+        allocations[anchor] += 1
+        allocated += 1
 
     result = []
     for st in subtypes_sorted:

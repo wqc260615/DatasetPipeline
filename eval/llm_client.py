@@ -183,6 +183,7 @@ class RemoteClient:
 
     DEFAULT_BASE_URL = "https://token.sensenova.cn/v1"
     DEFAULT_MODEL = "deepseek-v4-flash"
+    EMPTY_LENGTH_TOKEN_CAP = 4096
 
     def __init__(
         self,
@@ -314,12 +315,14 @@ class RemoteClient:
         """Single-turn chat completion; returns the assistant reply or None on error."""
         import time
         max_retries = 3
+        current_max_tokens = max_tokens
+        length_token_cap = max(max_tokens, self.EMPTY_LENGTH_TOKEN_CAP)
         for attempt in range(1, max_retries + 1):
             try:
                 request_args: dict[str, Any] = {
                     "model": self.model,
                     "messages": [{"role": "user", "content": prompt}],
-                    "max_tokens": max_tokens,
+                    "max_tokens": current_max_tokens,
                     "temperature": self.temperature,
                 }
                 extra_body = self._extra_body()
@@ -331,10 +334,12 @@ class RemoteClient:
                     diag = self._empty_response_diagnostics(response)
                     logger.warning(
                         "Remote API returned empty content "
-                        "(attempt %d/%d, finish_reason=%s, completion_tokens=%s, "
-                        "reasoning_tokens=%s, reasoning_present=%s, tool_calls=%s, refusal=%s)",
+                        "(attempt %d/%d, max_tokens=%s, finish_reason=%s, "
+                        "completion_tokens=%s, reasoning_tokens=%s, "
+                        "reasoning_present=%s, tool_calls=%s, refusal=%s)",
                         attempt,
                         max_retries,
+                        current_max_tokens,
                         diag["finish_reason"],
                         diag["completion_tokens"],
                         diag["reasoning_tokens"],
@@ -343,6 +348,17 @@ class RemoteClient:
                         diag["refusal"],
                     )
                     if attempt < max_retries:
+                        if diag["finish_reason"] == "length":
+                            next_max_tokens = min(
+                                current_max_tokens * 2,
+                                length_token_cap,
+                            )
+                            if next_max_tokens > current_max_tokens:
+                                logger.info(
+                                    "Retrying empty length response with max_tokens=%s",
+                                    next_max_tokens,
+                                )
+                                current_max_tokens = next_max_tokens
                         time.sleep(2 ** attempt)
                         continue
                     return None

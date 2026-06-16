@@ -15,7 +15,11 @@ from tqdm import tqdm
 from eval.context_retriever import ContextRetriever
 from eval.llm_client import LLMClient, RemoteClient
 from eval.metrics import compute_metrics
-from eval.prompt_builder import CONTEXT_UNAVAILABLE, build_prompt
+from eval.prompt_builder import (
+    CONTEXT_UNAVAILABLE,
+    build_prompt,
+    build_question_only_prompt,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -61,15 +65,27 @@ def _context_retrieved(context: dict) -> bool:
 def evaluate_batch(
     qa_pairs: list[dict],
     client: LLMClient | RemoteClient,
-    retriever: ContextRetriever,
+    retriever: ContextRetriever | None,
     max_tokens: int = 256,
     batch_size: int = 1,
+    retry_null_max_tokens: int | None = None,
+    question_only: bool = False,
 ) -> list[dict]:
     """Evaluate a list of QA pairs in batches; return a result record for each."""
     # 1. Pre-compute contexts and prompts
-    logger.info("Building prompts for %d QA pairs ...", len(qa_pairs))
-    contexts = [retriever.get_context_for_qa(qa) for qa in qa_pairs]
-    prompts = [build_prompt(qa, ctx) for qa, ctx in zip(qa_pairs, contexts)]
+    prompt_mode = "question_only" if question_only else "slice_context"
+    if question_only:
+        logger.info(
+            "Building question-only prompts for %d QA pairs ...", len(qa_pairs)
+        )
+        contexts = [{} for _ in qa_pairs]
+        prompts = [build_question_only_prompt(qa) for qa in qa_pairs]
+    else:
+        if retriever is None:
+            raise ValueError("retriever is required unless question_only=True")
+        logger.info("Building prompts for %d QA pairs ...", len(qa_pairs))
+        contexts = [retriever.get_context_for_qa(qa) for qa in qa_pairs]
+        prompts = [build_prompt(qa, ctx) for qa, ctx in zip(qa_pairs, contexts)]
 
     # 2. Batch inference — skip items with no context (prompt is None)
     answerable_indices = [i for i, p in enumerate(prompts) if p is not None]
@@ -89,6 +105,37 @@ def evaluate_batch(
     for idx, pred in zip(answerable_indices, answerable_predictions):
         predictions[idx] = pred
 
+    # One recovery pass for context-backed items where the provider returned no
+    # usable content after its own retries. Context misses stay as the sentinel.
+    if retry_null_max_tokens:
+        null_retry_indices = [
+            idx for idx in answerable_indices if predictions[idx] is None
+        ]
+        if null_retry_indices:
+            logger.warning(
+                "Retrying %d QA pairs with no prediction using max_tokens=%d.",
+                len(null_retry_indices),
+                retry_null_max_tokens,
+            )
+            null_retry_prompts = [prompts[i] for i in null_retry_indices]
+            null_retry_predictions: list = []
+            n_retry_batches = math.ceil(len(null_retry_prompts) / batch_size)
+            for i in tqdm(range(n_retry_batches), desc="Retrying nulls"):
+                batch = null_retry_prompts[i * batch_size : (i + 1) * batch_size]
+                null_retry_predictions.extend(
+                    client.complete_batch(batch, max_tokens=retry_null_max_tokens)
+                )
+            recovered = 0
+            for idx, pred in zip(null_retry_indices, null_retry_predictions):
+                if pred is not None:
+                    predictions[idx] = pred
+                    recovered += 1
+            logger.info(
+                "Recovered %d/%d missing predictions.",
+                recovered,
+                len(null_retry_indices),
+            )
+
     # 3. Assemble result records
     results: list[dict] = []
     for qa, ctx, prediction in zip(qa_pairs, contexts, predictions):
@@ -100,6 +147,7 @@ def evaluate_batch(
             "question": qa["question"],
             "ground_truth": qa["answer"],
             "prediction": prediction,
+            "prompt_mode": prompt_mode,
             "context_retrieved": _context_retrieved(ctx),
             "slice_id": qa.get("slice_id"),
             "from_slice_id": qa.get("from_slice_id"),

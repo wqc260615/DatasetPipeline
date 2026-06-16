@@ -351,6 +351,11 @@ _FILE_MISSING = "# [File did not exist in this version]"
 CONTEXT_UNAVAILABLE = "[context unavailable]"
 
 
+def build_question_only_prompt(qa_pair: dict) -> str:
+    """Return the no-context control prompt for a QA pair."""
+    return qa_pair["question"]
+
+
 def build_prompt(qa_pair: dict, context: dict) -> str | None:
     """Return the prompt string for a QA pair given its retrieved context.
 

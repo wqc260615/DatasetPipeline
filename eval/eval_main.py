@@ -40,18 +40,23 @@ def _format_summary(
     repo: str,
     tag: str,
     model_name: str,
+    prompt_mode: str,
     results: list[dict],
     agg: dict[str, dict[str, float]],
 ) -> str:
     no_prediction = sum(1 for r in results if r["prediction"] is None)
     context_miss = sum(1 for r in results if not r["context_retrieved"])
+    context_label = (
+        "Context absent" if prompt_mode == "question_only" else "Context missing"
+    )
 
     lines = [
         f"=== Evaluation summary ({repo} / {tag}) ===",
         f"  Model           : {model_name}",
+        f"  Prompt mode     : {prompt_mode}",
         f"  Total evaluated : {len(results)}",
         f"  No prediction   : {no_prediction}",
-        f"  Context missing : {context_miss}",
+        f"  {context_label:<15}: {context_miss}",
         "",
         "  Metrics by subtype:",
     ]
@@ -124,6 +129,14 @@ def main() -> None:
         default="data/eval_results",
         help="Directory to write result JSONL files",
     )
+    parser.add_argument(
+        "--question-only",
+        action="store_true",
+        help=(
+            "Run a no-context control: send only each QA question to the model, "
+            "without retrieving slices or source/reference files."
+        ),
+    )
 
     # Remote OpenAI-compatible API options
     parser.add_argument(
@@ -170,6 +183,16 @@ def main() -> None:
         default=None,
         help="Provider-specific thinking-mode toggle, currently useful for DeepSeek V4.",
     )
+    parser.add_argument(
+        "--retry-null-max-tokens",
+        type=int,
+        default=None,
+        help=(
+            "Max tokens for one extra pass over context-backed QA pairs whose "
+            "prediction is still null. For remote inference, defaults to up to "
+            "4x --max-tokens capped at 4096; set 0 to disable."
+        ),
+    )
     args = parser.parse_args()
 
     qa_file = (
@@ -194,10 +217,16 @@ def main() -> None:
         qa_pairs = random.sample(qa_pairs, args.sample)
         logger.info("Sampled %d pairs (seed=%d)", len(qa_pairs), args.seed)
 
-    retriever = ContextRetriever(
-        slices_root=Path(args.slices_dir),
-        repos_root=Path(args.repos_dir),
-    )
+    retriever = None
+    if args.question_only:
+        logger.info(
+            "Question-only control enabled: skipping slice/context retrieval."
+        )
+    else:
+        retriever = ContextRetriever(
+            slices_root=Path(args.slices_dir),
+            repos_root=Path(args.repos_dir),
+        )
     active_model = args.api_model if args.api_key else args.model
     if args.api_key:
         client: LLMClient | RemoteClient = RemoteClient(
@@ -216,10 +245,21 @@ def main() -> None:
             batch_size=args.batch_size,
         )
 
+    retry_null_max_tokens = args.retry_null_max_tokens
+    if retry_null_max_tokens is None and args.api_key:
+        retry_null_max_tokens = max(
+            args.max_tokens,
+            min(args.max_tokens * 4, RemoteClient.EMPTY_LENGTH_TOKEN_CAP),
+        )
+    if retry_null_max_tokens is not None and retry_null_max_tokens <= 0:
+        retry_null_max_tokens = None
+
     results = evaluate_batch(
         qa_pairs, client, retriever,
         max_tokens=args.max_tokens,
         batch_size=args.batch_size,
+        retry_null_max_tokens=retry_null_max_tokens,
+        question_only=args.question_only,
     )
 
     # Write per-item results
@@ -227,6 +267,9 @@ def main() -> None:
     model_output_dir.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     tag = args.subtype or (Path(args.qa_file).stem if args.qa_file else args.qa_type)
+    prompt_mode = "question_only" if args.question_only else "slice_context"
+    if args.question_only:
+        tag = f"{tag}_question_only"
     base_name = f"{args.repo}_{tag}_{timestamp}"
     out_file = model_output_dir / f"{base_name}.jsonl"
     with open(out_file, "w", encoding="utf-8") as f:
@@ -240,6 +283,7 @@ def main() -> None:
         repo=args.repo,
         tag=tag,
         model_name=active_model,
+        prompt_mode=prompt_mode,
         results=results,
         agg=agg,
     )
