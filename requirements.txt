@@ -1,0 +1,28 @@
+# Python >= 3.10
+
+# Core pipeline dependencies
+GitPython>=3.1.40
+pydantic>=2.5.0
+PyYAML>=6.0.1
+tree-sitter>=0.20.4
+tree-sitter-python>=0.20.4
+tree-sitter-java>=0.20.4
+tqdm>=4.66.1
+
+# QA generation and sampling
+spacy>=3.7.0
+scikit-learn>=1.3.0
+
+# Evaluation: local HuggingFace / PyTorch backend
+torch>=2.2.0
+transformers>=4.40.0
+accelerate>=0.30.0
+
+# Evaluation: OpenAI-compatible remote API backend
+openai>=1.30.0
+
+# Evaluation: Apple Silicon local backend, imported as mlx_lm
+mlx-lm>=0.18.0; platform_system == "Darwin" and platform_machine == "arm64"
+
+# Development and tests
+pytest>=8.0.0
